@@ -1,0 +1,17 @@
+#parse("header.vm")
+
+#if ($image)
+    <div class="image"><img src="$image" alt="Depiction of $label" /></div>
+#end
+
+#if ($comment)
+    <p>$comment</p>
+#end
+
+#if (!$properties.isEmpty())
+#parse("proptable.vm")
+#else
+    <p>No further information is available.</p>
+#end
+
+#parse("footer.vm")

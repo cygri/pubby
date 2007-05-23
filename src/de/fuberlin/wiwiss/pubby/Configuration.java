@@ -125,10 +125,10 @@ public class Configuration {
 	}
 
 	public MappedResource getMappedResourceFromRelativeWebURI(String relativeWebURI) {
+		relativeWebURI = fixUnescapedCharacters(relativeWebURI);
 		return new MappedResource(
 				relativeWebURI,
-				getDatasetBase() + unescapeURIDelimiters(
-						fixUnescapedCharacters(relativeWebURI)),
+				getDatasetBase() + unescapeURIDelimiters(relativeWebURI),
 				this);
 	}
 	

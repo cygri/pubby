@@ -8,6 +8,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+/**
+ * A data source backed by a Jena model.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class ModelDataSource implements DataSource {
 	private Model model;
 

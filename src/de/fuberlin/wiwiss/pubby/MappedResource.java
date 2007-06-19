@@ -2,6 +2,12 @@ package de.fuberlin.wiwiss.pubby;
 
 import com.hp.hpl.jena.rdf.model.Property;
 
+/**
+ * A resource that is mapped between the SPARQL dataset and the Web server.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class MappedResource {
 	private String relativeWebURI;
 	private String datasetURI;
@@ -13,19 +19,31 @@ public class MappedResource {
 		this.config = config;
 	}
 
+	/**
+	 * @return the resource's URI within the SPARQL dataset
+	 */
 	public String getDatasetURI() {
 		return datasetURI;
 	}
 	
+	/**
+	 * @return the resource's URI on the public Web server
+	 */
 	public String getWebURI() {
 		return config.getWebApplicationBaseURI() + 
 				config.getWebResourcePrefix() + relativeWebURI;
 	}
 	
+	/**
+	 * @return the HTML page describing the resource on the public Web server
+	 */
 	public String getPageURL() {
 		return config.getWebApplicationBaseURI() + "page/" + relativeWebURI;
 	}
 	
+	/**
+	 * @return the RDF document describing the resource on the public Web server
+	 */
 	public String getDataURL() {
 		return config.getWebApplicationBaseURI() + "data/" + relativeWebURI;
 	}

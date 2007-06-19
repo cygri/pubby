@@ -19,6 +19,13 @@ import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
+/**
+ * A servlet for rendering an HTML page describing the blank nodes
+ * related to a given resource via a given property.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class PathPageURLServlet extends BasePathServlet {
 		
 	public boolean doGet(MappedResource resource, Property property, boolean isInverse, 

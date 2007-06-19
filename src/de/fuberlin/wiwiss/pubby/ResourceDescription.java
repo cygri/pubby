@@ -20,6 +20,14 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 
+/**
+ * A convenient interface to an RDF description of a resource.
+ * Provides access to its label, a textual comment, detailed
+ * representations of its properties, and so on.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class ResourceDescription {
 	private final MappedResource mappedResource;
 	private final Model model;

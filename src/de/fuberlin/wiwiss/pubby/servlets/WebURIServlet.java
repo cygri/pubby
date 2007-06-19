@@ -12,6 +12,14 @@ import org.joseki.http.AcceptList;
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 
+/**
+ * Servlet that handles the public URIs of mapped resources.
+ * It redirects either to the page URL or to the data URL,
+ * based on content negotiation.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class WebURIServlet extends BaseServlet {
 
 	private static String contentTypeHTML = "text/html";

@@ -16,6 +16,13 @@ import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
+/**
+ * A servlet for serving an RDF document describing the blank nodes
+ * related to a given resource via a given property.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class PathDataURLServlet extends BasePathServlet {
 		
 	public boolean doGet(MappedResource resource, Property property, boolean isInverse, 
@@ -23,7 +30,7 @@ public class PathDataURLServlet extends BasePathServlet {
 			HttpServletResponse response,
 			Configuration config) throws IOException {
 
-		OutputRequestParamHandler handler = new OutputRequestParamHandler(request);
+		RequestParamHandler handler = new RequestParamHandler(request);
 		if (handler.isMatchingRequest()) {
 			request = handler.getModifiedRequest();
 		}

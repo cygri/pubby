@@ -8,6 +8,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
+/**
+ * A data source backed by a SPARQL endpoint accessed through
+ * the SPARQL protocol.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class RemoteSPARQLDataSource implements DataSource {
 	private String endpointURL;
 	private String defaultGraphName;

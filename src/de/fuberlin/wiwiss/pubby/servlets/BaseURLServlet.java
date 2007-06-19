@@ -9,15 +9,14 @@ import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 
 /**
- * An abstract base servlet for servlets that manage a namespace of resources.
- * This class handles preprocessing of the request to extract the
- * resource URI relative to the namespace root, and manages the
- * {@link Configuration} instance shared by all servlets.
+ * An abstract base servlet for servlets that manage a namespace
+ * of documents related to a set of resources. This class handles
+ * preprocessing of the request to extract the resource URI.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public abstract class BaseResourceServlet extends BaseServlet {
+public abstract class BaseURLServlet extends BaseServlet {
 	
 	protected abstract boolean doGet(
 			MappedResource resource,

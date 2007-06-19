@@ -12,63 +12,64 @@
   </context-param>
   
   <servlet>
-    <servlet-name>ResourceServlet</servlet-name>
+    <servlet-name>WebURIServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.WebURIServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet>
-    <servlet-name>PageServlet</servlet-name>
+    <servlet-name>PageURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PageURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>PageServlet</servlet-name>
+    <servlet-name>PageURLServlet</servlet-name>
     <url-pattern>/page/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PathPageServlet</servlet-name>
+    <servlet-name>PathPageURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathPageURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>PathPageServlet</servlet-name>
+    <servlet-name>PathPageURLServlet</servlet-name>
     <url-pattern>/pathpage/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>DataServlet</servlet-name>
+    <servlet-name>DataURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.DataURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>DataServlet</servlet-name>
+    <servlet-name>DataURLServlet</servlet-name>
     <url-pattern>/data/*</url-pattern>
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>PathDataServlet</servlet-name>
+    <servlet-name>PathDataURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathDataURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>PathDataServlet</servlet-name>
+    <servlet-name>PathDataURLServlet</servlet-name>
     <url-pattern>/pathdata/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>IndexServlet</servlet-name>
-    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.IndexServlet</servlet-class>
+    <servlet-name>RootServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.RootServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>    
 
+  <!-- Handles everything not caught by the others -->
   <servlet-mapping>
-    <servlet-name>IndexServlet</servlet-name>
+    <servlet-name>RootServlet</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 </web-app>

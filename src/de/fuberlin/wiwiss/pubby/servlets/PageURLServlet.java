@@ -14,7 +14,14 @@ import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
-public class PageURLServlet extends BaseResourceServlet {
+/**
+ * A servlet for serving the HTML page describing a resource.
+ * Invokes a Velocity template.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
+public class PageURLServlet extends BaseURLServlet {
 
 	public boolean doGet(MappedResource resource, 
 			HttpServletRequest request,

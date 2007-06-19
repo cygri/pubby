@@ -1,7 +1,7 @@
 #parse("header.vm")
 
 #if ($image)
-    <div class="image"><img src="$image" alt="Depiction of $label" /></div>
+    <div class="image"><img src="$image" alt="Depiction of $title" /></div>
 #end
 
 #if ($comment)

@@ -19,14 +19,22 @@ import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
-public class DataURLServlet extends BaseResourceServlet {
+/**
+ * Servlet for serving RDF documents containing a description
+ * of a given resource.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
+public class DataURLServlet extends BaseURLServlet {
 	
 	protected boolean doGet(MappedResource resource,
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			Configuration config) throws IOException {
 
-		OutputRequestParamHandler handler = new OutputRequestParamHandler(request);
+		// Handle ?output=format request parameter
+		RequestParamHandler handler = new RequestParamHandler(request);
 		if (handler.isMatchingRequest()) {
 			request = handler.getModifiedRequest();
 		}
@@ -34,16 +42,22 @@ public class DataURLServlet extends BaseResourceServlet {
 		String datasetURI = resource.getDatasetURI();
 		String webURI = resource.getWebURI();
 		Model description = getResourceDescription(datasetURI);
+		
+		// Check if resource exists in dataset
 		if (description.size() == 0) {
 			response.setStatus(404);
 			response.setContentType("text/plain");
 			response.getOutputStream().println("Nothing known about <" + webURI + ">");
 			return true;
 		}
+		
+		// Add owl:sameAs statements referring to the original dataset URI
 		Resource r = description.getResource(webURI);
 		if (config.getAddSameAsStatements()) {
 			r.addProperty(OWL.sameAs, description.createResource(datasetURI));
 		}
+		
+		// Add links to RDF documents with descriptions of the blank nodes
 		StmtIterator it = r.listProperties();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();

@@ -21,6 +21,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
+/**
+ * The server's configuration.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
 public class Configuration {
 	private final Model model;
 	private final Resource config;

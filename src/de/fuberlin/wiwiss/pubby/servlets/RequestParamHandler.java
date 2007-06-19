@@ -7,7 +7,18 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-public class OutputRequestParamHandler {
+/**
+ * Analyzes an HttpServletRequest to check for the presence
+ * of an ?output=n3 or ?output=rdfxml request parameter in
+ * the URI. If present, returns a modified HttpServletRequest
+ * that has the appropriate MIME type in the Accept: header.
+ * This request can then be fed into the rest of our content
+ * negotiation based tooling.
+ * 
+ * @author Richard Cyganiak (richard@cyganiak.de)
+ * @version $Id$
+ */
+public class RequestParamHandler {
 	private static final String ATTRIBUTE_NAME_IS_HANDLED =
 		"OutputRequestParamHandler.isHandled";
 	private final static HashMap mimeTypes = new HashMap();
@@ -19,7 +30,7 @@ public class OutputRequestParamHandler {
 	private final HttpServletRequest request;
 	private final String requestedType;
 
-	public OutputRequestParamHandler(HttpServletRequest request) {
+	public RequestParamHandler(HttpServletRequest request) {
 		this.request = request;
 		requestedType = identifyRequestedType(request.getParameter("output"));
 	}

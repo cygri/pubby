@@ -1,0 +1,55 @@
+@prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix : <http://dbpedia.org/resource/> .
+@prefix p: <http://dbpedia.org/property/> .
+@prefix units: <http://dbpedia.org/units/> .
+@prefix geonames: <http://www.geonames.org/ontology#> .
+
+<> a conf:Configuration;
+
+    # Dataset name for display in page titles
+    conf:datasetName "DBpedia.org";
+    # Homepage with description of the dataset for the link in the page header
+    conf:datasetHomepage <http://dbpedia.org>;
+
+    # SPARQL endpoint URL of the dataset
+    conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
+    # Default graph name to query (not necessary for most endpoints)
+    conf:sparqlDefaultGraph <http://dbpedia.org>;
+
+    # Common URI prefix of all resource URIs in the SPARQL dataset
+    conf:datasetBase <http://dbpedia.org/resource/>;
+    # Common URI prefix of all resources on the Web; this must be where
+    # this web application is running, or else links won't work
+    conf:webBase <http://localhost:8080/>;
+    # Will be appended to the conf:webBase to form the public
+    # resource URIs; if not present, defaults to ""
+    conf:webResourcePrefix "resource/";
+    # Fixes an issue with the server running behind an Apache proxy;
+    # can be ignored otherwise
+    conf:fixUnescapedCharacters "(),";
+    
+    # If set to true, requests that ask for RDF data will be
+    # redirected to a SPARQL DESCRIBE query result coming from the
+    # endpoint. This is faster, but only works if the URIs in the
+    # SPARQL dataset are identical to the Web URIs.
+    conf:redirectRDFRequestsToEndpoint "false";
+
+    # URL of an RDF file whose prefix mapping is to be used by the
+    # server; defaults to <>, which is *this* file.
+    conf:usePrefixesFrom <>;
+    # If labels and descriptions are available in multiple languages,
+    # prefer this one.
+    conf:defaultLanguage "en";
+    # When the homepage of the server is accessed, this resource will
+    # be shown.
+    conf:indexResource <http://dbpedia.org/resource/Wikipedia>;
+    .

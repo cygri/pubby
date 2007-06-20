@@ -1,10 +1,13 @@
 <project name="pubby" default="classes" basedir=".">
 
+  <property name="version"        value="0.1"/>
   <property name="src"            value="${basedir}/src"/>
   <property name="webroot"        value="${basedir}/webapp"/>
   <property name="webinf"         value="${webroot}/WEB-INF"/>
   <property name="webinf.lib"     value="${webinf}/lib"/>
   <property name="webinf.classes" value="${webinf}/classes"/>
+  <property name="distname"       value="${ant.project.name}-${version}"/>
+  <property name="zip"            value="${basedir}/${distname}.zip"/>
   <property name="war"            value="${basedir}/${ant.project.name}.war" />
   <property name="jetty.lib"      value="${basedir}/jetty"/>
   <property name="javac.debug"    value="true" />
@@ -27,6 +30,7 @@
 
   <target name="clean" description="Remove generated files"> 
     <delete file="${war}" quiet="false"/>
+    <delete file="${zip}" quiet="false"/>
     <delete quiet="false" includeemptydirs="true">
       <fileset dir="${webinf.classes}"/>
     </delete>
@@ -57,5 +61,11 @@
       <exclude name="WEB-INF/web.xml"/>
       <exclude name="**/CVS/**"/>
     </war>
+  </target>
+
+  <target name="zip" depends="classes">
+    <zip destfile="${zip}">
+      <zipfileset prefix="${distname}" dir="."/>
+    </zip>
   </target>
 </project>

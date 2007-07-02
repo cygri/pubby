@@ -90,11 +90,11 @@ public abstract class BaseServlet extends HttpServlet {
 			relativeURI = relativeURI.substring(1);
 		}
 		if (!doGet(relativeURI, request, response, config)) {
-			send404(response);
+			send404(response, null);
 		}
 	}
 	
-	private void send404(HttpServletResponse response) throws IOException {
+	protected void send404(HttpServletResponse response, String resourceURI) throws IOException {
 		response.setStatus(404);
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
@@ -103,6 +103,9 @@ public abstract class BaseServlet extends HttpServlet {
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("sparql_endpoint", config.getDataSource().getEndpointURL());
 		context.put("title", "404 Not Found");
+		if (resourceURI != null) {
+			context.put("uri", resourceURI);
+		}
 		template.renderXHTML("404.vm");
 	}
 }

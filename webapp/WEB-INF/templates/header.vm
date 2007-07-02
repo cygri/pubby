@@ -1,7 +1,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <title>$title | $project_name</title>
+#if ($rdf_link)
     <link rel="alternate" type="application/rdf+xml" href="$rdf_link" title="RDF" />
+#end
     <link rel="stylesheet" type="text/css" href="${server_base}static/style.css" />
     <script type="text/javascript" src="${server_base}static/script.js"></script>
   </head>

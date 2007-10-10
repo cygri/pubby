@@ -21,17 +21,20 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public class ModelResponse {
 	private ResponseHttp josekiResponse;
+	private HttpServletResponse response;
 	private Model model;
 	
 	public ModelResponse(Model model, HttpServletRequest request, 
 			HttpServletResponse response) {
 		this.josekiResponse = new ResponseHttp(
 				createJosekiRequest(request), request, response);
+		this.response = response;
 		this.model = model;
 	}
 	
 	public void serve() {
 		try {
+			this.response.addHeader("Vary", "accept");
 			this.josekiResponse.doResponseModel(this.model);
 		} catch (QueryExecutionException ex) {
 			this.josekiResponse.doException(ex);

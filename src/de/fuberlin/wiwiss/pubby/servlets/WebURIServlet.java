@@ -52,6 +52,7 @@ public class WebURIServlet extends BaseServlet {
 		}
 		MappedResource resource = config.getMappedResourceFromRelativeWebURI(relativeURI);
 		response.setStatus(303);
+		response.addHeader("Vary", "accept");
 		if (clientPrefersHTML(request)) {
 			response.addHeader("Location", resource.getPageURL());
 		} else if (config.redirectRDFRequestsToEndpoint()) {

@@ -32,8 +32,7 @@ public class PathPageURLServlet extends BasePathServlet {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException {		
-		Model descriptions = getAnonymousPropertyValues(resource.getDatasetURI(),
-				property, isInverse);
+		Model descriptions = getAnonymousPropertyValues(resource, property, isInverse);
 		if (descriptions.size() == 0) {
 			return false;
 		}
@@ -51,7 +50,7 @@ public class PathPageURLServlet extends BasePathServlet {
 					(Resource) value.as(Resource.class), descriptions, config));
 		}
 		
-		Model description = getResourceDescription(resource.getDatasetURI());
+		Model description = getResourceDescription(resource);
 		ResourceDescription resourceDescription = new ResourceDescription(
 				resource, description, config);
 
@@ -64,7 +63,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("project_link", config.getProjectLink());
 		context.put("title", title);
 		context.put("server_base", config.getWebApplicationBaseURI());
-		context.put("sparql_endpoint", config.getDataSource().getEndpointURL());
+		context.put("sparql_endpoint", resource.getDataset().getDataSource().getEndpointURL());
 		context.put("back_uri", resource.getWebURI());
 		context.put("back_label", resourceDescription.getLabel());
 		context.put("rdf_link", isInverse ? resource.getInversePathDataURL(property) : resource.getPathDataURL(property));

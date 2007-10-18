@@ -17,16 +17,16 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
  */
 public class ModelTranslator {
 	private final Model model;
-	private final Configuration config;
+	private final Configuration serverConfig;
 	
 	public ModelTranslator(Model model, Configuration configuration) {
 		this.model = model;
-		this.config = configuration;
+		this.serverConfig = configuration;
 	}
 	
 	public Model getTranslated() {
 		Model result = ModelFactory.createDefaultModel();
-		result.setNsPrefixes(config.getPrefixes());
+		result.setNsPrefixes(serverConfig.getPrefixes());
 		StmtIterator it = model.listStatements();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
@@ -47,9 +47,8 @@ public class ModelTranslator {
 	}
 	
 	private String getPublicURI(String datasetURI) {
-		if (!config.isDatasetURI(datasetURI)) {
-			return datasetURI;
-		}
-		return config.getMappedResourceFromDatasetURI(datasetURI).getWebURI();
+		MappedResource resource = serverConfig.getMappedResourceFromDatasetURI(datasetURI);
+		if (resource == null) return datasetURI;
+		return resource.getWebURI();
 	}
 }

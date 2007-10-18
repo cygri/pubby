@@ -28,10 +28,10 @@ public abstract class BaseURLServlet extends BaseServlet {
 			HttpServletResponse response, Configuration config) 
 	throws IOException, ServletException {
 		MappedResource resource = config.getMappedResourceFromRelativeWebURI(
-				relativeURI);
+				relativeURI, false);
 		if (resource == null) return false;
 		if (!doGet(resource, request, response, config)) {
-			send404(response, resource.getWebURI());
+			send404(response, resource);
 		}
 		return true;
 	}

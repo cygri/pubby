@@ -28,7 +28,7 @@ public class PageURLServlet extends BaseURLServlet {
 			HttpServletResponse response,
 			Configuration config) throws ServletException, IOException {
 
-		Model description = getResourceDescription(resource.getDatasetURI());
+		Model description = getResourceDescription(resource);
 		if (description.size() == 0) {
 			return false;
 		}
@@ -39,7 +39,7 @@ public class PageURLServlet extends BaseURLServlet {
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
 		String tabulatorLink = "http://dig.csail.mit.edu/2005/ajar/ajaw/tab.html?uri=" +
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
-		String openLinkLink = "http://dbpedia.openlinksw.com:8890/DAV/JS/rdfbrowser/index.html?uri=" +
+		String openLinkLink = "http://dbpedia.openlinksw.com:8890/rdfbrowser/?uri=" +
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
@@ -51,7 +51,7 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("disco_link", discoLink);
 		context.put("tabulator_link", tabulatorLink);
 		context.put("openlink_link", openLinkLink);
-		context.put("sparql_endpoint", config.getDataSource().getEndpointURL());
+		context.put("sparql_endpoint", resource.getDataset().getDataSource().getEndpointURL());
 		context.put("title", resourceDescription.getLabel());
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());

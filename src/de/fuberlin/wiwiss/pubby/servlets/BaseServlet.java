@@ -16,6 +16,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.util.FileManager;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelTranslator;
 
 /**
@@ -61,17 +62,18 @@ public abstract class BaseServlet extends HttpServlet {
 		}
 	}
 	
-	protected Model getResourceDescription(String datasetURI) {
+	protected Model getResourceDescription(MappedResource resource) {
 		return new ModelTranslator(
-				config.getDataSource().getResourceDescription(datasetURI), 
+				resource.getDataset().getDataSource().getResourceDescription(
+						resource.getDatasetURI()),
 				config).getTranslated();
 	}
 	
-	protected Model getAnonymousPropertyValues(String datasetURI, 
+	protected Model getAnonymousPropertyValues(MappedResource resource, 
 			Property property, boolean isInverse) {
 		return new ModelTranslator(
-				config.getDataSource().getAnonymousPropertyValues(
-						datasetURI, property, isInverse),
+				resource.getDataset().getDataSource().getAnonymousPropertyValues(
+						resource.getDatasetURI(), property, isInverse),
 				config).getTranslated();
 	}
 	
@@ -90,22 +92,34 @@ public abstract class BaseServlet extends HttpServlet {
 			relativeURI = relativeURI.substring(1);
 		}
 		if (!doGet(relativeURI, request, response, config)) {
-			send404(response, null);
+			send404(response, null, null);
 		}
 	}
 	
-	protected void send404(HttpServletResponse response, String resourceURI) throws IOException {
+	protected void send404(HttpServletResponse response, MappedResource resource) throws IOException {
+		send404(response, resource.getWebURI(), 
+				resource.getDataset().getDataSource().getEndpointURL());
+	}
+
+	protected void send404(HttpServletResponse response, String resourceURI, String endpointURL) throws IOException {
 		response.setStatus(404);
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
 		context.put("server_base", config.getWebApplicationBaseURI());
-		context.put("sparql_endpoint", config.getDataSource().getEndpointURL());
+		context.put("sparql_endpoint", endpointURL);
 		context.put("title", "404 Not Found");
 		if (resourceURI != null) {
 			context.put("uri", resourceURI);
 		}
 		template.renderXHTML("404.vm");
+	}
+	
+	protected String addQueryString(String dataURL, HttpServletRequest request) {
+		if (request.getParameter("output") == null) {
+			return dataURL;
+		}
+		return dataURL + "?output=" + request.getParameter("output");
 	}
 }

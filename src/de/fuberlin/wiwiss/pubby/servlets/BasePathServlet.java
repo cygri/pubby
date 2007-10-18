@@ -38,7 +38,8 @@ public abstract class BasePathServlet extends BaseServlet {
 		}
 		Property property = ResourceFactory.createProperty(
 				config.getPrefixes().getNsPrefixURI(prefix), localName);
-		MappedResource resource = config.getMappedResourceFromRelativeWebURI(matcher.group(4));
+		MappedResource resource = config.getMappedResourceFromRelativeWebURI(
+				matcher.group(4), false);
 		doGet(resource, property, isInverse, request, response, config);
 		return true;
 	}

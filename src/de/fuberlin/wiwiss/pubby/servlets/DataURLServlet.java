@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joseki.http.ModelResponse;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -16,6 +15,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
+import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
@@ -33,15 +33,9 @@ public class DataURLServlet extends BaseURLServlet {
 			HttpServletResponse response,
 			Configuration config) throws IOException {
 
-		// Handle ?output=format request parameter
-		RequestParamHandler handler = new RequestParamHandler(request);
-		if (handler.isMatchingRequest()) {
-			request = handler.getModifiedRequest();
-		}
-		
 		String datasetURI = resource.getDatasetURI();
 		String webURI = resource.getWebURI();
-		Model description = getResourceDescription(datasetURI);
+		Model description = getResourceDescription(resource);
 		
 		// Check if resource exists in dataset
 		if (description.size() == 0) {
@@ -53,7 +47,7 @@ public class DataURLServlet extends BaseURLServlet {
 		
 		// Add owl:sameAs statements referring to the original dataset URI
 		Resource r = description.getResource(webURI);
-		if (config.getAddSameAsStatements()) {
+		if (resource.getDataset().getAddSameAsStatements()) {
 			r.addProperty(OWL.sameAs, description.createResource(datasetURI));
 		}
 		
@@ -84,14 +78,15 @@ public class DataURLServlet extends BaseURLServlet {
 				&& description.getNsPrefixURI("rdfs") == null) {
 			description.setNsPrefix("rdfs", RDFS.getURI());
 		}
-		Resource document = description.getResource(resource.getDataURL());
+		Resource document = description.getResource(addQueryString(resource.getDataURL(), request));
 		document.addProperty(FOAF.primaryTopic, r);
 		document.addProperty(RDFS.label, 
 				"RDF description of " + 
 				new ResourceDescription(resource, description, config).getLabel());
-		config.addDocumentMetadata(description, document);
+		resource.getDataset().addDocumentMetadata(description, document);
 
-		new ModelResponse(description, request, response).serve();
+		ModelResponse server = new ModelResponse(description, request, response);
+		server.serve();
 		return true;
 	}
 }

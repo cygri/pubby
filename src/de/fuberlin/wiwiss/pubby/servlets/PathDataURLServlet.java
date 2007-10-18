@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joseki.http.ModelResponse;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -13,6 +12,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
+import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
@@ -30,14 +30,7 @@ public class PathDataURLServlet extends BasePathServlet {
 			HttpServletResponse response,
 			Configuration config) throws IOException {
 
-		RequestParamHandler handler = new RequestParamHandler(request);
-		if (handler.isMatchingRequest()) {
-			request = handler.getModifiedRequest();
-		}
-		
-
-		Model descriptions = getAnonymousPropertyValues(
-				resource.getDatasetURI(), property, isInverse);
+		Model descriptions = getAnonymousPropertyValues(resource, property, isInverse);
 		if (descriptions.size() == 0) {
 			return false;
 		}
@@ -53,7 +46,10 @@ public class PathDataURLServlet extends BasePathServlet {
 		}
 		Resource r = descriptions.getResource(resource.getWebURI());
 		Resource document = descriptions.getResource(
-				isInverse ? resource.getInversePathDataURL(property) : resource.getPathDataURL(property));
+				addQueryString(
+						isInverse 
+								? resource.getInversePathDataURL(property) 
+								: resource.getPathDataURL(property), request));
 		document.addProperty(FOAF.primaryTopic, r);
 		String resourceLabel = new ResourceDescription(resource, descriptions, config).getLabel();
 		String propertyLabel = config.getPrefixes().qnameFor(property.getURI());
@@ -64,7 +60,7 @@ public class PathDataURLServlet extends BasePathServlet {
 			document.addProperty(RDFS.label, 
 					"RDF description of resources that are " + propertyLabel + " of " + resourceLabel);
 		}
-		config.addDocumentMetadata(descriptions, document);
+		resource.getDataset().addDocumentMetadata(descriptions, document);
 
 		new ModelResponse(descriptions, request, response).serve();
 		return true;

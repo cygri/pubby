@@ -1,6 +1,6 @@
 <project name="pubby" default="classes" basedir=".">
 
-  <property name="version"        value="0.1"/>
+  <property name="version"        value="0.2"/>
   <property name="src"            value="${basedir}/src"/>
   <property name="webroot"        value="${basedir}/webapp"/>
   <property name="webinf"         value="${webroot}/WEB-INF"/>

@@ -28,7 +28,7 @@ public class PubbyNegotiator {
 		pubbyNegotiator.addVariant("application/x-turtle;q=0.9")
 				.addAliasMediaType("application/turtle;q=0.8")
 				.addAliasMediaType("text/turtle;q=0.5");
-		pubbyNegotiator.addVariant("text/plain;q=0.9");
+		pubbyNegotiator.addVariant("text/plain;q=0.59");
 
 		dataNegotiator = new ContentTypeNegotiator();
 		dataNegotiator.addVariant("application/rdf+xml")

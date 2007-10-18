@@ -16,32 +16,13 @@
 <> a conf:Configuration;
 
     # Dataset name for display in page titles
-    conf:datasetName "DBpedia.org";
+    conf:projectName "DBpedia.org";
     # Homepage with description of the dataset for the link in the page header
-    conf:datasetHomepage <http://dbpedia.org>;
+    conf:projectHomepage <http://dbpedia.org>;
 
-    # SPARQL endpoint URL of the dataset
-    conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
-    # Default graph name to query (not necessary for most endpoints)
-    conf:sparqlDefaultGraph <http://dbpedia.org>;
-
-    # Common URI prefix of all resource URIs in the SPARQL dataset
-    conf:datasetBase <http://dbpedia.org/resource/>;
     # Common URI prefix of all resources on the Web; this must be where
     # this web application is running, or else links won't work
     conf:webBase <http://localhost:8080/>;
-    # Will be appended to the conf:webBase to form the public
-    # resource URIs; if not present, defaults to ""
-    conf:webResourcePrefix "resource/";
-    # Fixes an issue with the server running behind an Apache proxy;
-    # can be ignored otherwise
-    conf:fixUnescapedCharacters "(),";
-    
-    # If set to true, requests that ask for RDF data will be
-    # redirected to a SPARQL DESCRIBE query result coming from the
-    # endpoint. This is faster, but only works if the URIs in the
-    # SPARQL dataset are identical to the Web URIs.
-    conf:redirectRDFRequestsToEndpoint "false";
 
     # URL of an RDF file whose prefix mapping is to be used by the
     # server; defaults to <>, which is *this* file.
@@ -52,4 +33,26 @@
     # When the homepage of the server is accessed, this resource will
     # be shown.
     conf:indexResource <http://dbpedia.org/resource/Wikipedia>;
+
+	conf:dataset [
+	    # SPARQL endpoint URL of the dataset
+	    conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
+	    # Default graph name to query (not necessary for most endpoints)
+	    conf:sparqlDefaultGraph <http://dbpedia.org>;
+	
+	    # Common URI prefix of all resource URIs in the SPARQL dataset
+	    conf:datasetBase <http://dbpedia.org/resource/>;
+	    # Will be appended to the conf:webBase to form the public
+	    # resource URIs; if not present, defaults to ""
+	    conf:webResourcePrefix "resource/";
+	    # Fixes an issue with the server running behind an Apache proxy;
+	    # can be ignored otherwise
+	    conf:fixUnescapedCharacters "(),";
+	    
+	    # If set to true, requests that ask for RDF data will be
+	    # redirected to a SPARQL DESCRIBE query result coming from the
+	    # endpoint. This is faster, but only works if the URIs in the
+	    # SPARQL dataset are identical to the Web URIs.
+	    conf:redirectRDFRequestsToEndpoint "false";
+	];
     .

@@ -4,16 +4,18 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 <> a conf:Configuration;
-    conf:datasetName "Richard Cyganiak's Homepage";
-    conf:datasetHomepage <http://richard.cyganiak.de/>;
-
-    conf:datasetBase <http://richard.cyganiak.de/>;
+    conf:projectName "Richard Cyganiak's Homepage";
+    conf:projectHomepage <http://richard.cyganiak.de/>;
     conf:webBase <http://localhost:8080/>;
-    conf:addSameAsStatements "true";
-    
-    conf:loadRDF <http://richard.cyganiak.de/foaf.rdf>;
-    conf:loadRDF <http://richard.cyganiak.de/cygri.rdf>;
-    
+
+	conf:dataset [
+	    conf:datasetBase <http://richard.cyganiak.de/>;
+	    conf:addSameAsStatements "true";
+	    
+	    conf:loadRDF <http://richard.cyganiak.de/foaf.rdf>;
+	    conf:loadRDF <http://richard.cyganiak.de/cygri.rdf>;
+	];
+	
     conf:usePrefixesFrom <http://richard.cyganiak.de/foaf.rdf>;
     conf:usePrefixesFrom <http://richard.cyganiak.de/cygri.rdf>;
     conf:labelProperty rdfs:label, dc:title, foaf:name;

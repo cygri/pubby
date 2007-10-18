@@ -4,7 +4,8 @@
       This page shows information obtained from the SPARQL endpoint at <a class="sparql-uri" href="$sparql_endpoint">$sparql_endpoint</a>.<br />
 #end
 #if ($rdf_link)
-      <a href="$rdf_link">As RDF/XML</a> | <a href="$rdf_link?output=n3">As N3</a>
+      <a href="$rdf_link?output=n3">As N3</a> |
+      <a href="$rdf_link?output=xml">As RDF/XML</a>
 #set ($has_text = true)
 #end
 #if ($disco_link)
@@ -25,7 +26,7 @@
 #if ($has_text)
       |
 #end
-      <a href="$openlink_link">Browse in OpenLink</a>
+      <a href="$openlink_link">Browse in OpenLink Browser</a>
 #set ($has_text = true)
 #end
     </div>

@@ -8,7 +8,7 @@
   <display-name>Pubby</display-name>
   <context-param>
     <param-name>config-file</param-name>
-    <param-value>config.n3</param-value>
+    <param-value>config-myfoaf.n3</param-value>
   </context-param>
   
   <servlet>

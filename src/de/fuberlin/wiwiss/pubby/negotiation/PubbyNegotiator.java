@@ -1,5 +1,7 @@
 package de.fuberlin.wiwiss.pubby.negotiation;
 
+import java.util.regex.Pattern;
+
 
 
 public class PubbyNegotiator {
@@ -12,9 +14,14 @@ public class PubbyNegotiator {
 		
 		// Send HTML to clients that indicate they accept everything.
 		// This is specifically so that cURL sees HTML, and also catches
-		// the broken versions of Safari that send "*/*" on some requests
+		// various browsers that send "*/*" in some circumstances.
 		pubbyNegotiator.addUserAgentOverride(null, "*/*", "text/html");
 
+		// MSIE (7.0) sends either */*, or */* with a list of other random types,
+		// but always without q values. That's useless. We will simply send
+		// HTML to MSIE, no matter what. Boy, do I hate IE.
+		pubbyNegotiator.addUserAgentOverride(Pattern.compile("MSIE"), null, "text/html");
+		
 //		pubbyNegotiator.addUserAgentOverride(Pattern.compile("Safari"), "*/*", "text/html");
 
 		pubbyNegotiator.addVariant("text/html;q=0.6")

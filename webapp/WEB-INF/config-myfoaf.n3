@@ -1,3 +1,7 @@
+# Example configuration which loads some static RDF files
+# (my personal FOAF file) and re-publishes them. 
+# Assumes Pubby is running at http://localhost:8080/
+
 @prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .

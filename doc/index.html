@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <title>Pubby &#8211; A Linked Data Frontend for SPARQL Endpoints</title>
 <!--  <link rel="DOAP" type="application/rdf+xml" href="http://www4.wiwiss.fu-berlin.de/is-group/data/projects/Project3" />-->
-<style type=text/css>
+<style type="text/css">
 body { background: white; color: black; font-family: sans-serif; line-height: 1.4em; padding: 2.5em 3em; margin: 0; }
 :link { color: #00c; }
 :visited { color: #609; }
@@ -68,26 +68,31 @@ pre { speak-punctuation: code; }
 
 <div id="content">
 
+<p><strong>Pubby</strong> can be used to add <strong>Linked Data
+  interfaces</strong> to SPARQL endpoints.</p> 
 <p>Much Semantic Web data lives inside triple stores and can be accessed only
-  by sending <strong>SPARQL</strong> queries to a SPARQL endpoint.
-  <strong>Pubby</strong> can be used to add a <strong>Linked Data
-  interface</strong> to those SPARQL endpoints.</p> 
+  by sending <strong>SPARQL</strong> queries to a SPARQL endpoint. It is hard
+  to connect information in these stores with other external data sources.</p>
 <p><a href="http://linkeddata.org/">Linked Data</a>
-  is a style of publishing data
-  on the Semantic Web that allows a wide variety of RDF browsers (e.g.
+  is a style of publishing data on the Semantic Web that makes it easy to
+  interlink, discover and consume data on the Semantic Web. It allows
+  a wide variety of existing RDF browsers (e.g.
   <a href="http://sites.wiwiss.fu-berlin.de/suhl/bizer/ng4j/disco/">Disco</a>,
   <a href="http://www.w3.org/2005/ajar/tab">Tabulator</a>,
   <a href="http://demo.openlinksw.com/DAV/JS/rdfbrowser/index.html">OpenLink Browser</a>),
   RDF crawlers (e.g. <a href="http://www.swse.org/">SWSE</a>,
   <a href="http://swoogle.umbc.edu/">Swoogle</a>), and query agents (e.g.
   <a href="http://sites.wiwiss.fu-berlin.de/suhl/bizer/ng4j/semwebclient/">SemWeb Client Library</a>,
-  <a href="http://moustaki.org/swic/">SWIC</a>) to discover, access and use the data.</p>
-<p>Pubby is implemented as a Java web application.</p>
+  <a href="http://moustaki.org/swic/">SWIC</a>) to access the data.</p>
+<p>Pubby makes it easy to turn a SPARQL endpoint into a Linked Data server.
+  It is implemented as a Java web application.</p>
 
 <h2 id="news">News</h2>
 
 <ul>
-  <li><strong>2007-06-20: Pubby 0.1 released.</strong> Today marks the release of the first alpha version of Pubby.
+  <li><strong>2007-10-22: Pubby 0.2 released.</strong> This version adds multi-dataset support, has improved content negotiation,
+    adds the <tt>conf:datasetURIPattern</tt> option, plus various small improvements and bug fixes.</li>
+  <li><strong>2007-06-20: Pubby 0.1 released.</strong> Today marks the release of the first alpha version of Pubby.</li>
 </ul>
 
 <h2>Features</h2>
@@ -115,7 +120,7 @@ pre { speak-punctuation: code; }
   the fictional URI <tt>tag:dbpedia.org,2007:Berlin</tt>.</p>
 
 <p>When setting up a Pubby server for a SPARQL endpoint, you will <strong>configure a mapping</strong>
-  that translates those URIs to dereferenceable URIs handled by Pubby, if your
+  that translates those URIs to dereferenceable URIs handled by Pubby. If your
   server is running at <tt>http://myserver.org:8080/pubby/</tt>, then the Berlin URI above might be 
   mapped to <tt>http://myserver.org:8080/pubby/Berlin</tt>.</p>
 
@@ -125,7 +130,7 @@ pre { speak-punctuation: code; }
   303 redirect required by Web Architecture, and content negotiation between HTML, RDF/XML and N3
   descriptions of the same resource.</p>
 
-<p>Pubby was originally developed for the <a href="http://dbpedia.org/">DBpedia</a> project. To
+<p>Pubby was originally developed for the <a href="http://dbpedia.org/">DBpedia</a> project, to
   add a Linked Data interface to the <a href="http://www.openlinksw.com/virtuoso/">Virtuoso</a>
   triple store that hosts the DBpedia dataset. You can see Pubby in action at DBpedia,
   e.g. here's the URI for Berlin in DBpedia's Linked Data interface:
@@ -135,7 +140,7 @@ pre { speak-punctuation: code; }
 
 <ol>
 <li><strong><a href="download">Download Pubby</a></strong>
-  <small>Current version: v0.1 (alpha), released 2007-06-20</small></li>
+  <small>Current version: v0.2 (alpha), released 2007-10-22</small></li>
 
 <li>If you haven't already, download and install a <strong>servlet container</strong>. Pubby
   has been tested with <a href="http://tomcat.apache.org/">Tomcat</a> and <a href="http://www.mortbay.org/">Jetty</a>.
@@ -154,53 +159,41 @@ pre { speak-punctuation: code; }
 
 <h2>Configuration</h2>
 
-<p>The Pubby configuration file uses <a href="http://www.w3.org/DesignIssues/Notation3">N3</a>
-  syntax. It typically starts with some boilerplate prefix declarations, followed
-  by a configuration section that has this form:</p>
+<p>The Pubby configuration file uses <strong><a href="http://www.w3.org/DesignIssues/Notation3">N3</a></strong>
+  syntax. It typically starts with some boilerplate <strong>prefix declarations</strong>, followed
+  by a <strong>server configuration section</strong>, and one or more <strong>dataset configuration sections</strong>:</p>
 
 <pre>&lt;&gt; a conf:Configuration;
     conf:<em>option1</em> <em>value1</em>;
     conf:<em>option2</em> <em>value2</em>;
     (...)
+    conf:dataset [
+        conf:<em>option1</em> <em>value1</em>;
+        conf:<em>option2</em> <em>value2</em>;
+    ];
     .
 </pre>
 
 <p>There is an <a href="config-example.n3">example configuration file</a>.</p>
 
-<p>Below is a list of all supported configuration directives. Note that punctuation
-  is significant, e.g. URIs are always enclosed in angle brackets, while literal
+<p>Note that <strong>punctuation is significant</strong>,
+  e.g. URIs are always enclosed in angle brackets, while literal
   values are enclosed in quotes. All directives are optional unless otherwise noted.</p>
 
+<h3>Server Configuration Section</h3>
+
+<p>Below is a list of all supported directives for the server configuration section.</p>
+
 <dl>
-<dt><tt>conf:datasetName "<em>Dataset Name</em>";</tt></dt>
-<dd><p>The name of the dataset, for display in page titles.</p></dd>
+<dt><tt>conf:projectName "<em>Project Name</em>";</tt></dt>
+<dd><p>The name of the project, for display in page titles.</p></dd>
 
-<dt><tt>conf:datasetHomepage &lt;<em>dataset_homepage_url.html</em>&gt;;</tt></dt>
+<dt><tt>conf:projectHomepage &lt;<em>project_homepage_url.html</em>&gt;;</tt></dt>
 <dd><p>A project homepage or similar URL, for linking in page titles.</p></dd>
-
-<dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
-<dd><p><strong>Required.</strong> The common URI prefix of the resource identifiers in the SPARQL dataset;
-  only resources with this prefix will be mapped and made available by Pubby.</p></dd>
 
 <dt><tt>conf:webBase &lt;<em>server_base_uri</em>&gt;;</tt></dt>
 <dd><p><strong>Required.</strong> The root URL where the Pubby web application is installed, e.g.
   <tt>http://myserver/mydataset/</tt>.</p></dd>
-
-<dt><tt>conf:sparqlEndpoint &lt;<em>sparql_endpoint_url</em>&gt;;</tt></dt>
-<dd><p><strong>Required.</strong> The URL of the SPARQL endpoint whose data we want to expose.</p></dd>
-
-<dt><tt>conf:sparqlDefaultGraph &lt;<em>sparql_default_graph_name</em>&gt;;</tt></dt>
-<dd><p>If the data of interest is not located in the SPARQL dataset's default graph, but within
-  a named graph, then its name must be specified here.</p></dd>
-
-<dt><tt>conf:addSameAsStatements <em>"true"/"false"</em>;</tt></dt>
-<dd><p>If set to <tt>"true"</tt>, an <tt>owl:sameAs</tt> statement of the form
-  <tt>&lt;web_uri&gt; owl:sameAs &lt;dataset_uri&gt;</tt> will be present in Linked Data output.</p></dd>
-
-<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data1.rdf</em>&gt;, ...;</tt></dt>
-<dd><p>Load one or more RDF documents from the Web or the file system and use them as the
-  data source. The SPARQL endpoint configured above will be ignored. Allows using Pubby as
-  an RDF server for publishing static RDF files.</p></dd>
 
 <dt><tt>conf:labelProperty <em>ex:property1</em>, <em>ex:property2</em>, ...;</tt></dt>
 <dd><p>The value of these RDF properties, if present in the dataset, will be used
@@ -227,10 +220,52 @@ pre { speak-punctuation: code; }
 <dd><p>The URI of a resource whose description will be displayed as the home page of the Pubby installation.
   Note that you have to specify a <em>dataset URI</em>, not a mapped web URI.</p></dd>
 
+<dt><tt>conf:dataset [ ... ];</tt></dt>
+<dd><p><strong>Required.</strong> Introduces a dataset configuration section.
+  There can be one or more dataset sections.</p></dd>
+</dl>
+
+
+<h3>Dataset Configuration Section</h3>
+
+<p>Below is a list of all supported directives for the server configuration section.</p>
+
+<dl>
+<dt><tt>conf:sparqlEndpoint &lt;<em>sparql_endpoint_url</em>&gt;;</tt></dt>
+<dd><p><strong>Required.</strong> The URL of the SPARQL endpoint whose data we want to expose.</p></dd>
+
+<dt><tt>conf:sparqlDefaultGraph &lt;<em>sparql_default_graph_name</em>&gt;;</tt></dt>
+<dd><p>If the data of interest is not located in the SPARQL dataset's default graph, but within
+  a named graph, then its name must be specified here.</p></dd>
+
+<dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
+<dd><p><strong>Required.</strong> The common URI prefix of the resource identifiers in the SPARQL dataset;
+  only resources with this prefix will be mapped and made available by Pubby.</p></dd>
+
+<dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
+<dd><p>If present, only dateset URIs matching this
+  <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">Java-style regular expression</a>
+  will be mapped and made available by Pubby. The regular expression must match
+  <em>everything after the <tt>datasetBase</tt> part of the URI</em>.</p>
+  <pre>conf:datasetBase &lt;http://example.org/&gt;;
+conf:datasetURIPattern "(users|documents)/.*";</pre>
+  <p>This example configuration will publish the dataset URI <tt>http://example.org/users/alice</tt>, but not
+  <tt>http://example.org/invoices/5395842</tt> because the URI part <tt>invoices/5395842</tt>
+  does not match the regular expression.</p></dd>
+
+<dt><tt>conf:addSameAsStatements <em>"true"/"false"</em>;</tt></dt>
+<dd><p>If set to <tt>"true"</tt>, an <tt>owl:sameAs</tt> statement of the form
+  <tt>&lt;web_uri&gt; owl:sameAs &lt;dataset_uri&gt;</tt> will be present in Linked Data output.</p></dd>
+
+<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data1.rdf</em>&gt;, ...;</tt></dt>
+<dd><p>Load one or more RDF documents from the Web or the file system and use them as the
+  data source. The SPARQL endpoint configured above will be ignored. Allows using Pubby as
+  an RDF server for publishing static RDF files.</p></dd>
+
 <dt><tt>conf:rdfDocumentMetadata [ <em>statement1; statement2; ...;</em> ];</tt></dt>
 <dd>
 <p>All statements inside a <tt>conf:rdfDocumentMetadata</tt> block will be added as document metadata
-  to the RDF documents published by the server. This feature can be used for instance to add licensing
+  to the RDF documents published for this dataset. This feature can be used for instance to add licensing
   information to your published documents.</p>
 
 <pre>conf:rdfDocumentMetadata [
@@ -254,7 +289,7 @@ pre { speak-punctuation: code; }
   running Pubby behind an Apache proxy)</p></dd>
 
 <dt><tt>conf:redirectRDFRequestsToEndpoint <em>"true"/"false"</em>;</tt></dt>
-<dd>Instead of serving RDF documents, Pubby will redirect requests for
+<dd><p>Instead of serving RDF documents, Pubby will redirect requests for
   RDF to <tt>DESCRIBE</tt> query results on the SPARQL server. This
   reduces Pubby's job to serving HTML descriptions of resources. All features that affect
   the RDF output will have no effect, e.g. URI rewriting and adding of
@@ -282,7 +317,7 @@ pre { speak-punctuation: code; }
   and can be
   <a href="http://dbpedia.svn.sourceforge.net/viewvc/dbpedia/pubby/">browsed online</a>.</p>
 
-<p><a href="http://sourceforge.net/projects/d2rq-map/"><img src="http://sourceforge.net/sflogo.php?group_id=190976&amp;type=5" alt="SourceForge Logo" border="0" /></a></p>
+<p><a href="http://sourceforge.net/projects/d2rq-map/"><img src="http://sourceforge.net/sflogo.php?group_id=190976&amp;type=5" alt="SourceForge Logo" /></a></p>
 
 <!--
 <div><a href="http://www4.wiwiss.fu-berlin.de/is-group/data/projects/Project3"><img src="http://www.wiwiss.fu-berlin.de/suhl/_img/doap.png" align="absmiddle" /></a> (<a href="http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=http%3A//www4.wiwiss.fu-berlin.de/is-group/resource/projects/Project3">View with Disco</a>)</div>

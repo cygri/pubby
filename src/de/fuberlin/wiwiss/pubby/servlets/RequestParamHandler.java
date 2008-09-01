@@ -32,6 +32,18 @@ public class RequestParamHandler {
 		mimeTypes.put("text", "text/plain");
 	}
 	
+	/**
+	 * Removes the "output=foobar" part of a URI if present.
+	 */
+	public static String removeOutputRequestParam(String uri) {
+		// Remove the param: output=[a-z0-9]*
+		// There are two cases. The param can occur at the end of the URI,
+		// this is matched by the first part: [?&]param$
+		// Or it can occur elsewhere, then it's matched by param& with a
+		// lookbehind that requires [?&] to occur before the pattern.
+		return uri.replaceFirst("([?&]output=[a-z0-9]*$)|((?<=[?&])output=[a-z0-9]*&)", "");
+	}
+	
 	private final HttpServletRequest request;
 	private final String requestedType;
 

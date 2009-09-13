@@ -1,23 +1,34 @@
 package de.fuberlin.wiwiss.pubby;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
+
+import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
+import de.fuberlin.wiwiss.pubby.vocab.META;
 
 /**
  * The server's configuration.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
+ * @author Hannes Mühleisen
+ * @author Olaf Hartig
  * @version $Id$
  */
 public class Dataset {
@@ -27,6 +38,9 @@ public class Dataset {
 	private final Pattern datasetURIPattern;
 	private final char[] fixUnescapeCharacters;
 	private final Resource rdfDocumentMetadataTemplate;
+	private final String metadataTemplate;
+	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
+	private Calendar currentTime;
 	
 	public Dataset(Resource config) {
 		model = config.getModel();
@@ -50,6 +64,11 @@ public class Dataset {
 			rdfDocumentMetadataTemplate = config.getProperty(CONF.rdfDocumentMetadata).getResource();
 		} else {
 			rdfDocumentMetadataTemplate = null;
+		}
+		if (config.hasProperty(CONF.metadataTemplate)) {
+			metadataTemplate = config.getProperty(CONF.metadataTemplate).getString();
+		} else {
+			metadataTemplate = null;
 		}
 		if (config.hasProperty(CONF.sparqlEndpoint)) {
 			String endpointURL = config.getProperty(CONF.sparqlEndpoint).getResource().getURI();
@@ -142,6 +161,146 @@ public class Dataset {
 			}
 			document.add(stmt.getSubject(), stmt.getPredicate(), documentResource);
 		}
+	}
+	
+	public Model addMetadataFromTemplate(Model document, MappedResource documentResource, ServletContext context) {
+		if (metadataTemplate == null) {
+			return null;
+		}
+		
+		currentTime = Calendar.getInstance();
+		
+		// add metadata from templates
+		Model tplModel = ModelFactory.createDefaultModel();
+		String tplPath = context.getRealPath("/") + "/WEB-INF/templates/" + metadataTemplate;
+		FileManager.get().readModel( tplModel, tplPath, FileUtils.guessLang(tplPath,"N3") );
+
+		// iterate over template statements to replace placeholders
+		Model metadata = ModelFactory.createDefaultModel();
+		StmtIterator it = tplModel.listStatements();
+		while (it.hasNext()) {
+			Statement stmt = it.nextStatement();
+			Resource subj = stmt.getSubject();
+			Property pred = stmt.getPredicate();
+			RDFNode  obj  = stmt.getObject();
+			
+			try {
+				if (subj.toString().contains(metadataPlaceholderURIPrefix)){
+					subj = (Resource) parsePlaceholder(subj, documentResource, context);
+					if (subj == null) {
+						// create a unique blank node with a fixed id.
+						subj = model.createResource(new AnonId(String.valueOf(stmt.getSubject().hashCode())));
+					}
+				}
+				
+				if (obj.toString().contains(metadataPlaceholderURIPrefix)){
+					obj = parsePlaceholder(obj, documentResource, context);
+				}
+				
+				// only add statements with some objects
+				if (obj != null) {
+					stmt = metadata.createStatement(subj,pred,obj);
+					metadata.add(stmt);
+				}
+			} catch (Exception e) {
+				// something went wrong, oops - lets better remove the offending statement
+				metadata.remove(stmt);
+				e.printStackTrace();
+			}
+		}
+		
+		// remove blank nodes that don't have any properties
+		boolean changes = true;
+		while ( changes ) {
+			changes = false;
+			StmtIterator stmtIt = metadata.listStatements();
+			List remList = new ArrayList();
+			while (stmtIt.hasNext()) {
+				Statement s = stmtIt.nextStatement();
+				if (    s.getObject().isAnon()
+				     && ! ((Resource) s.getObject().as(Resource.class)).listProperties().hasNext() ) {
+					remList.add(s);
+					changes = true;
+				}
+			}
+			metadata.remove(remList);
+		}
+
+		if (document == null) {
+			return metadata;
+		} else {
+			return document.add( metadata );
+		}
+	}
+	
+	private RDFNode parsePlaceholder(RDFNode phRes, MappedResource documentResource, ServletContext context) {
+		String phURI = phRes.asNode().getURI();
+		// get package name and placeholder name from placeholder URI
+		phURI = phURI.replace(metadataPlaceholderURIPrefix, "");
+		String phPackage = phURI.substring(0, phURI.indexOf(":")+1);
+		String phName = phURI.replace(phPackage, "");
+		phPackage = phPackage.replace(":", "");
+		
+		if (phPackage.equals("auto")) {
+			// <about:metadata:auto:query> - the SPARQL Query used to get the RDF Graph
+			if (phName.equals("query")) {
+				RemoteSPARQLDataSource ds = (RemoteSPARQLDataSource) documentResource.getDataset().getDataSource();
+				return model.createTypedLiteral(ds.getPreviousDescribeQuery());
+			}
+			// <about:metadata:auto:time> - the current time
+			if (phName.equals("time")) {
+				return model.createTypedLiteral(currentTime);
+			}
+		}
+		
+		if (phPackage.equals("data")) {
+			// <about:metadata:data:graph> - URI of the graph
+			if (phName.equals("graph")) {
+				return model.createResource(documentResource.getDataURL());
+			}
+			// <about:metadata:data:resource> - URI of the resource
+			if (phName.equals("resource")) {
+				return model.createResource(documentResource.getWebURI());
+			}
+		}
+		
+		// <about:metadata:config:*> - The configuration parameters
+		if (phPackage.equals("config")) {
+			// look for requested property in the dataset config
+			Property p  = model.createProperty(CONF.NS + phName);
+			if (config.hasProperty(p))
+				return config.getProperty(p).getObject();
+			
+			// find pointer to the global configuration set...
+			StmtIterator it = config.getModel().listStatements(null, CONF.dataset, config);
+			Statement ptrStmt = it.nextStatement();
+			if (ptrStmt == null) return null;
+			
+			// look in global config if nothing found so far
+			Resource globalConfig = ptrStmt.getSubject();
+			if (globalConfig.hasProperty(p))
+				return globalConfig.getProperty(p).getObject();
+		}
+		
+		// <about:metadata:metadata:*> - The metadata provided by users
+		if (phPackage.equals("metadata")) {
+			// look for requested property in the dataset config
+			Property p  = model.createProperty(META.NS + phName);
+			if (config.hasProperty(p))
+				return config.getProperty(p).getObject();
+			
+			// find pointer to the global configuration set...
+			StmtIterator it = config.getModel().listStatements(null, CONF.dataset, config);
+			Statement ptrStmt = it.nextStatement();
+			if (ptrStmt == null) return null;
+			
+			// look in global config if nothing found so far
+			Resource globalConfig = ptrStmt.getSubject();
+			if (globalConfig.hasProperty(p))
+				return globalConfig.getProperty(p).getObject();
+		}
+
+		return model.createResource(new AnonId(String.valueOf(phRes.hashCode())));
 	}
 	
 	private boolean getBooleanConfigValue(Property property, boolean defaultValue) {

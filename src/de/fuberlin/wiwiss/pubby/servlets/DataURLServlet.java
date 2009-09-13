@@ -84,6 +84,8 @@ public class DataURLServlet extends BaseURLServlet {
 				"RDF description of " + 
 				new ResourceDescription(resource, description, config).getLabel());
 		resource.getDataset().addDocumentMetadata(description, document);
+		resource.getDataset().addMetadataFromTemplate(description, resource, getServletContext());
+
 
 		ModelResponse server = new ModelResponse(description, request, response);
 		server.serve();

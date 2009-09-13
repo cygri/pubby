@@ -18,6 +18,7 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 public class RemoteSPARQLDataSource implements DataSource {
 	private String endpointURL;
 	private String defaultGraphName;
+	private String previousDescribeQuery;
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphName) {
 		this.endpointURL = endpointURL;
@@ -60,7 +61,12 @@ public class RemoteSPARQLDataSource implements DataSource {
 		return execDescribeQuery(query);
 	}
 	
+	public String getPreviousDescribeQuery() {
+		return previousDescribeQuery;
+	}
+	
 	private Model execDescribeQuery(String query) {
+		previousDescribeQuery = query;
 		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
 		if (defaultGraphName != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));

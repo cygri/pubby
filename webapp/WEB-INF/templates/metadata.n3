@@ -1,0 +1,72 @@
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix prv:      <http://purl.org/net/provenance/ns#> .
+@prefix prvTypes: <http://purl.org/net/provenance/types#> .
+@prefix prvIV:    <http://purl.org/net/provenance/integrity#> .
+
+@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix sp:   <http://spinrdf.org/sp#> .
+
+
+<about:metadata:data:graph> a rdfg:Graph ;
+	foaf:primaryTopic <about:metadata:data:resource> ;
+	foaf:topic <about:metadata:data:graph> ;
+
+	prv:createdBy [
+			a prv:DataCreation ;
+			prv:performedAt <about:metadata:auto:time> ;
+			prv:performedBy _:pubby ;
+			prv:usedData [
+				a prvTypes:QueryResult ;
+				a rdfg:Graph ;
+
+				prv:retrievedBy [
+					a prv:DataAccess ;
+					prv:performedAt <about:metadata:auto:time> ;
+					prv:performedBy _:pubby ;
+					prv:accessedService _:sparql ;
+				] ;
+
+				prv:createdBy [
+					a prvTypes:QueryExecution ;
+					prv:performedBy _:sparql ;
+					prv:usedData <about:metadata:config:sparqlEndpoint> ;
+					prv:usedGuideline [
+						a prv:DataItem ;
+						a prvTypes:SPARQLQuery ;
+						a sp:Describe ;
+						rdfs:label <about:metadata:auto:query> ;
+					]
+				] ;
+			] ;
+		] .
+           
+_:pubby a prvTypes:DataCreatingService ;
+	a prv:DataProvidingService ;
+	prv:operatedBy <about:metadata:metadata:pubbyOperator> ;
+	prv:usedBy     <about:metadata:metadata:pubbyUser> ;
+	rdfs:seeAlso   <about:metadata:config:webBase> .
+
+_:sparql a prvTypes:DataCreatingService ;
+	prv:operatedBy  <about:metadata:metadata:endpointOperator> ;
+	prv:usedBy  <about:metadata:metadata:endpointUser> ;
+	rdfs:seeAlso  <about:metadata:config:sparqlEndpoint> .
+
+<about:metadata:metadata:pubbyUser>
+	foaf:name <about:metadata:metadata:pubbyUserName> ;
+	foaf:homepage <about:metadata:metadata:pubbyUserHomepage> .
+
+<about:metadata:metadata:pubbyOperator>
+	foaf:name <about:metadata:metadata:pubbyOperatorName> ;
+	foaf:homepage <about:metadata:metadata:pubbyOperatorHomepage> .
+
+<about:metadata:metadata:endpointUser>
+	foaf:name <about:metadata:metadata:endpointUserName> ;
+	foaf:homepage <about:metadata:metadata:endpointUserHomepage> .
+
+<about:metadata:metadata:endpointOperator>
+	foaf:name <about:metadata:metadata:endpointOperatorName> ;
+	foaf:homepage <about:metadata:metadata:endpointOperatorHomepage> .

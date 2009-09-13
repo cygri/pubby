@@ -15,6 +15,7 @@
 
 # Prefix declarations to be used in RDF output
 @prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+@prefix meta: <http://example.org/metadata#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -29,6 +30,8 @@
 @prefix yago: <http://localhost:8080/class/yago/> .
 @prefix units: <http://dbpedia.org/units/> .
 @prefix geonames: <http://www.geonames.org/ontology#> .
+@prefix prv:      <http://purl.org/net/provenance/ns#> .
+@prefix prvTypes: <http://purl.org/net/provenance/types#> .
 
 # Server configuration section
 <> a conf:Configuration;
@@ -65,6 +68,19 @@
         # Fixes an issue with the server running behind an Apache proxy;
         # can be ignored otherwise
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
+
+        # include metadata
+        conf:metadataTemplate "metadata.n3";
+
+        # configure your metadata here
+        # Use properties with the meta: prefix where the property name
+        # corresponds to the placeholder URIs in metadata.n3 that begin
+        # with about:metadata:metadata:
+        # Examples for such properties are:
+#        meta:pubbyUser <URI of the data publisher who uses this Pubby>;
+#        meta:pubbyOperator <URI of the service provider who operates this Pubby>;
+#        meta:endpointUser <URI of the data publisher who uses the SPARQL endpoint queried by this Pubby>;
+#        meta:endpointOperator <URI of the service provider who operates the SPARQL endpoint>;
     ];
 
 # Dataset configuration section #2 (for DBpedia classes and properties)

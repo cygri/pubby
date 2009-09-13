@@ -34,3 +34,12 @@ function expand(i) {
     span.removeChild(span.firstChild);
     span.insertBefore(long_literal_texts[i], span.firstChild);
 }
+
+function showAllMetadata(name) {
+	var ele = document.getElementById(name);
+	if (ele == null) return;
+	var tables = document.getElementsByTagName('table');
+	for (i = 0; i < tables.length; i++) {
+		tables[i].style.display = 'block';
+	}
+}

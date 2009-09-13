@@ -1,11 +1,16 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -29,10 +34,13 @@ public class PageURLServlet extends BaseURLServlet {
 			Configuration config) throws ServletException, IOException {
 
 		Model description = getResourceDescription(resource);
+		
 		if (description.size() == 0) {
 			return false;
 		}
-
+		
+		Velocity.setProperty("velocimacro.context.localscope", Boolean.TRUE);
+		
 		ResourceDescription resourceDescription = new ResourceDescription(
 				resource, description, config);
 		String discoLink = "http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=" +
@@ -56,6 +64,19 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());
 		context.put("properties", resourceDescription.getProperties());
+		
+		try {
+			Model metadata = resource.getDataset().addMetadataFromTemplate(null, resource, getServletContext());
+			context.put("metadata", metadata.getResource(resource.getDataURL()).listProperties().toList());
+			Map nsSet = metadata.getNsPrefixMap();
+			nsSet.putAll(description.getNsPrefixMap());
+			context.put("prefixes", nsSet.entrySet());
+			context.put("blankNodesMap", new HashMap());
+		}
+		catch (Exception e) {
+			context.put("metadata", Boolean.FALSE);
+		}
+	
 		template.renderXHTML("page.vm");
 		return true;
 	}

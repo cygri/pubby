@@ -11,13 +11,13 @@
 @prefix sp:   <http://spinrdf.org/sp#> .
 
 
-<about:metadata:data:graph> a rdfg:Graph ;
-	foaf:primaryTopic <about:metadata:data:resource> ;
-	foaf:topic <about:metadata:data:graph> ;
+<about:metadata:runtime:graph> a rdfg:Graph ;
+	foaf:primaryTopic <about:metadata:runtime:resource> ;
+	foaf:topic <about:metadata:runtime:graph> ;
 
 	prv:createdBy [
 			a prv:DataCreation ;
-			prv:performedAt <about:metadata:auto:time> ;
+			prv:performedAt <about:metadata:runtime:time> ;
 			prv:performedBy _:pubby ;
 			prv:usedData [
 				a prvTypes:QueryResult ;
@@ -25,7 +25,7 @@
 
 				prv:retrievedBy [
 					a prv:DataAccess ;
-					prv:performedAt <about:metadata:auto:time> ;
+					prv:performedAt <about:metadata:runtime:time> ;
 					prv:performedBy _:pubby ;
 					prv:accessedService _:sparql ;
 				] ;
@@ -38,7 +38,7 @@
 						a prv:DataItem ;
 						a prvTypes:SPARQLQuery ;
 						a sp:Describe ;
-						rdfs:label <about:metadata:auto:query> ;
+						rdfs:label <about:metadata:runtime:query> ;
 					]
 				] ;
 			] ;
@@ -51,9 +51,9 @@ _:pubby a prvTypes:DataCreatingService ;
 	rdfs:seeAlso   <about:metadata:config:webBase> .
 
 _:sparql a prvTypes:DataCreatingService ;
-	prv:operatedBy  <about:metadata:metadata:endpointOperator> ;
-	prv:usedBy  <about:metadata:metadata:endpointUser> ;
-	rdfs:seeAlso  <about:metadata:config:sparqlEndpoint> .
+	prv:operatedBy <about:metadata:metadata:endpointOperator> ;
+	prv:usedBy     <about:metadata:metadata:endpointUser> ;
+	rdfs:seeAlso   <about:metadata:config:sparqlEndpoint> .
 
 <about:metadata:metadata:pubbyUser>
 	foaf:name <about:metadata:metadata:pubbyUserName> ;

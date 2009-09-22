@@ -241,24 +241,21 @@ public class Dataset {
 		String phName = phURI.replace(phPackage, "");
 		phPackage = phPackage.replace(":", "");
 		
-		if (phPackage.equals("auto")) {
-			// <about:metadata:auto:query> - the SPARQL Query used to get the RDF Graph
+		if (phPackage.equals("runtime")) {
+			// <about:metadata:runtime:query> - the SPARQL Query used to get the RDF Graph
 			if (phName.equals("query")) {
 				RemoteSPARQLDataSource ds = (RemoteSPARQLDataSource) documentResource.getDataset().getDataSource();
 				return model.createTypedLiteral(ds.getPreviousDescribeQuery());
 			}
-			// <about:metadata:auto:time> - the current time
+			// <about:metadata:runtime:time> - the current time
 			if (phName.equals("time")) {
 				return model.createTypedLiteral(currentTime);
 			}
-		}
-		
-		if (phPackage.equals("data")) {
-			// <about:metadata:data:graph> - URI of the graph
+			// <about:metadata:runtime:graph> - URI of the graph
 			if (phName.equals("graph")) {
 				return model.createResource(documentResource.getDataURL());
 			}
-			// <about:metadata:data:resource> - URI of the resource
+			// <about:metadata:runtime:resource> - URI of the resource
 			if (phName.equals("resource")) {
 				return model.createResource(documentResource.getWebURI());
 			}

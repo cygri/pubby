@@ -90,6 +90,7 @@ pre { speak-punctuation: code; }
 <h2 id="news">News</h2>
 
 <ul>
+  <li><strong>2009-09-26: Pubby 0.3 released.</strong> This version adds a <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a> that -by default- provides provenance information.</li>
   <li><strong>2007-10-22: Pubby 0.2 released.</strong> This version adds multi-dataset support, has improved content negotiation,
     adds the <tt>conf:datasetURIPattern</tt> option, plus various small improvements and bug fixes.</li>
   <li><strong>2007-06-20: Pubby 0.1 released.</strong> Today marks the release of the first alpha version of Pubby.</li>
@@ -104,6 +105,7 @@ pre { speak-punctuation: code; }
   <li>Provides a simple <strong>HTML interface</strong> showing the data available about each resource</li>
   <li>Takes care of handling <strong>303 redirects and content negotiation</strong></li>
   <li>Compatible with Tomcat and Jetty servlet containers</li>
+  <li>Includes a <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a> to add metadata to the provided data</li>
 </ul>
 
 <h2>How It Works</h2>
@@ -271,6 +273,13 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 <pre>conf:rdfDocumentMetadata [
     dc:publisher &lt;http://richard.cyganiak.de/foaf.rdf#cygri&gt;;
 ];</pre>
+</dd>
+
+<dt><tt>conf:metadataTemplate "metadata.n3";</tt></dt>
+<dd>
+<p>Refers to a metadata template that is used by the
+   <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a>.
+   This file is expected in directory <tt>./WEB-INF/templates/</tt>.</p>
 </dd>
 
 <dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>

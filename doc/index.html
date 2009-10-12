@@ -306,6 +306,7 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 
 <ul>
   <li>Only works for SPARQL endpoint that can answer <tt>DESCRIBE</tt> queries</li>
+  <li>Multiple dataset support may not work as expected: If a requested URI is matched by the <tt>conf:datasetURIPattern</tt> of more than one dataset (or one doesn't have a <tt>conf:datasetURIPattern</tt>), then <em>only one</em> of the possible endpoints will be queried at a time. Pubby will never try to query multiple endpoints in order to create a single response. In most cases, it is recommended to simply set up a separate Pubby instance for each dataset.</li>
 </ul>
 
 <h2><a name="support" id="support"></a>Support and feedback</h2>

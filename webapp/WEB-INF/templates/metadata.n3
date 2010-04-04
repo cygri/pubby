@@ -9,6 +9,7 @@
 @prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix sp:   <http://spinrdf.org/sp#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
 
 
 <about:metadata:runtime:graph> a rdfg:Graph ;
@@ -48,7 +49,14 @@ _:pubby a prvTypes:DataCreatingService ;
 	a prv:DataProvidingService ;
 	prv:operatedBy <about:metadata:metadata:pubbyOperator> ;
 	prv:usedBy     <about:metadata:metadata:pubbyUser> ;
+	prv:deployedSoftware _:pubbyRelease ;
 	rdfs:seeAlso   <about:metadata:config:webBase> .
+
+_:pubbyRelease a doap:Version ;
+               doap:revision "0.4" .
+_:pubbyProject a doap:Project ;
+               doap:release   _:pubbyRelease ;
+               doap:homepage  <http://www4.wiwiss.fu-berlin.de/pubby/> .
 
 _:sparql a prvTypes:DataCreatingService ;
 	prv:operatedBy <about:metadata:metadata:endpointOperator> ;

@@ -32,6 +32,7 @@
 @prefix geonames: <http://www.geonames.org/ontology#> .
 @prefix prv:      <http://purl.org/net/provenance/ns#> .
 @prefix prvTypes: <http://purl.org/net/provenance/types#> .
+@prefix doap:     <http://usefulinc.com/ns/doap#> .
 
 # Server configuration section
 <> a conf:Configuration;

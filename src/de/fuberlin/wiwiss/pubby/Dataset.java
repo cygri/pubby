@@ -318,6 +318,9 @@ public class Dataset {
 		StringBuffer encoded = new StringBuffer(uri.length() + 4);
 		for (int charIndex = 0; charIndex < uri.length(); charIndex++) {
 			boolean encodeThis = false;
+			if ((int) uri.charAt(charIndex) > 127) {
+				encodeThis = true;
+			}
 			for (int i = 0; i < fixUnescapeCharacters.length; i++) {
 				if (uri.charAt(charIndex) == fixUnescapeCharacters[i]) {
 					encodeThis = true;
@@ -326,7 +329,7 @@ public class Dataset {
 			}
 			if (encodeThis) {
 				encoded.append('%');
-				byte b = (byte) uri.charAt(charIndex);
+				int b = (int) uri.charAt(charIndex);
 				encoded.append(Integer.toString(b, 16).toUpperCase());
 			} else {
 				encoded.append(uri.charAt(charIndex));

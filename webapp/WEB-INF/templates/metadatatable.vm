@@ -59,4 +59,9 @@
 	</table>
 #end
 
-#listProperties ($rdf_link $metadata 'block') 
+## Replaced the commented line by the following one because the
+## RDF graph we want to talk about is a specific representation
+## of the data identified by the $rdf_link URI.
+##                                       Olaf, May 28, 2010
+## #listProperties ($rdf_link $metadata 'block') 
+#listProperties ('' $metadata 'block')

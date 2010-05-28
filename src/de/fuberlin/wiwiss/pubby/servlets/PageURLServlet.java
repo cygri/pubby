@@ -67,7 +67,12 @@ public class PageURLServlet extends BaseURLServlet {
 		
 		try {
 			Model metadata = resource.getDataset().addMetadataFromTemplate(null, resource, getServletContext());
-			context.put("metadata", metadata.getResource(resource.getDataURL()).listProperties().toList());
+			// Replaced the commented line by the following one because the
+			// RDF graph we want to talk about is a specific representation
+			// of the data identified by the getDataURL() URI.
+			//                                       Olaf, May 28, 2010
+			// context.put("metadata", metadata.getResource(resource.getDataURL()).listProperties().toList());
+			context.put("metadata", metadata.getResource("").listProperties().toList());
 			Map nsSet = metadata.getNsPrefixMap();
 			nsSet.putAll(description.getNsPrefixMap());
 			context.put("prefixes", nsSet.entrySet());

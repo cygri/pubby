@@ -33,6 +33,7 @@
 @prefix prv:      <http://purl.org/net/provenance/ns#> .
 @prefix prvTypes: <http://purl.org/net/provenance/types#> .
 @prefix doap:     <http://usefulinc.com/ns/doap#> .
+@prefix void:     <http://rdfs.org/ns/void#> .
 
 # Server configuration section
 <> a conf:Configuration;
@@ -82,6 +83,7 @@
 #        meta:pubbyOperator <URI of the service provider who operates this Pubby>;
 #        meta:endpointUser <URI of the data publisher who uses the SPARQL endpoint queried by this Pubby>;
 #        meta:endpointOperator <URI of the service provider who operates the SPARQL endpoint>;
+#        meta:endpointDataset <URI of the linked dataset that is exposed via the SPARQL endpoint>;
     ];
 
 # Dataset configuration section #2 (for DBpedia classes and properties)

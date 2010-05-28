@@ -7,12 +7,13 @@
 @prefix prvIV:    <http://purl.org/net/provenance/integrity#> .
 
 @prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/> .
+@prefix void: <http://rdfs.org/ns/void#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix sp:   <http://spinrdf.org/sp#> .
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 
 
-<about:metadata:runtime:graph> a rdfg:Graph ;
+<about:metadata:runtime:graph> a prv:DataItem , rdfg:Graph ;
 	foaf:primaryTopic <about:metadata:runtime:resource> ;
 	foaf:topic <about:metadata:runtime:graph> ;
 
@@ -21,6 +22,7 @@
 			prv:performedAt <about:metadata:runtime:time> ;
 			prv:performedBy _:pubby ;
 			prv:usedData [
+				a prv:DataItem ;
 				a prvTypes:QueryResult ;
 				a rdfg:Graph ;
 
@@ -28,15 +30,13 @@
 					a prv:DataAccess ;
 					prv:performedAt <about:metadata:runtime:time> ;
 					prv:performedBy _:pubby ;
-					prv:accessedService _:sparql ;
+					prv:accessedService <about:metadata:config:sparqlEndpoint> ;
 				] ;
 
 				prv:createdBy [
 					a prvTypes:QueryExecution ;
-					prv:performedBy _:sparql ;
-					prv:usedData <about:metadata:config:sparqlEndpoint> ;
+					prv:performedBy <about:metadata:config:sparqlEndpoint> ;
 					prv:usedGuideline [
-						a prv:DataItem ;
 						a prvTypes:SPARQLQuery ;
 						a sp:Describe ;
 						rdfs:label <about:metadata:runtime:query> ;
@@ -45,8 +45,9 @@
 			] ;
 		] .
            
-_:pubby a prvTypes:DataCreatingService ;
-	a prv:DataProvidingService ;
+_:pubby a prv:Actor ,
+          prvTypes:DataCreatingService ,
+          prv:DataProvidingService ;
 	prv:operatedBy <about:metadata:metadata:pubbyOperator> ;
 	prv:usedBy     <about:metadata:metadata:pubbyUser> ;
 	prv:deployedSoftware _:pubbyRelease ;
@@ -58,10 +59,11 @@ _:pubbyProject a doap:Project ;
                doap:release   _:pubbyRelease ;
                doap:homepage  <http://www4.wiwiss.fu-berlin.de/pubby/> .
 
-_:sparql a prvTypes:DataCreatingService ;
+<about:metadata:config:sparqlEndpoint> a prv:Actor ,
+                                         prvTypes:DataCreatingService ;
 	prv:operatedBy <about:metadata:metadata:endpointOperator> ;
-	prv:usedBy     <about:metadata:metadata:endpointUser> ;
-	rdfs:seeAlso   <about:metadata:config:sparqlEndpoint> .
+	prv:usedBy     <about:metadata:metadata:endpointUser> .
+<about:metadata:metadata:endpointDataset> void:sparqlEndpoint <about:metadata:config:sparqlEndpoint> .
 
 <about:metadata:metadata:pubbyUser>
 	foaf:name <about:metadata:metadata:pubbyUserName> ;

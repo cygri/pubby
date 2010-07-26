@@ -12,6 +12,8 @@
 @prefix sp:   <http://spinrdf.org/sp#> .
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 
+# This template provides provenance information about RDF graphs served by Pubby.
+# The provenance information is described using the Provenance Vocabulary v0.5.
 
 <about:metadata:runtime:graph> a prv:DataItem , rdfg:Graph ;
 	foaf:primaryTopic <about:metadata:runtime:resource> ;
@@ -34,6 +36,7 @@
 				] ;
 
 				prv:createdBy [
+					a prv:DataCreation ;
 					a prvTypes:QueryExecution ;
 					prv:performedBy <about:metadata:config:sparqlEndpoint> ;
 					prv:usedGuideline [

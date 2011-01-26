@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 /**
  * Analyzes an HttpServletRequest to check for the presence
- * of an ?output=n3 or ?output=rdfxml request parameter in
+ * of an ?output=n3 or =ttl or =rdfxml request parameter in
  * the URI. If present, returns a modified HttpServletRequest
  * that has the appropriate MIME type in the Accept: header.
  * This request can then be fed into the rest of our content
@@ -25,8 +25,17 @@ public class RequestParamHandler {
 	static {
 		mimeTypes.put("rdfxml", "application/rdf+xml");
 		mimeTypes.put("xml", "application/rdf+xml");
-		mimeTypes.put("turtle", "application/x-turtle");
-		mimeTypes.put("ttl", "application/x-turtle");
+
+		// Explicitly asking for output=turtle will still return
+		// the N3 media type because browsers tend to *display*
+		// text/* media types, while they tend to *download*
+		// application/* media types. Displaying serves users better,
+		// so we report the content as N3 even though it actually is
+		// Turtle.
+		mimeTypes.put("ttl", "text/rdf+n3;charset=utf-8");
+		mimeTypes.put("turtle", "text/rdf+n3;charset=utf-8");
+//		mimeTypes.put("turtle", "application/x-turtle");
+//		mimeTypes.put("ttl", "application/x-turtle");
 		mimeTypes.put("n3", "text/rdf+n3;charset=utf-8");
 		mimeTypes.put("nt", "text/plain");
 		mimeTypes.put("text", "text/plain");

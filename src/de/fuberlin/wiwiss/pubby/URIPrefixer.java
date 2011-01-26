@@ -56,7 +56,7 @@ public class URIPrefixer {
 		return localName;
 	}
 	
-	public String toN3() {
+	public String toTurtle() {
 		if (hasPrefix()) {
 			return getPrefix() + ":" + getLocalName();
 		}

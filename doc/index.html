@@ -131,7 +131,7 @@ pre { speak-punctuation: code; }
 <p>Pubby will <strong>handle requests to the mapped URIs</strong> by connecting to the SPARQL endpoint,
   asking it for information about the original URI, and passing back the results to the client.
   It also handles various <strong>details of the HTTP interaction</strong>, such as the
-  303 redirect required by Web Architecture, and content negotiation between HTML, RDF/XML and N3
+  303 redirect required by Web Architecture, and content negotiation between HTML, RDF/XML and Turtle 
   descriptions of the same resource.</p>
 
 <h2>Download and Installation</h2>
@@ -151,13 +151,13 @@ pre { speak-punctuation: code; }
   This will change the Pubby root to <tt>http://myserver/mydataset/</tt>.</li>
 
 <li><strong>Modify the configuration file</strong> to suit your needs. It is located
-  within Pubby's webapp directory, at <tt>/WEB-INF/config.n3</tt>. See the next section
+  within Pubby's webapp directory, at <tt>/WEB-INF/config.ttl</tt>. See the next section
   for a list of supported configuration directives.</li>
 </ol>
 
 <h2>Configuration</h2>
 
-<p>The Pubby configuration file uses <strong><a href="http://www.w3.org/DesignIssues/Notation3">N3</a></strong>
+<p>The Pubby configuration file uses <strong><a href="http://www.w3.org/TeamSubmission/turtle/">Turtle</a></strong>
   syntax. It typically starts with some boilerplate <strong>prefix declarations</strong>, followed
   by a <strong>server configuration section</strong>, and one or more <strong>dataset configuration sections</strong>:</p>
 
@@ -172,7 +172,7 @@ pre { speak-punctuation: code; }
     .
 </pre>
 
-<p>There is an <a href="config.n3">example configuration file</a>.</p>
+<p>There is an <a href="config.ttl">example configuration file</a>.</p>
 
 <p>Note that <strong>punctuation is significant</strong>,
   e.g. URIs are always enclosed in angle brackets, while literal
@@ -271,7 +271,7 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 ];</pre>
 </dd>
 
-<dt><tt>conf:metadataTemplate "metadata.n3";</tt></dt>
+<dt><tt>conf:metadataTemplate "metadata.ttl";</tt></dt>
 <dd>
 <p>Refers to a metadata template that is used by the
    <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a>.
@@ -324,7 +324,7 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 <p>This project has received contributions from <a href="http://olafhartig.de/">Olaf Hartig</a> and <a href="http://www.linkedin.com/pub/boris-villazon-terrazas/5/601/1a">Boris Villazón-Terrazas</a>.</p>
 
 <div id="footer">
-  <small>$Id$</small>
+  <small><!-- $Id$ --></small>
 </div>
 </div>
 

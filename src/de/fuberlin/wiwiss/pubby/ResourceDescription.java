@@ -271,7 +271,7 @@ public class ResourceDescription {
 			String uri = ((Literal) node.as(Literal.class)).getDatatypeURI();
 			if (uri == null) return null;
 			URIPrefixer datatypePrefixer = new URIPrefixer(uri, getPrefixes());
-			return datatypePrefixer.toN3();
+			return datatypePrefixer.toTurtle();
 		}
 		public int compareTo(Object other) {
 			if (!(other instanceof Value)) {

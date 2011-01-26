@@ -73,11 +73,11 @@
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
 
         # include metadata
-        conf:metadataTemplate "metadata.n3";
+        conf:metadataTemplate "metadata.ttl";
 
         # configure your metadata here
         # Use properties with the meta: prefix where the property name
-        # corresponds to the placeholder URIs in metadata.n3 that begin
+        # corresponds to the placeholder URIs in metadata.ttl that begin
         # with about:metadata:metadata:
         # Examples for such properties are:
 #        meta:pubbyUser <URI of the data publisher who uses this Pubby>;

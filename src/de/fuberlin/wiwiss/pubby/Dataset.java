@@ -27,7 +27,7 @@ import de.fuberlin.wiwiss.pubby.vocab.META;
  * The server's configuration.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
- * @author Hannes Mühleisen
+ * @author Hannes MÃ¼hleisen
  * @author Olaf Hartig
  * @version $Id$
  */
@@ -41,6 +41,7 @@ public class Dataset {
 	private final String metadataTemplate;
 	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
 	private Calendar currentTime;
+	private Resource currentDocRepr;
 	
 	public Dataset(Resource config) {
 		model = config.getModel();
@@ -163,7 +164,7 @@ public class Dataset {
 		}
 	}
 	
-	public Model addMetadataFromTemplate(Model document, MappedResource documentResource, ServletContext context) {
+	public Resource addMetadataFromTemplate(Model document, MappedResource describedResource, ServletContext context) {
 		if (metadataTemplate == null) {
 			return null;
 		}
@@ -177,6 +178,7 @@ public class Dataset {
 
 		// iterate over template statements to replace placeholders
 		Model metadata = ModelFactory.createDefaultModel();
+		currentDocRepr = metadata.createResource();
 		StmtIterator it = tplModel.listStatements();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
@@ -186,7 +188,7 @@ public class Dataset {
 			
 			try {
 				if (subj.toString().contains(metadataPlaceholderURIPrefix)){
-					subj = (Resource) parsePlaceholder(subj, documentResource, context);
+					subj = (Resource) parsePlaceholder(subj, describedResource, context);
 					if (subj == null) {
 						// create a unique blank node with a fixed id.
 						subj = model.createResource(new AnonId(String.valueOf(stmt.getSubject().hashCode())));
@@ -194,7 +196,7 @@ public class Dataset {
 				}
 				
 				if (obj.toString().contains(metadataPlaceholderURIPrefix)){
-					obj = parsePlaceholder(obj, documentResource, context);
+					obj = parsePlaceholder(obj, describedResource, context);
 				}
 				
 				// only add statements with some objects
@@ -226,14 +228,14 @@ public class Dataset {
 			metadata.remove(remList);
 		}
 
-		if (document == null) {
-			return metadata;
-		} else {
-			return document.add( metadata );
+		if (document != null) {
+			document.add( metadata );
 		}
+
+		return currentDocRepr;
 	}
 	
-	private RDFNode parsePlaceholder(RDFNode phRes, MappedResource documentResource, ServletContext context) {
+	private RDFNode parsePlaceholder(RDFNode phRes, MappedResource describedResource, ServletContext context) {
 		String phURI = phRes.asNode().getURI();
 		// get package name and placeholder name from placeholder URI
 		phURI = phURI.replace(metadataPlaceholderURIPrefix, "");
@@ -244,7 +246,7 @@ public class Dataset {
 		if (phPackage.equals("runtime")) {
 			// <about:metadata:runtime:query> - the SPARQL Query used to get the RDF Graph
 			if (phName.equals("query")) {
-				RemoteSPARQLDataSource ds = (RemoteSPARQLDataSource) documentResource.getDataset().getDataSource();
+				RemoteSPARQLDataSource ds = (RemoteSPARQLDataSource) describedResource.getDataset().getDataSource();
 				return model.createTypedLiteral(ds.getPreviousDescribeQuery());
 			}
 			// <about:metadata:runtime:time> - the current time
@@ -257,12 +259,16 @@ public class Dataset {
 				// RDF graph we want to talk about is a specific representation
 				// of the data identified by the getDataURL() URI.
 				//                                       Olaf, May 28, 2010
-				//return model.createResource(documentResource.getDataURL());
-				return model.createResource("");
+				// return model.createResource(describedResource.getDataURL());
+				return currentDocRepr;
+			}
+			// <about:metadata:runtime:data> - URI of the data
+			if (phName.equals("data")) {
+				return model.createResource(describedResource.getDataURL());
 			}
 			// <about:metadata:runtime:resource> - URI of the resource
 			if (phName.equals("resource")) {
-				return model.createResource(documentResource.getWebURI());
+				return model.createResource(describedResource.getWebURI());
 			}
 		}
 		

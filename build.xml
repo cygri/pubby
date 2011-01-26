@@ -1,6 +1,6 @@
 <project name="pubby" default="classes" basedir=".">
 
-  <property name="version"        value="0.3.2-dev"/>
+  <property name="version"        value="0.3.3-dev"/>
   <property name="src"            value="${basedir}/src"/>
   <property name="webroot"        value="${basedir}/webapp"/>
   <property name="webinf"         value="${webroot}/WEB-INF"/>
@@ -45,6 +45,7 @@
            deprecation="${javac.deprecation}"
            source="${javac.target}"
            target="${javac.target}"
+           includeantruntime="false"
            >
        <classpath>
          <path refid="classpath"/>

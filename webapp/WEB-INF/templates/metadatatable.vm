@@ -64,4 +64,5 @@
 ## of the data identified by the $rdf_link URI.
 ##                                       Olaf, May 28, 2010
 ## #listProperties ($rdf_link $metadata 'block') 
-#listProperties ('' $metadata 'block')
+## #listProperties ('' $metadata 'block')
+#listProperties ($metadata $metadata.listProperties().toList() 'block')

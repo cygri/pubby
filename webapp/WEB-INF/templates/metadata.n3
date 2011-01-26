@@ -11,6 +11,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix sp:   <http://spinrdf.org/sp#> .
 @prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix ir:   <http://www.ontologydesignpatterns.org/cp/owl/informationrealization.owl#> .
 
 # This template provides provenance information about RDF graphs served by Pubby.
 # The provenance information is described using the Provenance Vocabulary v0.5.
@@ -18,6 +19,7 @@
 <about:metadata:runtime:graph> a prv:DataItem , rdfg:Graph ;
 	foaf:primaryTopic <about:metadata:runtime:resource> ;
 	foaf:topic <about:metadata:runtime:graph> ;
+	ir:realizes <about:metadata:runtime:data> ;
 
 	prv:createdBy [
 			a prv:DataCreation ;

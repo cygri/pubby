@@ -14,6 +14,8 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
@@ -66,13 +68,15 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("properties", resourceDescription.getProperties());
 		
 		try {
-			Model metadata = resource.getDataset().addMetadataFromTemplate(null, resource, getServletContext());
+			Model metadata = ModelFactory.createDefaultModel();
+			Resource documentRepresentation = resource.getDataset().addMetadataFromTemplate( metadata, resource, getServletContext() );
 			// Replaced the commented line by the following one because the
 			// RDF graph we want to talk about is a specific representation
 			// of the data identified by the getDataURL() URI.
 			//                                       Olaf, May 28, 2010
-			// context.put("metadata", metadata.getResource(resource.getDataURL()).listProperties().toList());
-			context.put("metadata", metadata.getResource("").listProperties().toList());
+			// context.put("metadata", metadata.getResource(resource.getDataURL()));
+			context.put("metadata", documentRepresentation);
+
 			Map nsSet = metadata.getNsPrefixMap();
 			nsSet.putAll(description.getNsPrefixMap());
 			context.put("prefixes", nsSet.entrySet());

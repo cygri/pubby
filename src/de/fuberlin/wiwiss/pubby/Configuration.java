@@ -81,8 +81,20 @@ public class Configuration {
 			it = config.listProperties(CONF.usePrefixesFrom);
 			while (it.hasNext()) {
 				Statement stmt = it.nextStatement();
-				prefixes.setNsPrefixes(FileManager.get().loadModel(
-						stmt.getResource().getURI()));
+				String uri = stmt.getResource().getURI();
+				
+				// We'd like to use format auto-detection, but
+				// Jena's Turtle parser doesn't capture prefix
+				// declarations in the current version, so we
+				// override the auto-detection and use the
+				// N3 parser.
+				Model m;
+				if (uri.endsWith(".ttl")) {
+					m = FileManager.get().loadModel(uri, "N3");
+				} else {
+					m = FileManager.get().loadModel(uri);
+				}
+				prefixes.setNsPrefixes(m);
 			}
 		} else {
 			prefixes.setNsPrefixes(model);

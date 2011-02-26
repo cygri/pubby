@@ -1,7 +1,6 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -53,13 +52,9 @@ public abstract class BaseServlet extends HttpServlet {
 		if (!configFile.isAbsolute()) {
 			configFile = new File(getServletContext().getRealPath("/") + "/WEB-INF/" + param);
 		}
-		try {
-			return new Configuration(
-					FileManager.get().loadModel(
-							configFile.getAbsoluteFile().toURL().toExternalForm()));
-		} catch (MalformedURLException ex) {
-			throw new RuntimeException(ex);
-		}
+		return new Configuration(
+				FileManager.get().loadModel(
+						configFile.getAbsoluteFile().toURI().toString()));
 	}
 	
 	protected Model getResourceDescription(MappedResource resource) {

@@ -49,7 +49,7 @@ public class PageURLServlet extends BaseURLServlet {
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
 		String tabulatorLink = "http://dig.csail.mit.edu/2005/ajar/ajaw/tab.html?uri=" +
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
-		String openLinkLink = "http://demo.openlinksw.com/rdfbrowser/?uri=" +
+		String openLinkLink = "http://linkeddata.uriburner.com/ode/?uri=" +
 				URLEncoder.encode(resource.getWebURI(), "utf-8");
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();

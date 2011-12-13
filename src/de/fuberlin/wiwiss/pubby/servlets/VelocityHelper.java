@@ -10,7 +10,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 
 /**
- * A façade class that simplifies using a custom Velocity
+ * A facade class that simplifies using a custom Velocity
  * engine from a servlet. It encapsulates creation of the
  * VelocityEngine instance, its storage in the servlet
  * context, and the rendering of templates into the

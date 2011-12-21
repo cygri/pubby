@@ -72,9 +72,6 @@
         # can be ignored otherwise
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
 
-        # include metadata
-        conf:metadataTemplate "metadata.ttl";
-        
         # Queries for describing a resource denoted by "?__this__".
         # Will be executed in the below order, and results joined.
         conf:resourceDescriptionQuery [
@@ -97,7 +94,10 @@
         conf:anonymousInversePropertyDescriptionQuery [
             conf:sparql "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
         ];
-
+        
+        # include metadata
+        conf:metadataTemplate "metadata.ttl";
+        
         # configure your metadata here
         # Use properties with the meta: prefix where the property name
         # corresponds to the placeholder URIs in metadata.ttl that begin

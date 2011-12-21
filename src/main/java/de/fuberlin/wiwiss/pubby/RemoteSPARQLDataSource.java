@@ -1,16 +1,16 @@
 package de.fuberlin.wiwiss.pubby;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collections;
-
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.sparql.engine.http.HttpQuery;
 
 /**
  * A data source backed by a SPARQL endpoint accessed through
@@ -23,16 +23,49 @@ import com.hp.hpl.jena.vocabulary.RDF;
 public class RemoteSPARQLDataSource implements DataSource {
 	
 	private String endpointURL;
-	private String defaultGraphName;
+	private String defaultGraphURI;
 	private String webResourcePrefix;
 	private String webBase;
 	private String previousDescribeQuery;
 	
-	public RemoteSPARQLDataSource(String endpointURL, String graphName, String webBase, String webResourcePrefix) {
+	private String[] resourceQueries;
+	private String[] anonPropertyQueries;
+	private String[] anonInversePropertyQueries;
+	
+	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI,
+			String webBase, String webResourcePrefix) {
+		this(endpointURL, defaultGraphURI, webBase, webResourcePrefix, null, null, null);
+	}
+	
+	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI, 
+			String webBase, String webResourcePrefix,
+			String[] resourceQueries, String[] anonPropertyQueries, String[] anonInversePropertyQueries) {
 		this.endpointURL = endpointURL;
-		this.defaultGraphName = graphName;
+		this.defaultGraphURI = defaultGraphURI;
 		this.webBase = webBase;
 		this.webResourcePrefix = webResourcePrefix;
+
+		// If no resource description queries given, set them to the default.
+		if (resourceQueries==null){
+			resourceQueries = new String[1];
+			resourceQueries[0] = "DESCRIBE ?__this__";
+		}
+
+		// If no anonymous property description queries given, set them to the default.
+		if (anonPropertyQueries==null){
+			anonPropertyQueries = new String[1];
+			anonPropertyQueries[0] = "DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}";
+		}
+
+		// If no anonymous inverse property description queries given, set them to the default.
+		if (anonInversePropertyQueries==null){
+			anonInversePropertyQueries = new String[1];
+			anonInversePropertyQueries[0] = "DESCRIBE ?x WHERE {?__property__ ?__this__ ?x. FILTER (isBlank(?x))}";
+		}
+
+		this.resourceQueries = resourceQueries;
+		this.anonPropertyQueries = anonPropertyQueries;
+		this.anonInversePropertyQueries = anonInversePropertyQueries;
 	}
 	
 	public String getEndpointURL() {
@@ -44,13 +77,13 @@ public class RemoteSPARQLDataSource implements DataSource {
 			StringBuffer result = new StringBuffer();
 			result.append(endpointURL);
 			result.append("?");
-			if (defaultGraphName != null) {
+			if (defaultGraphURI != null) {
 				result.append("default-graph-uri=");
-				result.append(URLEncoder.encode(defaultGraphName, "utf-8"));
+				result.append(URLEncoder.encode(defaultGraphURI, "utf-8"));
 				result.append("&");
 			}
 			result.append("query=");
-			result.append(URLEncoder.encode(buildDescribeQuery(resourceURI), "utf-8"));
+			result.append(URLEncoder.encode(preProcessQuery(resourceQueries[0], resourceURI), "utf-8"));
 			return result.toString();
 		} catch (UnsupportedEncodingException ex) {
 			// can't happen, utf-8 is always supported
@@ -58,51 +91,71 @@ public class RemoteSPARQLDataSource implements DataSource {
 		}
 	}
 
-	private String buildDescribeQuery(String resourceURI) {
-		return "DESCRIBE <" + resourceURI + ">";
-	}
-	
-	private String buildConstructQuery(String resourceURI) {
+	private String buildIndexQuery(String resourceURI) {
 		return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o } LIMIT 1000";
 	}
 	
 	public Model getResourceDescription(String resourceURI) {
 		String index = Configuration.buildIndexResource(this.webBase, this.webResourcePrefix);
 		if (index.equals(resourceURI)) {
-			return execConstructQuery(buildConstructQuery(resourceURI));
+			return execIndexQuery(buildIndexQuery(resourceURI));
 		} else {
-			return execDescribeQuery(buildDescribeQuery(resourceURI));
+			// Loop over resource description queries, join results in a single model.
+			// Process each query to replace place-holders of the given resource.
+			Model model = executeQuery(preProcessQuery(resourceQueries[0], resourceURI));
+			for (int i=1; i<resourceQueries.length; i++){
+				model.add(executeQuery(preProcessQuery(resourceQueries[i], resourceURI)));
+			}
+			return model;
 		}
 	}
-	
+
 	public Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse) {
-		String query = "DESCRIBE ?x WHERE { "
-			+ (isInverse 
-					? "?x <" + property.getURI() + "> <" + resourceURI + "> . "
-					: "<" + resourceURI + "> <" + property.getURI() + "> ?x . ")
-			+ "FILTER (isBlank(?x)) }";
-		return execDescribeQuery(query);
+		
+		// Loop over anonymous property description queries, join results in a single model.
+		// Process each query to replace place-holders of the given resource and property.
+		String[] queries = isInverse ? anonInversePropertyQueries : anonPropertyQueries;
+		Model model = executeQuery(preProcessQuery(queries[0], resourceURI, property));
+		for (int i=1; i<queries.length; i++){
+			model.add(executeQuery(preProcessQuery(queries[i], resourceURI, property)));
+		}
+		return model;
 	}
 	
 	public String getPreviousDescribeQuery() {
 		return previousDescribeQuery;
 	}
 	
-	private Model execDescribeQuery(String query) {
-		previousDescribeQuery = query;
-		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
-		if (defaultGraphName != null) {
-			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
+	private Model executeQuery(String queryString) {
+
+		previousDescribeQuery = queryString;
+
+		// Since we don't know the exact query type (e.g. DESCRIBE or CONSTRUCT),
+		// and com.hp.hpl.jena.query.QueryFactory could throw exceptions on
+		// vendor-specific sections of the query, we use the lower-level
+		// com.hp.hpl.jena.sparql.engine.http.HttpQuery to execute the query and
+		// read the results into model.
+		
+		HttpQuery httpQuery = new HttpQuery(endpointURL);
+		httpQuery.addParam("query", queryString);
+		if (defaultGraphURI != null) {
+			httpQuery.addParam("default-graph-uri", defaultGraphURI);
 		}
-		return endpoint.execDescribe();
+		httpQuery.setAccept("application/rdf+xml");
+		
+		Model model = ModelFactory.createDefaultModel();
+		InputStream in = httpQuery.exec();
+		model.read(in, null);
+		return model;
 	}
 	
-	private Model execConstructQuery(String query) {
-		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
-		if (defaultGraphName != null) {
-			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
-		}
-		Model model = endpoint.execConstruct();
+	private String preProcessQuery(String query, String resourceURI){
+		return preProcessQuery(query, resourceURI, null);
+	}
+	
+
+	private Model execIndexQuery(String query) {
+		Model model = executeQuery(query);
 		Property siocContainerOf = model.createProperty("http://rdfs.org/sioc/ns#container_of");
 		ResIterator iter = model.listSubjects();
 		Resource index = model.createResource(Configuration.buildIndexResource(this.webBase, this.webResourcePrefix));
@@ -117,5 +170,33 @@ public class RemoteSPARQLDataSource implements DataSource {
 						 model.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
 						 model.createLiteral("Synthetic container for listing all resources available on this dataset"));
 		return model;
+	}
+
+	private String preProcessQuery(String query, String resourceURI, Property property){
+		
+		String result = replaceString(query, "?__this__", "<" + resourceURI + ">");
+		if (property!=null){
+			result = replaceString(result, "?__property__", "<" + property.getURI() + ">");
+		}
+		return result;
+	}
+	
+	private String replaceString(String text, String searchString, String replacement) {
+
+		int start = 0;
+		int end = text.indexOf(searchString, start);
+		if (end == -1) {
+			return text;
+		}
+
+		int replacementLength = searchString.length();
+		StringBuffer buf = new StringBuffer();
+		while (end != -1) {
+			buf.append(text.substring(start, end)).append(replacement);
+			start = end + replacementLength;
+			end = text.indexOf(searchString, start);
+		}
+		buf.append(text.substring(start));
+		return buf.toString();
 	}
 }

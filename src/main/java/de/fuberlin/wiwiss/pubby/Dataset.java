@@ -73,10 +73,17 @@ public class Dataset {
 		}
 		if (config.hasProperty(CONF.sparqlEndpoint)) {
 			String endpointURL = config.getProperty(CONF.sparqlEndpoint).getResource().getURI();
-			String graphName = config.hasProperty(CONF.sparqlDefaultGraph)
-								? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
-								: null;
-			dataSource = new RemoteSPARQLDataSource(endpointURL, graphName, webBase, this.getWebResourcePrefix());
+			String defaultGraphURI = config.hasProperty(CONF.sparqlDefaultGraph)
+					? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
+					: null;
+			dataSource = new RemoteSPARQLDataSource(
+					endpointURL,
+					defaultGraphURI,
+					webBase, 
+					this.getWebResourcePrefix(),
+					listSPARQLQueries(CONF.resourceDescriptionQuery),
+					listSPARQLQueries(CONF.anonymousPropertyDescriptionQuery),
+					listSPARQLQueries(CONF.anonymousInversePropertyDescriptionQuery));
 		} else {
 			Model data = ModelFactory.createDefaultModel();
 			StmtIterator it = config.listProperties(CONF.loadRDF);
@@ -356,5 +363,14 @@ public class Dataset {
 	private String unescapeURIDelimiters(String uri) {
 		return uri.replaceAll("%23", "#").replaceAll("%3F", "?");
 	}
-	
+
+	private String[] listSPARQLQueries(Property queryProperty) {
+
+		ArrayList list = new ArrayList();
+		StmtIterator it = config.listProperties(queryProperty);
+		while (it.hasNext()) {
+			list.add(it.nextStatement().getResource().getProperty(CONF.sparql).getString());
+		}
+		return list.isEmpty() ? null : (String[]) list.toArray(new String[list.size()]);
+	}
 }

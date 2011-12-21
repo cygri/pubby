@@ -74,6 +74,29 @@
 
         # include metadata
         conf:metadataTemplate "metadata.ttl";
+        
+        # Queries for describing a resource denoted by "?__this__".
+        # Will be executed in the below order, and results joined.
+        conf:resourceDescriptionQuery [
+            conf:sparql "DESCRIBE ?__this__";
+        ];
+        conf:resourceDescriptionQuery [
+            conf:sparql "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o. FILTER (?o = ?__this__) }";
+        ];
+        
+        # Queries for describing the blank nodes related to a given resource via a given property.
+        # The resource and the property should be denoted by "?__this__" and "?__property__".
+        # Queries will be executed in the below order, and results joined.
+        conf:anonymousPropertyDescriptionQuery [
+            conf:sparql "DESCRIBE ?x WHERE { ?__this__ ?__property__ ?x. FILTER (isBlank(?x)) }";
+        ];
+        
+        # Queries for describing the blank nodes inversely related to a given resource via a given property.
+        # The resource and the property should be denoted by "?__this__" and "?__property__".
+        # Queries will be executed in the below order, and results joined.
+        conf:anonymousInversePropertyDescriptionQuery [
+            conf:sparql "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
+        ];
 
         # configure your metadata here
         # Use properties with the meta: prefix where the property name

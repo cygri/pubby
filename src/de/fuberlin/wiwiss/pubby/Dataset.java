@@ -42,7 +42,6 @@ public class Dataset {
 	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
 	private Calendar currentTime;
 	private Resource currentDocRepr;
-	private String webBase;
 	
 	public Dataset(Resource config, String webBase) {
 		this.model = config.getModel();

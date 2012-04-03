@@ -11,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
-import de.fuberlin.wiwiss.pubby.vocab.CONF;
 import de.fuberlin.wiwiss.pubby.vocab.RDF;
 
 /**
@@ -24,7 +23,6 @@ import de.fuberlin.wiwiss.pubby.vocab.RDF;
  */
 public class RemoteSPARQLDataSource implements DataSource {
 	
-	private Resource config;
 	private String endpointURL;
 	private String defaultGraphName;
 	private String webResourcePrefix;

@@ -64,7 +64,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	private String buildDescribeQuery(String resourceURI) {
 		String index = Configuration.buildIndexResource(this.webBase, this.webResourcePrefix);
 		if (index.equals(resourceURI)) {
-			return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o }";
+			return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o } LIMIT 1000";
 		} else {
 			return "DESCRIBE <" + resourceURI + ">";
 		}

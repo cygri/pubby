@@ -59,16 +59,20 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 
 	private String buildDescribeQuery(String resourceURI) {
-		String index = Configuration.buildIndexResource(this.webBase, this.webResourcePrefix);
-		if (index.equals(resourceURI)) {
-			return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o } LIMIT 1000";
-		} else {
-			return "DESCRIBE <" + resourceURI + ">";
-		}
+		return "DESCRIBE <" + resourceURI + ">";
+	}
+	
+	private String buildConstructQuery(String resourceURI) {
+		return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o } LIMIT 1000";
 	}
 	
 	public Model getResourceDescription(String resourceURI) {
-		return execDescribeQuery(buildDescribeQuery(resourceURI));
+		String index = Configuration.buildIndexResource(this.webBase, this.webResourcePrefix);
+		if (index.equals(resourceURI)) {
+			return execConstructQuery(buildConstructQuery(resourceURI));
+		} else {
+			return execDescribeQuery(buildDescribeQuery(resourceURI));
+		}
 	}
 	
 	public Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse) {
@@ -90,27 +94,28 @@ public class RemoteSPARQLDataSource implements DataSource {
 		if (defaultGraphName != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
 		}
-		
-		//FIXME: more elegant way to discriminate query execution 
-		//		 (lateral effect from introducing CONSTRUCT query for listing all resources on index)
-		if (query.startsWith("CONSTRUCT")) {
-			Model model = endpoint.execConstruct();
-			Property containerOf = model.createProperty("http://rdfs.org/sioc/ns#container_of");
-			ResIterator iter = model.listSubjects();
-			Resource index = model.createResource(Configuration.buildIndexResource(this.webBase, this.webResourcePrefix));
-			while (iter.hasNext()) {
-				Resource o = iter.next();
-				if (!index.equals(o)) {
-					Statement statement = model.createStatement(index, containerOf, o);
-					model.add(statement);
-				}
-			}
-			model.addLiteral(index, 
-							 model.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
-							 model.createLiteral("Synthetic container for listing by default all resources on pubby"));
-			return model;
-		} else {
-			return endpoint.execDescribe();
+		return endpoint.execDescribe();
+	}
+	
+	private Model execConstructQuery(String query) {
+		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
+		if (defaultGraphName != null) {
+			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
 		}
+		Model model = endpoint.execConstruct();
+		Property siocContainerOf = model.createProperty("http://rdfs.org/sioc/ns#container_of");
+		ResIterator iter = model.listSubjects();
+		Resource index = model.createResource(Configuration.buildIndexResource(this.webBase, this.webResourcePrefix));
+		while (iter.hasNext()) {
+			Resource o = iter.nextResource();
+			if (!index.equals(o)) {
+				Statement statement = model.createStatement(index, siocContainerOf, o);
+				model.add(statement);
+			}
+		}
+		model.addLiteral(index, 
+						 model.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
+						 model.createLiteral("Synthetic container for listing all resources available on this dataset"));
+		return model;
 	}
 }

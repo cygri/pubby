@@ -10,8 +10,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
-
-import de.fuberlin.wiwiss.pubby.vocab.RDF;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * A data source backed by a SPARQL endpoint accessed through

@@ -26,6 +26,8 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * @version $Id$
  */
 public class Configuration {
+	
+	public static final String INDEX = "index"; 
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
@@ -46,7 +48,7 @@ public class Configuration {
 		datasets = new ArrayList();
 		it = model.listStatements(config, CONF.dataset, (RDFNode) null);
 		while (it.hasNext()) {
-			datasets.add(new Dataset(it.nextStatement().getResource()));
+			datasets.add(new Dataset(it.nextStatement().getResource(), this.getWebApplicationBaseURI()));
 		}
 		labelProperties = new ArrayList();
 		it = model.listStatements(config, CONF.labelProperty, (RDFNode) null);
@@ -158,4 +160,16 @@ public class Configuration {
 	public String getWebApplicationBaseURI() {
 		return config.getProperty(CONF.webBase).getResource().getURI();
 	}
+	
+	public String buildIndexResource() {
+		String webApplicationBaseURI = this.getWebApplicationBaseURI();
+		Statement dataset = this.config.getProperty(CONF.dataset);
+		String webResourcePrefix = dataset.getProperty(CONF.webResourcePrefix).getString();
+		return buildIndexResource(webApplicationBaseURI, webResourcePrefix);
+	}
+	
+	public static String buildIndexResource(String webApplicationBaseURI, String webResourcePrefix) {
+		return  webApplicationBaseURI + webResourcePrefix + INDEX;
+	}
+	
 }

@@ -6,23 +6,33 @@ import java.util.Collections;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * A data source backed by a SPARQL endpoint accessed through
  * the SPARQL protocol.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
+ * @author Sergio Fernández (sergio.fernandez@fundacionctic.org)
  * @version $Id$
  */
 public class RemoteSPARQLDataSource implements DataSource {
+	
 	private String endpointURL;
 	private String defaultGraphName;
+	private String webResourcePrefix;
+	private String webBase;
 	private String previousDescribeQuery;
 	
-	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphName) {
+	public RemoteSPARQLDataSource(String endpointURL, String graphName, String webBase, String webResourcePrefix) {
 		this.endpointURL = endpointURL;
-		this.defaultGraphName = defaultGraphName;
+		this.defaultGraphName = graphName;
+		this.webBase = webBase;
+		this.webResourcePrefix = webResourcePrefix;
 	}
 	
 	public String getEndpointURL() {
@@ -40,16 +50,29 @@ public class RemoteSPARQLDataSource implements DataSource {
 				result.append("&");
 			}
 			result.append("query=");
-			result.append(URLEncoder.encode("DESCRIBE <" + resourceURI + ">", "utf-8"));
+			result.append(URLEncoder.encode(buildDescribeQuery(resourceURI), "utf-8"));
 			return result.toString();
 		} catch (UnsupportedEncodingException ex) {
 			// can't happen, utf-8 is always supported
 			throw new RuntimeException(ex);
 		}
 	}
+
+	private String buildDescribeQuery(String resourceURI) {
+		return "DESCRIBE <" + resourceURI + ">";
+	}
+	
+	private String buildConstructQuery(String resourceURI) {
+		return "CONSTRUCT { ?s <" + RDF.type.getURI() + "> ?o } WHERE { ?s <" + RDF.type.getURI() + "> ?o } LIMIT 1000";
+	}
 	
 	public Model getResourceDescription(String resourceURI) {
-		return execDescribeQuery("DESCRIBE <" + resourceURI + ">");
+		String index = Configuration.buildIndexResource(this.webBase, this.webResourcePrefix);
+		if (index.equals(resourceURI)) {
+			return execConstructQuery(buildConstructQuery(resourceURI));
+		} else {
+			return execDescribeQuery(buildDescribeQuery(resourceURI));
+		}
 	}
 	
 	public Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse) {
@@ -72,5 +95,27 @@ public class RemoteSPARQLDataSource implements DataSource {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
 		}
 		return endpoint.execDescribe();
+	}
+	
+	private Model execConstructQuery(String query) {
+		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
+		if (defaultGraphName != null) {
+			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
+		}
+		Model model = endpoint.execConstruct();
+		Property siocContainerOf = model.createProperty("http://rdfs.org/sioc/ns#container_of");
+		ResIterator iter = model.listSubjects();
+		Resource index = model.createResource(Configuration.buildIndexResource(this.webBase, this.webResourcePrefix));
+		while (iter.hasNext()) {
+			Resource o = iter.nextResource();
+			if (!index.equals(o)) {
+				Statement statement = model.createStatement(index, siocContainerOf, o);
+				model.add(statement);
+			}
+		}
+		model.addLiteral(index, 
+						 model.createProperty("http://www.w3.org/2000/01/rdf-schema#label"), 
+						 model.createLiteral("Synthetic container for listing all resources available on this dataset"));
+		return model;
 	}
 }

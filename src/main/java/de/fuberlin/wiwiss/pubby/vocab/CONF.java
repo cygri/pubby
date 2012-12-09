@@ -23,6 +23,8 @@ public class CONF {
 	public static final Property defaultLanguage = m.createProperty(NS + "defaultLanguage");
 	public static final Property indexResource = m.createProperty(NS + "indexResource");
 	public static final Property dataset = m.createProperty(NS + "dataset");
+	public static final Property showLabels = m.createProperty(NS + "showLabels");
+	public static final Property loadVocabularyFromURL = m.createProperty(NS + "loadVocabularyFromURL");
 
 	public static final Property datasetBase = m.createProperty(NS + "datasetBase");
 	public static final Property datasetURIPattern = m.createProperty(NS + "datasetURIPattern");

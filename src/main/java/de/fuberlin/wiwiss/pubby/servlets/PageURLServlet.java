@@ -67,7 +67,8 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());
 		context.put("properties", resourceDescription.getProperties());
-		
+		context.put("showLabels", new Boolean(config.showLabels()));
+
 		try {
 			Model metadata = ModelFactory.createDefaultModel();
 			for (MappedResource resource: resources) {

@@ -37,6 +37,7 @@ public class Configuration {
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
+	private final VocabularyStore vocabularyStore = new VocabularyStore(this);
 	
 	public Configuration(Model configurationModel) {
 		model = configurationModel;
@@ -79,8 +80,14 @@ public class Configuration {
 		if (imageProperties.isEmpty()) {
 			imageProperties.add(model.createProperty("http://xmlns.com/foaf/0.1/depiction"));
 		}
-		
-		prefixes = new PrefixMappingImpl();		
+
+		it = model.listStatements(config, CONF.loadVocabularyFromURL, (RDFNode) null);
+		while (it.hasNext()) {
+			vocabularyStore.addSourceURL(
+					it.nextStatement().getObject().asResource().getURI());
+		}
+
+		prefixes = new PrefixMappingImpl();
 		if (config.hasProperty(CONF.usePrefixesFrom)) {
 			it = config.listProperties(CONF.usePrefixesFrom);
 			while (it.hasNext()) {
@@ -189,5 +196,16 @@ public class Configuration {
 			return config.getProperty(CONF.webResourcePrefix).getString();
 		}
 		return "";
+	}
+
+	public boolean showLabels() {
+		if (config.hasProperty(CONF.showLabels)) {
+			return config.getProperty(CONF.showLabels).getBoolean();
+		}
+		return false;
+	}
+
+	public VocabularyStore getVocabularyStore() {
+		return vocabularyStore;
 	}
 }

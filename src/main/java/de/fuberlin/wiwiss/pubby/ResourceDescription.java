@@ -18,8 +18,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-
-import de.fuberlin.wiwiss.pubby.Configuration;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * A convenient interface to an RDF description of a resource.
@@ -43,7 +42,7 @@ public class ResourceDescription {
 		this.model = model;
 		this.resource = model.getResource(hypermediaResource.getAbsoluteIRI());
 		this.config = config;
-	}
+   	}
 
 	public ResourceDescription(Resource resource, Model model, Configuration config) {
 		this.hypermediaResource = null;
@@ -103,7 +102,7 @@ public class ResourceDescription {
 			Property predicate = stmt.getPredicate();
 			String key = "=>" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(predicate, false));
+				propertyBuilders.put(key, new PropertyBuilder(predicate, false, config.getVocabularyStore()));
 			}
 			((PropertyBuilder) propertyBuilders.get(key)).addValue(stmt.getObject());
 		}
@@ -113,7 +112,7 @@ public class ResourceDescription {
 			Property predicate = stmt.getPredicate();
 			String key = "<=" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(predicate, true));
+				propertyBuilders.put(key, new PropertyBuilder(predicate, true, config.getVocabularyStore()));
 			}
 			((PropertyBuilder) propertyBuilders.get(key)).addValue(stmt.getSubject());
 		}
@@ -179,13 +178,15 @@ public class ResourceDescription {
 		private final boolean isInverse;
 		private final List<Value> values;
 		private final int blankNodeCount;
+		private final VocabularyStore vocabularyStore;
 		public ResourceProperty(Property predicate, boolean isInverse, List<Value> values,
-				int blankNodeCount) {
+				int blankNodeCount, VocabularyStore vocabularyStore) {
 			this.predicate = predicate;
 			this.predicatePrefixer = new URIPrefixer(predicate, getPrefixes());
 			this.isInverse = isInverse;
 			this.values = values;
 			this.blankNodeCount = blankNodeCount;
+			this.vocabularyStore = vocabularyStore;
 		}
 		public boolean isInverse() {
 			return isInverse;
@@ -201,6 +202,12 @@ public class ResourceDescription {
 		}
 		public String getLocalName() {
 			return predicatePrefixer.getLocalName();
+		}
+		public String getLabel() {
+			return vocabularyStore.getLabel(predicate.getURI());
+		}
+		public String getDescription() {
+			return vocabularyStore.getDescription(predicate.getURI());
 		}
 		public List<Value> getValues() {
 			return values;
@@ -238,28 +245,34 @@ public class ResourceDescription {
 		private final boolean isInverse;
 		private final List<Value> values = new ArrayList<Value>();
 		private int blankNodeCount = 0;
-		PropertyBuilder(Property predicate, boolean isInverse) {
+		private VocabularyStore vocabularyStore;
+		PropertyBuilder(Property predicate, boolean isInverse, VocabularyStore vocabularyStore) {
 			this.predicate = predicate;
 			this.isInverse = isInverse;
+			this.vocabularyStore = vocabularyStore;
 		}
 		void addValue(RDFNode valueNode) {
 			if (valueNode.isAnon()) {
 				blankNodeCount++;
 				return;
 			}
-			values.add(new Value(valueNode));
+			values.add(new Value(valueNode, predicate, vocabularyStore));
 		}
 		ResourceProperty toProperty() {
 			Collections.sort(values);
-			return new ResourceProperty(predicate, isInverse, values, blankNodeCount);
+			return new ResourceProperty(predicate, isInverse, values, blankNodeCount, vocabularyStore);
 		}
 	}
 	
 	public class Value implements Comparable<Value> {
 		private final RDFNode node;
 		private URIPrefixer prefixer;
-		public Value(RDFNode valueNode) {
+		private Property predicate;
+		private VocabularyStore vocabularyStore;
+		public Value(RDFNode valueNode, Property predicate, VocabularyStore vocabularyStore) {
 			this.node = valueNode;
+			this.predicate = predicate;
+			this.vocabularyStore = vocabularyStore;
 			if (valueNode.isURIResource()) {
 				prefixer = new URIPrefixer((Resource) valueNode.as(Resource.class), getPrefixes());
 			}
@@ -282,6 +295,12 @@ public class ResourceDescription {
 			}
 			return prefixer.getLocalName();
 		}
+		public String getLabel() {
+			return vocabularyStore.getLabel(node.asNode().getURI());
+		}
+		public String getDescription() {
+			return vocabularyStore.getDescription(node.asNode().getURI());
+		}
 		public String getDatatypeLabel() {
 			if (!node.isLiteral()) return null;
 			String uri = ((Literal) node.as(Literal.class)).getDatatypeURI();
@@ -292,6 +311,9 @@ public class ResourceDescription {
 			} else {
 				return "?:" + datatypePrefixer.getLocalName();
 			}
+		}
+		public boolean isType() {
+			return predicate.equals(RDF.type);
 		}
 		public int compareTo(Value other) {
 			if (!(other instanceof Value)) {

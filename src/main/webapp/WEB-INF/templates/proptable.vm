@@ -11,7 +11,9 @@
 #if ($property.isInverse())
           <small>is</small>
 #end
-#if ($property.hasPrefix())
+#if ($showLabels)
+          <a class="uri" href="$property.URI" title="$property.URI: $property.description">$property.label</a>
+#elseif ($property.hasPrefix())
           <a class="uri" href="$property.URI" title="$property.URI"><small>$property.Prefix:</small>$property.LocalName</a>
 #else
           <a class="uri" href="$property.URI" title="$property.URI"><small>?:</small>$property.LocalName</a>
@@ -25,7 +27,9 @@
 #foreach ($value in $property.Values)
             <li>
 #if ($value.Node.isURI())
-#if ($value.hasPrefix())
+#if ($showLabels && $value.isType())
+              <a class="uri" href="$value.Node.URI" title="$value.Node.URI: $value.description">$value.label</a>
+#elseif ($value.hasPrefix())
               <a class="uri" href="$value.Node.URI" title="$value.Node.URI"><small>$value.Prefix:</small>$value.LocalName</a>
 #else
               <small>&lt;</small><a class="uri" href="$value.Node.URI">$value.Node.URI</a><small>&gt;</small>

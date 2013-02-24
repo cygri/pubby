@@ -43,8 +43,8 @@ public class Dataset {
 	private Calendar currentTime;
 	private Resource currentDocRepr;
 	
-	public Dataset(Resource config) {
-		model = config.getModel();
+	public Dataset(Resource config, String webBase) {
+		this.model = config.getModel();
 		this.config = config;
 		if (config.hasProperty(CONF.datasetURIPattern)) {
 			datasetURIPattern = Pattern.compile(
@@ -73,10 +73,10 @@ public class Dataset {
 		}
 		if (config.hasProperty(CONF.sparqlEndpoint)) {
 			String endpointURL = config.getProperty(CONF.sparqlEndpoint).getResource().getURI();
-			String defaultGraph = config.hasProperty(CONF.sparqlDefaultGraph)
-					? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
-					: null;
-			dataSource = new RemoteSPARQLDataSource(endpointURL, defaultGraph);
+			String graphName = config.hasProperty(CONF.sparqlDefaultGraph)
+								? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
+								: null;
+			dataSource = new RemoteSPARQLDataSource(endpointURL, graphName, webBase, this.getWebResourcePrefix());
 		} else {
 			Model data = ModelFactory.createDefaultModel();
 			StmtIterator it = config.listProperties(CONF.loadRDF);
@@ -356,4 +356,5 @@ public class Dataset {
 	private String unescapeURIDelimiters(String uri) {
 		return uri.replaceAll("%23", "#").replaceAll("%3F", "?");
 	}
+	
 }

@@ -2,6 +2,10 @@ package de.fuberlin.wiwiss.pubby;
 
 import com.hp.hpl.jena.rdf.model.Property;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
+
 /**
  * A resource that is mapped between the SPARQL dataset and the Web server.
  * 
@@ -16,7 +20,15 @@ public class MappedResource {
 	
 	public MappedResource(String relativeWebURI, String datasetURI, 
 			Configuration config, Dataset dataset) {
-		this.relativeWebURI = relativeWebURI;
+		String decodeRelativeWebURI;
+		try{
+			decodeRelativeWebURI = URLDecoder.decode(relativeWebURI,"utf-8");
+		}
+		catch(UnsupportedEncodingException ex){
+			decodeRelativeWebURI = relativeWebURI;
+			throw new RuntimeException(ex);
+		}
+		this.relativeWebURI = decodeRelativeWebURI;
 		this.datasetURI = datasetURI;
 		this.serverConfig = config;
 		this.datasetConfig = dataset;
@@ -48,7 +60,15 @@ public class MappedResource {
 	 * @return the HTML page describing the resource on the public Web server
 	 */
 	public String getPageURL() {
-		return serverConfig.getWebApplicationBaseURI() + "page/" + relativeWebURI;
+		String encodeRelativeWebURI;
+		try{
+		  encodeRelativeWebURI = URLEncoder.encode(relativeWebURI,"utf-8");
+		}
+		catch(UnsupportedEncodingException ex){
+		  encodeRelativeWebURI = relativeWebURI;
+		  throw new RuntimeException(ex);
+		}
+		return serverConfig.getWebApplicationBaseURI() + "page/" + encodeRelativeWebURI;
 	}
 	
 	/**

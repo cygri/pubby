@@ -124,7 +124,7 @@ public class ResourceDescription {
 	}
 
 	private PrefixMapping getPrefixes() {
-		return model;
+		return config.getPrefixes();
 	}
 
 	private Collection getValuesFromMultipleProperties(Collection properties) {

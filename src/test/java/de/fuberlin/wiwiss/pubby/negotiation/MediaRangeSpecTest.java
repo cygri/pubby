@@ -117,7 +117,7 @@ public class MediaRangeSpecTest extends TestCase {
 		assertIllegalMediaTypeSyntax("a");
 		assertIllegalMediaTypeSyntax(" a/b ");
 		assertIllegalMediaTypeSyntax("a / b");
-		assertIllegalMediaTypeSyntax("Š/b");
+		assertIllegalMediaTypeSyntax("\u00E4/b");
 		assertIllegalMediaTypeSyntax("a\na/b");
 		assertIllegalMediaTypeSyntax("a/b;c");
 		assertIllegalMediaTypeSyntax("a/b;c=");

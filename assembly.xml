@@ -1,0 +1,25 @@
+<assembly>
+<!--  <id>bin</id>-->
+  <formats>
+    <format>zip</format>
+  </formats>
+  <baseDirectory>${project.artifactId}</baseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>target/${project.artifactId}</directory>
+      <outputDirectory>/</outputDirectory>
+      <excludes>
+        <exclude>META-INF</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>

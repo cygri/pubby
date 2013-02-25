@@ -146,14 +146,16 @@ pre { speak-punctuation: code; }
   has been tested with <a href="http://tomcat.apache.org/">Tomcat</a> and <a href="http://www.mortbay.org/">Jetty</a>.
   I will assume your server is set up to run at <tt>http://myserver/</tt>.</li>
 
-<li>Unzip the Pubby distribution and <strong>copy the <tt>webapp</tt> directory</strong>
+<li>Unzip the Pubby distribution and <strong>move the <tt>pubby</tt> directory</strong>
   into the servlet container's <tt>webapps</tt> folder. If Pubby is the only
   web application you want to run in the container, then rename the <tt>webapp</tt>
-  directory to <tt>root</tt>. Otherwise, rename it to something like <tt>mydataset</tt>.
-  This will change the Pubby root to <tt>http://myserver/mydataset/</tt>.</li>
+  directory to <tt>ROOT</tt>. This will make Pubby run at
+  <tt>http://myserver/</tt>. Otherwise, you may rename it to something like
+  <tt>mydataset</tt>.
+  This will make Pubby run at <tt>http://myserver/mydataset/</tt>.</li>
 
 <li><strong>Modify the configuration file</strong> to suit your needs. It is located
-  within Pubby's webapp directory, at <tt>/WEB-INF/config.ttl</tt>. See the next section
+  within the <tt>pubby</tt> directory, at <tt>/WEB-INF/config.ttl</tt>. See the next section
   for a list of supported configuration directives.</li>
 </ol>
 
@@ -322,6 +324,23 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 <h2 id="development">Source code and development</h2>
 <p>Pubby is open source (<a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a>). Pubby is hosted on <a href="http://github.com/">GitHub</a>.
   The official version of the source code is available from <a href="http://github.com/cygri/pubby">the <tt>cygri/pubby</tt> repository</a>.</p>
+
+<p>You need a <a href="http://git-scm.com/">git</a> client to get the source, and <a href="http://maven.apache.org/">Apache Maven</a> to build it:</p>
+
+<pre>
+# Get source from GitHub
+git clone https://github.com/cygri/pubby.git
+cd pubby
+
+# If you work with Eclipse, create project files
+mvn eclipse:eclipse
+
+# Compile and run with Jetty Maven plugin
+mvn jetty:run
+
+# Build a distribution in target/pubby.zip
+mvn clean package
+</pre>
 
 <h2 id="acknowledgements">Acknowledgements</h2>
 <p>This project has received contributions from <a href="http://olafhartig.de/">Olaf Hartig</a> and <a href="http://www.linkedin.com/pub/boris-villazon-terrazas/5/601/1a">Boris Villazón-Terrazas</a>.</p>

@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -91,4 +90,6 @@ public class DataURLServlet extends BaseURLServlet {
 		server.serve();
 		return true;
 	}
+	
+	private static final long serialVersionUID = 6825866213915066364L;
 }

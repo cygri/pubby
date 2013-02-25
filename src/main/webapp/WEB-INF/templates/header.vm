@@ -11,7 +11,11 @@
     <div id="header">
       <div>
         <h1 id="title">$title</h1>
+#if ($project_link)
         <div id="homelink">at <a href="$project_link">$project_name</a></div>
+#else
+        <div id="homelink">at <a href="$server_base">$project_name</a></div>
+#end
       </div>
 #if ($uri)
       <div class="page-resource-uri"><a href="$uri">$uri</a></div>

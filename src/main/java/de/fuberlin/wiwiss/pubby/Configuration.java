@@ -3,6 +3,7 @@ package de.fuberlin.wiwiss.pubby;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -26,15 +27,15 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * @version $Id$
  */
 public class Configuration {
+	private static final String DEFAULT_PROJECT_NAME = "Untitled Dataset";
 	
-	public static final String INDEX = "index"; 
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
 	private final Collection labelProperties;
 	private final Collection commentProperties;
 	private final Collection imageProperties;
-	private final Collection datasets;
+	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
 	
 	public Configuration(Model configurationModel) {
 		model = configurationModel;
@@ -45,10 +46,9 @@ public class Configuration {
 		}
 		config = it.nextStatement().getSubject();
 
-		datasets = new ArrayList();
 		it = model.listStatements(config, CONF.dataset, (RDFNode) null);
 		while (it.hasNext()) {
-			datasets.add(new Dataset(it.nextStatement().getResource(), this.getWebApplicationBaseURI()));
+			datasets.add(new Dataset(it.nextStatement().getResource()));
 		}
 		labelProperties = new ArrayList();
 		it = model.listStatements(config, CONF.labelProperty, (RDFNode) null);
@@ -91,6 +91,21 @@ public class Configuration {
 		}
 		if (prefixes.getNsURIPrefix(CONF.NS) != null) {
 			prefixes.removeNsPrefix(prefixes.getNsURIPrefix(CONF.NS));
+		}
+		if (prefixes.getNsURIPrefix(RDF.getURI()) == null && 
+				prefixes.getNsPrefixURI("rdf") == null) {
+			// If no prefix is defined for the RDF namespace, set it to rdf:
+			// unless that would overwrite something.
+			prefixes.setNsPrefix("rdf", RDF.getURI());
+		}
+		// If we don't have an indexResource, then add an index builder dataset
+		// as the first dataset. It will be responsible for handling the
+		// homepage/index resource.
+		if (!config.hasProperty(CONF.indexResource)) {
+			String indexURL = getWebApplicationBaseURI();
+			List<Dataset> realDatasets = new ArrayList<Dataset>(datasets);
+			Dataset indexDataset = new Dataset(new IndexDataSource(indexURL, realDatasets, this), indexURL);
+			datasets.add(0, indexDataset);
 		}
 	}
 
@@ -150,26 +165,16 @@ public class Configuration {
 	}
 	
 	public String getProjectLink() {
-		return config.getProperty(CONF.projectHomepage).getResource().getURI();
+		Statement stmt = config.getProperty(CONF.projectHomepage);
+		return stmt == null ? null : stmt.getResource().getURI();
 	}
 
 	public String getProjectName() {
-		return config.getProperty(CONF.projectName).getString();
+		Statement stmt = config.getProperty(CONF.projectName);
+		return stmt == null ? DEFAULT_PROJECT_NAME : stmt.getString();
 	}
 
 	public String getWebApplicationBaseURI() {
 		return config.getProperty(CONF.webBase).getResource().getURI();
 	}
-	
-	public String buildIndexResource() {
-		String webApplicationBaseURI = this.getWebApplicationBaseURI();
-		Statement dataset = this.config.getProperty(CONF.dataset);
-		String webResourcePrefix = dataset.getProperty(CONF.webResourcePrefix).getString();
-		return buildIndexResource(webApplicationBaseURI, webResourcePrefix);
-	}
-	
-	public static String buildIndexResource(String webApplicationBaseURI, String webResourcePrefix) {
-		return  webApplicationBaseURI + webResourcePrefix + INDEX;
-	}
-	
 }

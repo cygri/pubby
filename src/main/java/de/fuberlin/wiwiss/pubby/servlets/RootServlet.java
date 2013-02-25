@@ -29,18 +29,11 @@ public class RootServlet extends BaseServlet {
 			getServletContext().getNamedDispatcher("default").forward(request, response);
 			return true;
 		}
-		
-		if ("".equals(relativeURI)) {
-			// If index resource is defined
-			// redirect requests for the index page to it
-			// if not, list all resources
-			if (config.getIndexResource() != null) {
-				response.sendRedirect(config.getIndexResource().getWebURI());
-				return true;
-			} else {
-				response.sendRedirect(config.buildIndexResource());
-				return true;
-			}
+
+		// Homepage. If index resource is defined, redirect to it.
+		if ("".equals(relativeURI) && config.getIndexResource() != null) {
+			response.sendRedirect(config.getIndexResource().getWebURI());
+			return true;
 		}
 		
 		// Assume it's a resource URI -- will produce 404 if not

@@ -2,9 +2,7 @@ package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +34,7 @@ public class PageURLServlet extends BaseURLServlet {
 			Configuration config) throws ServletException, IOException {
 
 		Model description = getResourceDescription(resource);
-		
+
 		if (description.size() == 0) {
 			return false;
 		}
@@ -89,4 +87,6 @@ public class PageURLServlet extends BaseURLServlet {
 		template.renderXHTML("page.vm");
 		return true;
 	}
+
+	private static final long serialVersionUID = 3363621132360159793L;
 }

@@ -22,7 +22,8 @@ public class WebURIServlet extends BaseServlet {
 
 	public boolean doGet(String relativeURI, HttpServletRequest request,
 			HttpServletResponse response, Configuration config) throws IOException {
-		MappedResource resource = config.getMappedResourceFromRelativeWebURI(relativeURI, true);
+		MappedResource resource;
+		resource = config.getMappedResourceFromRelativeWebURI(relativeURI, true);
 		if (resource == null) return false;
 
 		response.addHeader("Vary", "Accept, User-Agent");
@@ -43,7 +44,7 @@ public class WebURIServlet extends BaseServlet {
 		String location;
 		if ("text/html".equals(bestMatch.getMediaType())) {
 			location = resource.getPageURL();
-		} else if (resource.getDataset().redirectRDFRequestsToEndpoint()) {
+		} else if (resource.getDataset() != null && resource.getDataset().redirectRDFRequestsToEndpoint()) {
 			location = resource.getDataset().getDataSource().getResourceDescriptionURL(
 					resource.getDatasetURI());	
 		} else {
@@ -54,4 +55,6 @@ public class WebURIServlet extends BaseServlet {
 				"303 See Other: For a description of this item, see " + location);
 		return true;
 	}
+
+	private static final long serialVersionUID = 3797268342314917283L;
 }

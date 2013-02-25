@@ -24,28 +24,50 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
 import de.fuberlin.wiwiss.pubby.vocab.META;
 
 /**
- * The server's configuration.
+ * A dataset block in the server's configuration.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
- * @author Hannes Mühleisen
+ * @author Hannes Muehleisen
  * @author Olaf Hartig
  * @version $Id$
  */
 public class Dataset {
+	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
+
 	private final Model model;
 	private final Resource config;
 	private final DataSource dataSource;
+	private final String datasetBase;
 	private final Pattern datasetURIPattern;
 	private final char[] fixUnescapeCharacters;
 	private final Resource rdfDocumentMetadataTemplate;
 	private final String metadataTemplate;
-	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
 	private Calendar currentTime;
 	private Resource currentDocRepr;
 	
-	public Dataset(Resource config, String webBase) {
-		this.model = config.getModel();
+	/**
+	 * Creates a degenerate dataset that contains only a single URI.
+	 * 
+	 * TODO: This is all wrong here, but we currently need it because we can't make a MappedResource without a Dataset
+	 * 
+	 * @param dataSource The data source that can describe the URI
+	 * @param constantURI The single constant URI contained in this dataset
+	 */
+	public Dataset(DataSource dataSource, String constantURI) {
+		this.dataSource = dataSource;
+		model = ModelFactory.createDefaultModel();
+		config = model.createResource();
+		datasetBase = constantURI;
+		datasetURIPattern = Pattern.compile("^$");
+		fixUnescapeCharacters = new char[0];
+		rdfDocumentMetadataTemplate = null;
+		metadataTemplate = null;
+	}
+	
+	public Dataset(Resource config) {
 		this.config = config;
+		model = config.getModel();
+		datasetBase = config.getProperty(CONF.datasetBase).getResource().getURI();
 		if (config.hasProperty(CONF.datasetURIPattern)) {
 			datasetURIPattern = Pattern.compile(
 					config.getProperty(CONF.datasetURIPattern).getString());
@@ -76,7 +98,7 @@ public class Dataset {
 			String graphName = config.hasProperty(CONF.sparqlDefaultGraph)
 								? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
 								: null;
-			dataSource = new RemoteSPARQLDataSource(endpointURL, graphName, webBase, this.getWebResourcePrefix());
+			dataSource = new RemoteSPARQLDataSource(endpointURL, graphName);
 		} else {
 			Model data = ModelFactory.createDefaultModel();
 			StmtIterator it = config.listProperties(CONF.loadRDF);
@@ -122,8 +144,8 @@ public class Dataset {
 				this);
 	}
 	
-	public String getDatasetBase() {
-		return config.getProperty(CONF.datasetBase).getResource().getURI();
+	private String getDatasetBase() {
+		return datasetBase;
 	}
 	
 	public boolean getAddSameAsStatements() {
@@ -145,6 +167,14 @@ public class Dataset {
 		return "";
 	}
 
+	public List<MappedResource> getIndex(Configuration configuration) {
+		List<MappedResource> result = new ArrayList<MappedResource>();
+		for (Resource r: dataSource.getIndex()) {
+			result.add(getMappedResourceFromDatasetURI(r.getURI(), configuration));
+		}
+		return result;
+	}
+	
 	public void addDocumentMetadata(Model document, Resource documentResource) {
 		if (rdfDocumentMetadataTemplate == null) {
 			return;

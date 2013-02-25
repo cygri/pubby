@@ -117,4 +117,6 @@ public abstract class BaseServlet extends HttpServlet {
 		}
 		return dataURL + "?output=" + request.getParameter("output");
 	}
+
+	private static final long serialVersionUID = 7594710471966527559L;
 }

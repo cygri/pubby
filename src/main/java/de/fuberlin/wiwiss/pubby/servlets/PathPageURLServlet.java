@@ -27,7 +27,7 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription;
  * @version $Id$
  */
 public class PathPageURLServlet extends BasePathServlet {
-		
+
 	public boolean doGet(MappedResource resource, Property property, boolean isInverse, 
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -38,7 +38,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		}
 
 		Resource r = descriptions.getResource(resource.getWebURI());
-		List resourceDescriptions = new ArrayList();
+		List<ResourceDescription> resourceDescriptions = new ArrayList<ResourceDescription>();
 		StmtIterator it = isInverse
 				? descriptions.listStatements(null, property, r)
 				: r.listProperties(property);
@@ -71,4 +71,6 @@ public class PathPageURLServlet extends BasePathServlet {
 		template.renderXHTML("pathpage.vm");
 		return true;
 	}
+	
+	private static final long serialVersionUID = -2597664961896022667L;
 }

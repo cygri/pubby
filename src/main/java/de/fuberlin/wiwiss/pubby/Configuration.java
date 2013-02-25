@@ -32,9 +32,9 @@ public class Configuration {
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
-	private final Collection labelProperties;
-	private final Collection commentProperties;
-	private final Collection imageProperties;
+	private final Collection<Property> labelProperties;
+	private final Collection<Property> commentProperties;
+	private final Collection<Property> imageProperties;
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
 	
 	public Configuration(Model configurationModel) {
@@ -50,7 +50,7 @@ public class Configuration {
 		while (it.hasNext()) {
 			datasets.add(new Dataset(it.nextStatement().getResource()));
 		}
-		labelProperties = new ArrayList();
+		labelProperties = new ArrayList<Property>();
 		it = model.listStatements(config, CONF.labelProperty, (RDFNode) null);
 		while (it.hasNext()) {
 			labelProperties.add(it.nextStatement().getObject().as(Property.class));
@@ -60,7 +60,7 @@ public class Configuration {
 			labelProperties.add(DC.title);
 			labelProperties.add(model.createProperty("http://xmlns.com/foaf/0.1/name"));
 		}
-		commentProperties = new ArrayList();
+		commentProperties = new ArrayList<Property>();
 		it = model.listStatements(config, CONF.commentProperty, (RDFNode) null);
 		while (it.hasNext()) {
 			commentProperties.add(it.nextStatement().getObject().as(Property.class));
@@ -69,7 +69,7 @@ public class Configuration {
 			commentProperties.add(RDFS.comment);
 			commentProperties.add(DC.description);
 		}
-		imageProperties = new ArrayList();
+		imageProperties = new ArrayList<Property>();
 		it = model.listStatements(config, CONF.imageProperty, (RDFNode) null);
 		while (it.hasNext()) {
 			imageProperties.add(it.nextStatement().getObject().as(Property.class));
@@ -110,7 +110,7 @@ public class Configuration {
 	}
 
 	public MappedResource getMappedResourceFromDatasetURI(String datasetURI) {
-		Iterator it = datasets.iterator();
+		Iterator<Dataset> it = datasets.iterator();
 		while (it.hasNext()) {
 			Dataset dataset = (Dataset) it.next();
 			if (dataset.isDatasetURI(datasetURI)) {
@@ -121,7 +121,7 @@ public class Configuration {
 	}
 
 	public MappedResource getMappedResourceFromRelativeWebURI(String relativeWebURI, boolean isResourceURI) {
-		Iterator it = datasets.iterator();
+		Iterator<Dataset> it = datasets.iterator();
 		while (it.hasNext()) {
 			Dataset dataset = (Dataset) it.next();
 			MappedResource resource = dataset.getMappedResourceFromRelativeWebURI(
@@ -137,15 +137,15 @@ public class Configuration {
 		return prefixes;
 	}
 
-	public Collection getLabelProperties() {
+	public Collection<Property> getLabelProperties() {
 		return labelProperties;
 	}
 	
-	public Collection getCommentProperties() {
+	public Collection<Property> getCommentProperties() {
 		return commentProperties;
 	}
 	
-	public Collection getImageProperties() {
+	public Collection<Property> getImageProperties() {
 		return imageProperties;
 	}
 	

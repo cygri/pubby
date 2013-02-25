@@ -17,7 +17,7 @@ import de.fuberlin.wiwiss.pubby.MappedResource;
  * @version $Id$
  */
 public abstract class BaseURLServlet extends BaseServlet {
-	
+
 	protected abstract boolean doGet(
 			MappedResource resource,
 			HttpServletRequest request,
@@ -35,4 +35,6 @@ public abstract class BaseURLServlet extends BaseServlet {
 		}
 		return true;
 	}
+	
+	private static final long serialVersionUID = -9003417732598023676L;
 }

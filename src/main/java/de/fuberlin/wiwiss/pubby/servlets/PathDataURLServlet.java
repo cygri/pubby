@@ -65,4 +65,6 @@ public class PathDataURLServlet extends BasePathServlet {
 		new ModelResponse(descriptions, request, response).serve();
 		return true;
 	}
+
+	private static final long serialVersionUID = -7927775670218866340L;
 }

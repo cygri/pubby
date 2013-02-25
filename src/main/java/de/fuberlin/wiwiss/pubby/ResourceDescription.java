@@ -35,7 +35,7 @@ public class ResourceDescription {
 	private final Resource resource;
 	private final Configuration config;
 	private PrefixMapping prefixes = null;
-	private List properties = null;
+	private List<ResourceProperty> properties = null;
 	
 	public ResourceDescription(MappedResource mappedResource, Model model, 
 			Configuration config) {
@@ -60,7 +60,7 @@ public class ResourceDescription {
 	}
 	
 	public String getLabel() {
-		Collection candidates = getValuesFromMultipleProperties(config.getLabelProperties());
+		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getLabelProperties());
 		String label = getBestLanguageMatch(
 				candidates, config.getDefaultLanguage());
 		if (label == null) {
@@ -70,13 +70,13 @@ public class ResourceDescription {
 	}
 	
 	public String getComment() {
-		Collection candidates = getValuesFromMultipleProperties(config.getCommentProperties());
+		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getCommentProperties());
 		return getBestLanguageMatch(candidates, config.getDefaultLanguage());
 	}
 	
 	public String getImageURL() {
-		Collection candidates = getValuesFromMultipleProperties(config.getImageProperties());
-		Iterator it = candidates.iterator();
+		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getImageProperties());
+		Iterator<RDFNode> it = candidates.iterator();
 		while (it.hasNext()) {
 			RDFNode candidate = (RDFNode) it.next();
 			if (candidate.isURIResource()) {
@@ -86,15 +86,16 @@ public class ResourceDescription {
 		return null;
 	}
 	
-	public List getProperties() {
+	public List<ResourceProperty> getProperties() {
 		if (properties == null) {
 			properties = buildProperties();
 		}
 		return properties;
 	}
 	
-	private List buildProperties() {
-		Map propertyBuilders = new HashMap();
+	private List<ResourceProperty> buildProperties() {
+		Map<String,PropertyBuilder> propertyBuilders = 
+				new HashMap<String,PropertyBuilder>();
 		StmtIterator it = resource.listProperties();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
@@ -115,8 +116,8 @@ public class ResourceDescription {
 			}
 			((PropertyBuilder) propertyBuilders.get(key)).addValue(stmt.getSubject());
 		}
-		List results = new ArrayList();
-		Iterator it2 = propertyBuilders.values().iterator();
+		List<ResourceProperty> results = new ArrayList<ResourceProperty>();
+		Iterator<PropertyBuilder> it2 = propertyBuilders.values().iterator();
 		while (it2.hasNext()) {
 			PropertyBuilder propertyBuilder = (PropertyBuilder) it2.next();
 			results.add(propertyBuilder.toProperty());
@@ -140,9 +141,10 @@ public class ResourceDescription {
 		return prefixes;
 	}
 
-	private Collection getValuesFromMultipleProperties(Collection properties) {
-		Collection results = new ArrayList();
-		Iterator it = properties.iterator();
+	private Collection<RDFNode> getValuesFromMultipleProperties(
+			Collection<Property> properties) {
+		Collection<RDFNode> results = new ArrayList<RDFNode>();
+		Iterator<Property> it = properties.iterator();
 		while (it.hasNext()) {
 			com.hp.hpl.jena.rdf.model.Property property = (com.hp.hpl.jena.rdf.model.Property) it.next();
 			StmtIterator labelIt = resource.listProperties(property);
@@ -154,11 +156,11 @@ public class ResourceDescription {
 		return results;
 	}
 	
-	private String getBestLanguageMatch(Collection nodes, String lang) {
-		Iterator it = nodes.iterator();
+	private String getBestLanguageMatch(Collection<RDFNode> nodes, String lang) {
+		Iterator<RDFNode> it = nodes.iterator();
 		String aLiteral = null;
 		while (it.hasNext()) {
-			RDFNode candidate = (RDFNode) it.next();
+			RDFNode candidate = it.next();
 			if (!candidate.isLiteral()) continue;
 			Literal literal = (Literal) candidate.as(Literal.class);
 			if (lang == null
@@ -170,13 +172,13 @@ public class ResourceDescription {
 		return aLiteral;
 	}
 	
-	public class ResourceProperty implements Comparable {
+	public class ResourceProperty implements Comparable<ResourceProperty> {
 		private final Property predicate;
 		private final URIPrefixer predicatePrefixer;
 		private final boolean isInverse;
-		private final List values;
+		private final List<Value> values;
 		private final int blankNodeCount;
-		public ResourceProperty(Property predicate, boolean isInverse, List values,
+		public ResourceProperty(Property predicate, boolean isInverse, List<Value> values,
 				int blankNodeCount) {
 			this.predicate = predicate;
 			this.predicatePrefixer = new URIPrefixer(predicate, getPrefixes());
@@ -199,7 +201,7 @@ public class ResourceDescription {
 		public String getLocalName() {
 			return predicatePrefixer.getLocalName();
 		}
-		public List getValues() {
+		public List<Value> getValues() {
 			return values;
 		}
 		public int getBlankNodeCount() {
@@ -213,7 +215,7 @@ public class ResourceDescription {
 					? mappedResource.getInversePathPageURL(predicate) 
 					: mappedResource.getPathPageURL(predicate);
 		}
-		public int compareTo(Object other) {
+		public int compareTo(ResourceProperty other) {
 			if (!(other instanceof ResourceProperty)) {
 				return 0;
 			}
@@ -233,7 +235,7 @@ public class ResourceDescription {
 	private class PropertyBuilder {
 		private final Property predicate;
 		private final boolean isInverse;
-		private final List values = new ArrayList();
+		private final List<Value> values = new ArrayList<Value>();
 		private int blankNodeCount = 0;
 		PropertyBuilder(Property predicate, boolean isInverse) {
 			this.predicate = predicate;
@@ -252,7 +254,7 @@ public class ResourceDescription {
 		}
 	}
 	
-	public class Value implements Comparable {
+	public class Value implements Comparable<Value> {
 		private final RDFNode node;
 		private URIPrefixer prefixer;
 		public Value(RDFNode valueNode) {
@@ -286,7 +288,7 @@ public class ResourceDescription {
 			URIPrefixer datatypePrefixer = new URIPrefixer(uri, getPrefixes());
 			return datatypePrefixer.toTurtle();
 		}
-		public int compareTo(Object other) {
+		public int compareTo(Value other) {
 			if (!(other instanceof Value)) {
 				return 0;
 			}

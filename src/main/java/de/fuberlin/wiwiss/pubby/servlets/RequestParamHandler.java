@@ -2,6 +2,7 @@ package de.fuberlin.wiwiss.pubby.servlets;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 public class RequestParamHandler {
 	private static final String ATTRIBUTE_NAME_IS_HANDLED =
 		"OutputRequestParamHandler.isHandled";
-	private final static HashMap mimeTypes = new HashMap();
+	private final static Map<String,String> mimeTypes = new HashMap<String,String>();
 	static {
 		mimeTypes.put("rdfxml", "application/rdf+xml");
 		mimeTypes.put("xml", "application/rdf+xml");
@@ -79,17 +80,20 @@ public class RequestParamHandler {
 		return null;
 	}
 	
+	@SuppressWarnings("rawtypes")	// The API uses raw types
 	private class WrappedRequest extends HttpServletRequestWrapper {
 		WrappedRequest() {
 			super(request);
 			setAttribute(ATTRIBUTE_NAME_IS_HANDLED, "true");
 		}
+		@Override
 		public String getHeader(String name) {
 			if ("accept".equals(name.toLowerCase())) {
 				return (String) mimeTypes.get(requestedType);
 			}
 			return super.getHeader(name);
 		}
+		@Override
 		public Enumeration getHeaderNames() {
 			final Enumeration realHeaders = super.getHeaderNames();
 			return new Enumeration() {
@@ -108,9 +112,10 @@ public class RequestParamHandler {
 				}
 			};
 		}
+		@Override
 		public Enumeration getHeaders(String name) {
 			if ("accept".equals(name.toLowerCase())) {
-				Vector v = new Vector();
+				Vector<Object> v = new Vector<Object>();
 				v.add(getHeader(name));
 				return v.elements();
 			}

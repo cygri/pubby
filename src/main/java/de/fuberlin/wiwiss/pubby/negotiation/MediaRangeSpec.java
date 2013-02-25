@@ -61,8 +61,8 @@ public class MediaRangeSpec {
 		if ("*".equals(type) && !"*".equals(subtype)) {
 			return null;
 		}
-		List parameterNames = new ArrayList();
-		List parameterValues = new ArrayList();
+		List<String> parameterNames = new ArrayList<String>();
+		List<String> parameterValues = new ArrayList<String>();
 		while (m.find()) {
 			String name = m.group(1).toLowerCase();
 			String value = (m.group(3) == null) ? m.group(2) : unescape(m.group(3));
@@ -84,8 +84,8 @@ public class MediaRangeSpec {
 	 * Parses an HTTP Accept header into a List of MediaRangeSpecs
 	 * @return A List of MediaRangeSpecs 
 	 */
-	public static List parseAccept(String s) {
-		List result = new ArrayList();
+	public static List<MediaRangeSpec> parseAccept(String s) {
+		List<MediaRangeSpec> result = new ArrayList<MediaRangeSpec>();
 		Matcher m = mediaRangePattern.matcher(s);
 		while (m.find()) {
 			result.add(parseRange(m.group()));
@@ -103,13 +103,13 @@ public class MediaRangeSpec {
 	
 	private final String type;
 	private final String subtype;
-	private final List parameterNames;
-	private final List parameterValues;
+	private final List<String> parameterNames;
+	private final List<String> parameterValues;
 	private final String mediaType;
 	private final double quality;
 
 	private MediaRangeSpec(String type, String subtype, 
-			List parameterNames, List parameterValues,
+			List<String> parameterNames, List<String> parameterValues,
 			double quality) {
 		this.type = type;
 		this.subtype = subtype;
@@ -152,7 +152,7 @@ public class MediaRangeSpec {
 		return mediaType;
 	}
 	
-	public List getParameterNames() {
+	public List<String> getParameterNames() {
 		return parameterNames;
 	}
 	
@@ -193,10 +193,10 @@ public class MediaRangeSpec {
 		return result;
 	}
 	
-	public MediaRangeSpec getBestMatch(List mediaRanges) {
+	public MediaRangeSpec getBestMatch(List<MediaRangeSpec> mediaRanges) {
 		MediaRangeSpec result = null;
 		int bestPrecedence = 0;
-		Iterator it = mediaRanges.iterator();
+		Iterator<MediaRangeSpec> it = mediaRanges.iterator();
 		while (it.hasNext()) {
 			MediaRangeSpec range = (MediaRangeSpec) it.next();
 			if (getPrecedence(range) > bestPrecedence) {

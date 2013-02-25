@@ -43,4 +43,6 @@ public abstract class BasePathServlet extends BaseServlet {
 		doGet(resource, property, isInverse, request, response, config);
 		return true;
 	}
+
+	private static final long serialVersionUID = 7393467141233996715L;
 }

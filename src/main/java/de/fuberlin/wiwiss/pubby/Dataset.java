@@ -246,7 +246,7 @@ public class Dataset {
 		while ( changes ) {
 			changes = false;
 			StmtIterator stmtIt = metadata.listStatements();
-			List remList = new ArrayList();
+			List<Statement> remList = new ArrayList<Statement>();
 			while (stmtIt.hasNext()) {
 				Statement s = stmtIt.nextStatement();
 				if (    s.getObject().isAnon()

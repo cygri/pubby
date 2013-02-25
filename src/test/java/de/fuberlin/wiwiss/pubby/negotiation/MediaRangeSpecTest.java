@@ -148,28 +148,28 @@ public class MediaRangeSpecTest extends TestCase {
 	}
 	
 	public void testAcceptOneRange() {
-		List accept = MediaRangeSpec.parseAccept("a/b");
+		List<MediaRangeSpec> accept = MediaRangeSpec.parseAccept("a/b");
 		assertNotNull(accept);
 		assertEquals(1, accept.size());
 		assertMediaRangeInList(accept, 0, "a/b");
 	}
 	
 	public void testAcceptTwoRanges() {
-		List accept = MediaRangeSpec.parseAccept("a/b,c/d");
+		List<MediaRangeSpec> accept = MediaRangeSpec.parseAccept("a/b,c/d");
 		assertEquals(2, accept.size());
 		assertMediaRangeInList(accept, 0, "a/b");
 		assertMediaRangeInList(accept, 1, "c/d");
 	}
 	
 	public void testAcceptIgnoreWSAndJunk() {
-		List accept = MediaRangeSpec.parseAccept("a/b , asdf , c/d");
+		List<MediaRangeSpec> accept = MediaRangeSpec.parseAccept("a/b , asdf , c/d");
 		assertEquals(2, accept.size());
 		assertMediaRangeInList(accept, 0, "a/b");
 		assertMediaRangeInList(accept, 1, "c/d");
 	}
 
 	public void testAcceptWithQuality() {
-		List accept = MediaRangeSpec.parseAccept("a/b;q=0.6,c/d;q=0.8");
+		List<MediaRangeSpec> accept = MediaRangeSpec.parseAccept("a/b;q=0.6,c/d;q=0.8");
 		assertEquals(2, accept.size());
 		assertMediaRangeInList(accept, 0, "a/b");
 		assertMediaRangeInList(accept, 1, "c/d");
@@ -200,7 +200,7 @@ public class MediaRangeSpecTest extends TestCase {
 	}
 	
 	public void testGetBestMatchSameQuality() {
-		List accept = MediaRangeSpec.parseAccept("*/*,a/*,a/b,a/b;c=d");
+		List<MediaRangeSpec> accept = MediaRangeSpec.parseAccept("*/*,a/*,a/b,a/b;c=d");
 		assertEquals("*/*", MediaRangeSpec.parseType("z/b").getBestMatch(accept).getMediaType());
 		assertEquals("a/*", MediaRangeSpec.parseType("a/z").getBestMatch(accept).getMediaType());
 		assertEquals("a/b", MediaRangeSpec.parseType("a/b").getBestMatch(accept).getMediaType());
@@ -214,7 +214,8 @@ public class MediaRangeSpecTest extends TestCase {
 		assertNull(MediaRangeSpec.parseRange(mediaType));
 	}
 	
-	private void assertMediaRangeInList(List list, int index, String mediaType) {
+	private void assertMediaRangeInList(List<MediaRangeSpec> list, 
+			int index, String mediaType) {
 		MediaRangeSpec range = (MediaRangeSpec) list.get(index);
 		assertEquals(mediaType, range.getMediaType());
 	}

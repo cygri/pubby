@@ -75,10 +75,10 @@ public class PageURLServlet extends BaseURLServlet {
 			// context.put("metadata", metadata.getResource(resource.getDataURL()));
 			context.put("metadata", documentRepresentation);
 
-			Map nsSet = metadata.getNsPrefixMap();
+			Map<String,String> nsSet = metadata.getNsPrefixMap();
 			nsSet.putAll(description.getNsPrefixMap());
 			context.put("prefixes", nsSet.entrySet());
-			context.put("blankNodesMap", new HashMap());
+			context.put("blankNodesMap", new HashMap<Resource,String>());
 		}
 		catch (Exception e) {
 			context.put("metadata", Boolean.FALSE);

@@ -1,7 +1,6 @@
 package de.fuberlin.wiwiss.pubby;
 
 import java.util.Iterator;
-import java.util.Map.Entry;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -26,11 +25,10 @@ public class URIPrefixer {
 	public URIPrefixer(Resource resource, PrefixMapping prefixes) {
 		this.resource = resource;
 		String uri = resource.getURI();
-		Iterator it = prefixes.getNsPrefixMap().entrySet().iterator();
+		Iterator<String> it = prefixes.getNsPrefixMap().keySet().iterator();
 		while (it.hasNext()) {
-			Entry entry = (Entry) it.next();
-			String entryPrefix = (String) entry.getKey();
-			String entryURI = (String) entry.getValue();
+			String entryPrefix = it.next();
+			String entryURI = prefixes.getNsPrefixURI(entryPrefix);
 			if (uri.startsWith(entryURI)) {
 				prefix = entryPrefix;
 				localName = uri.substring(entryURI.length());

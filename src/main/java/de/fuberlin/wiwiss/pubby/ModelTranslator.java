@@ -26,7 +26,10 @@ public class ModelTranslator {
 	
 	public Model getTranslated() {
 		Model result = ModelFactory.createDefaultModel();
-		result.setNsPrefixes(serverConfig.getPrefixes());
+		result.setNsPrefixes(model);
+		for (String prefix: serverConfig.getPrefixes().getNsPrefixMap().keySet()) {
+			result.setNsPrefix(prefix, serverConfig.getPrefixes().getNsPrefixURI(prefix));
+		}
 		StmtIterator it = model.listStatements();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();

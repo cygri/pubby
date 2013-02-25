@@ -17,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 
@@ -33,6 +34,7 @@ public class ResourceDescription {
 	private final Model model;
 	private final Resource resource;
 	private final Configuration config;
+	private PrefixMapping prefixes = null;
 	private List properties = null;
 	
 	public ResourceDescription(MappedResource mappedResource, Model model, 
@@ -123,8 +125,19 @@ public class ResourceDescription {
 		return results;
 	}
 
+	/**
+	 * Returns a prefix mapping containing all prefixes from the input model
+	 * and from the configuration, with the configuration taking precedence.
+	 */
 	private PrefixMapping getPrefixes() {
-		return config.getPrefixes();
+		if (prefixes == null) {
+			prefixes = new PrefixMappingImpl();
+			prefixes.setNsPrefixes(model);
+			for (String prefix: config.getPrefixes().getNsPrefixMap().keySet()) {
+				prefixes.setNsPrefix(prefix, config.getPrefixes().getNsPrefixURI(prefix));
+			}
+		}
+		return prefixes;
 	}
 
 	private Collection getValuesFromMultipleProperties(Collection properties) {

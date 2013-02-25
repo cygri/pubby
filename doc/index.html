@@ -334,7 +334,7 @@ git clone https://github.com/cygri/pubby.git
 cd pubby
 
 # If you work with Eclipse, create project files
-mvn eclipse:eclipse
+mvn eclipse:eclipse -DdownloadSources=true -DdownloadJavadocs=true
 
 # Compile and run with Jetty Maven plugin
 mvn jetty:run

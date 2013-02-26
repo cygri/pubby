@@ -17,6 +17,7 @@ import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
@@ -92,12 +93,11 @@ public class Configuration {
 		if (prefixes.getNsURIPrefix(CONF.NS) != null) {
 			prefixes.removeNsPrefix(prefixes.getNsURIPrefix(CONF.NS));
 		}
-		if (prefixes.getNsURIPrefix(RDF.getURI()) == null && 
-				prefixes.getNsPrefixURI("rdf") == null) {
-			// If no prefix is defined for the RDF namespace, set it to rdf:
-			// unless that would overwrite something.
-			prefixes.setNsPrefix("rdf", RDF.getURI());
-		}
+		// If no prefix is defined for the RDF and XSD namespaces, set them,
+		// unless that would overwrite something. This is the namespaces that
+		// have syntactic sugar in Turtle.
+		ModelUtil.addNSIfUndefined(prefixes, "rdf", RDF.getURI());
+		ModelUtil.addNSIfUndefined(prefixes, "xsd", XSD.getURI());
 		// If we don't have an indexResource, then add an index builder dataset
 		// as the first dataset. It will be responsible for handling the
 		// homepage/index resource.
@@ -109,6 +109,19 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * @param relativeIRI IRI relative to the server base. Note that a request URI needs to be percent-decoded first.
+	 * @param stripResourcePrefix If true, the webResourcePrefix will be stripped to derive the real relative IRI.
+	 * @return
+	 */
+	public HypermediaResource getController(String relativeIRI, boolean stripResourcePrefix) {
+		if (stripResourcePrefix) {
+			if (!relativeIRI.startsWith(getWebResourcePrefix())) return null;
+			relativeIRI = relativeIRI.substring(getWebResourcePrefix().length());
+		}
+		return new HypermediaResource(relativeIRI, this);
+	}
+	
 	public MappedResource getMappedResourceFromDatasetURI(String datasetURI) {
 		Iterator<Dataset> it = datasets.iterator();
 		while (it.hasNext()) {
@@ -120,17 +133,15 @@ public class Configuration {
 		return null;
 	}
 
-	public MappedResource getMappedResourceFromRelativeWebURI(String relativeWebURI, boolean isResourceURI) {
-		Iterator<Dataset> it = datasets.iterator();
-		while (it.hasNext()) {
-			Dataset dataset = (Dataset) it.next();
+	public Collection<MappedResource> getMappedResourcesFromRelativeWebURI(String relativeWebURI, boolean isResourceURI) {
+		Collection<MappedResource> results = new ArrayList<MappedResource>();
+		for (Dataset dataset: datasets) {
 			MappedResource resource = dataset.getMappedResourceFromRelativeWebURI(
 					relativeWebURI, isResourceURI, this);
-			if (resource != null) {
-				return resource;
-			}
+			if (resource == null) continue;
+			results.add(resource);
 		}
-		return null;
+		return results;
 	}
 	
 	public PrefixMapping getPrefixes() {
@@ -156,12 +167,12 @@ public class Configuration {
 		return config.getProperty(CONF.defaultLanguage).getString();
 	}
 	
-	public MappedResource getIndexResource() {
+	public HypermediaResource getIndexResource() {
 		if (!config.hasProperty(CONF.indexResource)) {
 			return null;
 		}
 		return getMappedResourceFromDatasetURI(
-				config.getProperty(CONF.indexResource).getResource().getURI());
+				config.getProperty(CONF.indexResource).getResource().getURI()).getController();
 	}
 	
 	public String getProjectLink() {
@@ -176,5 +187,12 @@ public class Configuration {
 
 	public String getWebApplicationBaseURI() {
 		return config.getProperty(CONF.webBase).getResource().getURI();
+	}
+
+	public String getWebResourcePrefix() {
+		if (config.hasProperty(CONF.webResourcePrefix)) {
+			return config.getProperty(CONF.webResourcePrefix).getString();
+		}
+		return "";
 	}
 }

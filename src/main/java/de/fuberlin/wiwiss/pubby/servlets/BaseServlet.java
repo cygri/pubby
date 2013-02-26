@@ -1,6 +1,7 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -11,12 +12,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelTranslator;
+import de.fuberlin.wiwiss.pubby.ModelUtil;
 
 /**
  * An abstract base servlet for servlets that manage a namespace of resources.
@@ -57,19 +61,44 @@ public abstract class BaseServlet extends HttpServlet {
 						configFile.getAbsoluteFile().toURI().toString()));
 	}
 	
-	protected Model getResourceDescription(MappedResource resource) {
-		return new ModelTranslator(
+	protected Model getResourceDescription(Collection<MappedResource> resources) {
+		Model result = ModelFactory.createDefaultModel();
+		for (MappedResource resource: resources) {
+			Model description = new ModelTranslator(
 				resource.getDataset().getDataSource().getResourceDescription(
 						resource.getDatasetURI()),
 				config).getTranslated();
+			// Add owl:sameAs statements referring to the original dataset URI
+			// TODO: Make this a wrapper around DataSource
+			if (resource.getDataset().getAddSameAsStatements()) {
+				description.getResource(resource.getController().getAbsoluteIRI()).addProperty(
+						OWL.sameAs, description.getResource(resource.getDatasetURI()));
+				ModelUtil.addNSIfUndefined(description, "owl", OWL.NS);
+			}
+			ModelUtil.mergeModels(result, description);
+		}
+		return result;
 	}
 	
-	protected Model getAnonymousPropertyValues(MappedResource resource, 
+	protected Model getAnonymousPropertyValues(Collection<MappedResource> resources, 
 			Property property, boolean isInverse) {
-		return new ModelTranslator(
-				resource.getDataset().getDataSource().getAnonymousPropertyValues(
-						resource.getDatasetURI(), property, isInverse),
-				config).getTranslated();
+		Model result = ModelFactory.createDefaultModel();
+		for (MappedResource resource: resources) {
+			ModelUtil.mergeModels(result, new ModelTranslator(
+					resource.getDataset().getDataSource().getAnonymousPropertyValues(
+							resource.getDatasetURI(), property, isInverse),
+					config).getTranslated());
+		} return result;
+	}
+
+	// TODO: This is crap. Should return an actual account of the provenance of all resources, regardless of data source
+	protected String getFirstSPARQLEndpoint(Collection<MappedResource> resources) {
+		for (MappedResource resource: resources) {
+			if (resource.getDataset().getDataSource().getEndpointURL() != null) {
+				return resource.getDataset().getDataSource().getEndpointURL();
+			}
+		}
+		return null;
 	}
 	
 	protected abstract boolean doGet(
@@ -87,23 +116,17 @@ public abstract class BaseServlet extends HttpServlet {
 			relativeURI = relativeURI.substring(1);
 		}
 		if (!doGet(relativeURI, request, response, config)) {
-			send404(response, null, null);
+			send404(response, null);
 		}
 	}
 	
-	protected void send404(HttpServletResponse response, MappedResource resource) throws IOException {
-		send404(response, resource.getWebURI(), 
-				resource.getDataset().getDataSource().getEndpointURL());
-	}
-
-	protected void send404(HttpServletResponse response, String resourceURI, String endpointURL) throws IOException {
+	protected void send404(HttpServletResponse response, String resourceURI) throws IOException {
 		response.setStatus(404);
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
 		context.put("server_base", config.getWebApplicationBaseURI());
-		context.put("sparql_endpoint", endpointURL);
 		context.put("title", "404 Not Found");
 		if (resourceURI != null) {
 			context.put("uri", resourceURI);

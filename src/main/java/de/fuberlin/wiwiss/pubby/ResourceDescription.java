@@ -30,33 +30,30 @@ import de.fuberlin.wiwiss.pubby.Configuration;
  * @version $Id$
  */
 public class ResourceDescription {
-	private final MappedResource mappedResource;
+	private final HypermediaResource hypermediaResource;
 	private final Model model;
 	private final Resource resource;
 	private final Configuration config;
 	private PrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
 	
-	public ResourceDescription(MappedResource mappedResource, Model model, 
+	public ResourceDescription(HypermediaResource resource, Model model, 
 			Configuration config) {
-		this.mappedResource = mappedResource;
+		this.hypermediaResource = resource;
 		this.model = model;
-		this.resource = model.getResource(mappedResource.getWebURI());
+		this.resource = model.getResource(hypermediaResource.getAbsoluteIRI());
 		this.config = config;
 	}
 
 	public ResourceDescription(Resource resource, Model model, Configuration config) {
-		this.mappedResource = null;
+		this.hypermediaResource = null;
 		this.model = model;
 		this.resource = resource;
 		this.config = config;
 	}
 	
 	public String getURI() {
-		if (mappedResource == null) {
-			return null;
-		}
-		return mappedResource.getWebURI();
+		return resource.getURI();
 	}
 	
 	public String getLabel() {
@@ -208,12 +205,12 @@ public class ResourceDescription {
 			return blankNodeCount;
 		}
 		public String getPathPageURL() {
-			if (mappedResource == null) {
+			if (hypermediaResource == null) {
 				return null;
 			}
 			return isInverse 
-					? mappedResource.getInversePathPageURL(predicate) 
-					: mappedResource.getPathPageURL(predicate);
+					? hypermediaResource.getInversePathPageURL(predicate) 
+					: hypermediaResource.getPathPageURL(predicate);
 		}
 		public int compareTo(ResourceProperty other) {
 			if (!(other instanceof ResourceProperty)) {
@@ -286,7 +283,11 @@ public class ResourceDescription {
 			String uri = ((Literal) node.as(Literal.class)).getDatatypeURI();
 			if (uri == null) return null;
 			URIPrefixer datatypePrefixer = new URIPrefixer(uri, getPrefixes());
-			return datatypePrefixer.toTurtle();
+			if (datatypePrefixer.hasPrefix()) {
+				return datatypePrefixer.toTurtle();
+			} else {
+				return "?:" + datatypePrefixer.getLocalName();
+			}
 		}
 		public int compareTo(Value other) {
 			if (!(other instanceof Value)) {

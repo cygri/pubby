@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.IRIEncoder;
 
 /**
  * A catch-all servlet managing the URI space of the web application.
@@ -32,7 +33,8 @@ public class RootServlet extends BaseServlet {
 
 		// Homepage. If index resource is defined, redirect to it.
 		if ("".equals(relativeURI) && config.getIndexResource() != null) {
-			response.sendRedirect(config.getIndexResource().getWebURI());
+			response.sendRedirect(IRIEncoder.toURI(
+					config.getIndexResource().getAbsoluteIRI()));
 			return true;
 		}
 		

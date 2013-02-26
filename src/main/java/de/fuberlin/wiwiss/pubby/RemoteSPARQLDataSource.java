@@ -1,7 +1,5 @@
 package de.fuberlin.wiwiss.pubby;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,25 +31,6 @@ public class RemoteSPARQLDataSource implements DataSource {
 	
 	public String getEndpointURL() {
 		return endpointURL;
-	}
-	
-	public String getResourceDescriptionURL(String resourceURI) {
-		try {
-			StringBuffer result = new StringBuffer();
-			result.append(endpointURL);
-			result.append("?");
-			if (defaultGraphName != null) {
-				result.append("default-graph-uri=");
-				result.append(URLEncoder.encode(defaultGraphName, "utf-8"));
-				result.append("&");
-			}
-			result.append("query=");
-			result.append(URLEncoder.encode(buildDescribeQuery(resourceURI), "utf-8"));
-			return result.toString();
-		} catch (UnsupportedEncodingException ex) {
-			// can't happen, utf-8 is always supported
-			throw new RuntimeException(ex);
-		}
 	}
 
 	private String buildDescribeQuery(String resourceURI) {

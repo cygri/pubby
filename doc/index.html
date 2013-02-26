@@ -224,6 +224,13 @@ pre { speak-punctuation: code; }
   Note that you have to specify a <em>dataset URI</em>, not a mapped web URI. When this directive is missing 
   on the configuration, a list of all available resources is generated.</p></dd>
 
+<dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
+<dd><p>If present, this string will be prefixed to resource URIs
+  on the web server. For example, if set to “<tt>resource/</tt>”,
+  then the resulting web URIs will be of the form
+  <tt>http://myserver/resource/XXX</tt>. The default is the
+  empty string.</dd>
+
 <dt><tt>conf:dataset [ ... ];</tt></dt>
 <dd><p><strong>Required.</strong> Introduces a dataset configuration section.
   There can be one or more dataset sections.</p></dd>
@@ -284,17 +291,6 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
    This file is expected in directory <tt>./WEB-INF/templates/</tt>.</p>
 </dd>
 
-<dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
-<dd><p>If present, this string will be prefixed to the mapped web URIs.
-  This is useful if you have to avoid potential name clashes with
-  URIs already used by the server itself. For example, if the dataset
-  includes a URI <tt>http://mydataset/page</tt>, and the dataset prefix
-  is <tt>http://mydataset/</tt>, then there would be a clash after mapping
-  because Pubby reserves the mapped URI <tt>http://myserver/mydataset/page</tt>
-  for its own use. In this case, you may specify a prefix like
-  <tt>"resource/"</tt>, which will result in a mapped URI of
-  <tt>http://myserver/mydataset/resource/page</tt>.</p></dd>
-
 <dt><tt>conf:supportsIRIs <em>true/false</em>;</tt></dt>
 <dd><p>Must be set to <code>false</code> on data sources that use URIs
   instead of IRIs in the RDF data. For example, the English-language
@@ -307,15 +303,6 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 <dt><tt>conf:fixUnescapedCharacters "<em>abc</em>";</tt></dt>
 <dd><p>(Only needed if you have problems with funny characters in the URIs when
   running Pubby behind an Apache proxy)</p></dd>
-
-<dt><tt>conf:redirectRDFRequestsToEndpoint <em>"true"/"false"</em>;</tt></dt>
-<dd><p>Instead of serving RDF documents, Pubby will redirect requests for
-  RDF to <tt>DESCRIBE</tt> query results on the SPARQL server. This
-  reduces Pubby's job to serving HTML descriptions of resources. All features that affect
-  the RDF output will have no effect, e.g. URI rewriting and adding of
-  <tt>owl:same</tt> statements won't work. This is useful to improve
-  performance in cases where the SPARQL dataset has been designed with Pubby publication
-  in mind.</p></dd>
 </dl>
 
 
@@ -323,7 +310,6 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
 
 <ul>
   <li>Only works for SPARQL endpoint that can answer <tt>DESCRIBE</tt> queries</li>
-  <li>Multiple dataset support may not work as expected: If a requested URI is matched by the <tt>conf:datasetURIPattern</tt> of more than one dataset (or one doesn't have a <tt>conf:datasetURIPattern</tt>), then <em>only one</em> of the possible endpoints will be queried at a time. Pubby will never try to query multiple endpoints in order to create a single response. In most cases, it is recommended to simply set up a separate Pubby instance for each dataset.</li>
   <li>Hash URIs on the web side are not supported.</li>
 </ul>
 

@@ -126,11 +126,11 @@ public class Dataset {
 	public MappedResource getMappedResourceFromRelativeWebURI(String relativeWebURI, 
 			boolean isResourceURI, Configuration configuration) {
 		if (isResourceURI) {
-			if (!"".equals(getWebResourcePrefix())) {
-				if (!relativeWebURI.startsWith(getWebResourcePrefix())) {
+			if (!"".equals(configuration.getWebResourcePrefix())) {
+				if (!relativeWebURI.startsWith(configuration.getWebResourcePrefix())) {
 					return null;
 				}
-				relativeWebURI = relativeWebURI.substring(getWebResourcePrefix().length());
+				relativeWebURI = relativeWebURI.substring(configuration.getWebResourcePrefix().length());
 			}
 		}
 		relativeWebURI = fixUnescapedCharacters(relativeWebURI);
@@ -161,21 +161,11 @@ public class Dataset {
 		return dataSource;
 	}
 	
-	public boolean redirectRDFRequestsToEndpoint() {
-		return getBooleanConfigValue(CONF.redirectRDFRequestsToEndpoint, false);
-	}
-	
-	public String getWebResourcePrefix() {
-		if (config.hasProperty(CONF.webResourcePrefix)) {
-			return config.getProperty(CONF.webResourcePrefix).getString();
-		}
-		return "";
-	}
-
-	public List<MappedResource> getIndex(Configuration configuration) {
-		List<MappedResource> result = new ArrayList<MappedResource>();
+	public List<HypermediaResource> getIndex(Configuration configuration) {
+		List<HypermediaResource> result = new ArrayList<HypermediaResource>();
 		for (Resource r: dataSource.getIndex()) {
-			result.add(getMappedResourceFromDatasetURI(r.getURI(), configuration));
+			result.add(getMappedResourceFromDatasetURI(
+					r.getURI(), configuration).getController()); 
 		}
 		return result;
 	}
@@ -299,11 +289,11 @@ public class Dataset {
 			}
 			// <about:metadata:runtime:data> - URI of the data
 			if (phName.equals("data")) {
-				return model.createResource(describedResource.getDataURL());
+				return model.createResource(describedResource.getController().getDataURL());
 			}
 			// <about:metadata:runtime:resource> - URI of the resource
 			if (phName.equals("resource")) {
-				return model.createResource(describedResource.getWebURI());
+				return model.createResource(describedResource.getController().getAbsoluteIRI());
 			}
 		}
 		

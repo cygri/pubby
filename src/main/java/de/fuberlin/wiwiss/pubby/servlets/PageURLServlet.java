@@ -1,6 +1,7 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
@@ -28,12 +30,13 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription;
  */
 public class PageURLServlet extends BaseURLServlet {
 
-	public boolean doGet(MappedResource resource, 
+	public boolean doGet(HypermediaResource controller,
+			Collection<MappedResource> resources, 
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws ServletException, IOException {
 
-		Model description = getResourceDescription(resource);
+		Model description = getResourceDescription(resources);
 
 		if (description.size() == 0) {
 			return false;
@@ -42,24 +45,24 @@ public class PageURLServlet extends BaseURLServlet {
 		Velocity.setProperty("velocimacro.context.localscope", Boolean.TRUE);
 		
 		ResourceDescription resourceDescription = new ResourceDescription(
-				resource, description, config);
+				controller, description, config);
 		String discoLink = "http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=" +
-				URLEncoder.encode(resource.getWebURI(), "utf-8");
+				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
 		String tabulatorLink = "http://dig.csail.mit.edu/2005/ajar/ajaw/tab.html?uri=" +
-				URLEncoder.encode(resource.getWebURI(), "utf-8");
+				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
 		String openLinkLink = "http://linkeddata.uriburner.com/ode/?uri=" +
-				URLEncoder.encode(resource.getWebURI(), "utf-8");
+				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
 		context.put("uri", resourceDescription.getURI());
 		context.put("server_base", config.getWebApplicationBaseURI());
-		context.put("rdf_link", resource.getDataURL());
+		context.put("rdf_link", controller.getDataURL());
 		context.put("disco_link", discoLink);
 		context.put("tabulator_link", tabulatorLink);
 		context.put("openlink_link", openLinkLink);
-		context.put("sparql_endpoint", resource.getDataset().getDataSource().getEndpointURL());
+		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
 		context.put("title", resourceDescription.getLabel());
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());
@@ -67,13 +70,15 @@ public class PageURLServlet extends BaseURLServlet {
 		
 		try {
 			Model metadata = ModelFactory.createDefaultModel();
-			Resource documentRepresentation = resource.getDataset().addMetadataFromTemplate( metadata, resource, getServletContext() );
-			// Replaced the commented line by the following one because the
-			// RDF graph we want to talk about is a specific representation
-			// of the data identified by the getDataURL() URI.
-			//                                       Olaf, May 28, 2010
-			// context.put("metadata", metadata.getResource(resource.getDataURL()));
-			context.put("metadata", documentRepresentation);
+			for (MappedResource resource: resources) {
+				Resource documentRepresentation = resource.getDataset().addMetadataFromTemplate( metadata, resource, getServletContext() );
+				// Replaced the commented line by the following one because the
+				// RDF graph we want to talk about is a specific representation
+				// of the data identified by the getDataURL() URI.
+				//                                       Olaf, May 28, 2010
+				// context.put("metadata", metadata.getResource(resource.getDataURL()));
+				context.put("metadata", documentRepresentation);
+			}
 
 			Map<String,String> nsSet = metadata.getNsPrefixMap();
 			nsSet.putAll(description.getNsPrefixMap());

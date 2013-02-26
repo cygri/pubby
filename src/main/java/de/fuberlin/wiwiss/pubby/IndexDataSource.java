@@ -37,16 +37,11 @@ public class IndexDataSource implements DataSource {
 	}
 
 	@Override
-	public String getResourceDescriptionURL(String resourceURI) {
-		return null;
-	}
-
-	@Override
 	public Model getResourceDescription(String resourceURI) {
 		if (!indexURL.equals(resourceURI)) {
 			return EMPTY_MODEL;
 		}
-		List<MappedResource> resources = new ArrayList<MappedResource>();
+		List<HypermediaResource> resources = new ArrayList<HypermediaResource>();
 		for (Dataset dataset: datasets) {
 			resources.addAll(dataset.getIndex(config));
 		}
@@ -64,14 +59,14 @@ public class IndexDataSource implements DataSource {
 		return Collections.singletonList(ResourceFactory.createResource(indexURL));
 	}
 	
-	private Model describe(List<MappedResource> resources) {
+	private Model describe(List<HypermediaResource> resources) {
 		Model model = ModelFactory.createDefaultModel();
 		model.setNsPrefix("sioc", SIOC_NS);
 		model.setNsPrefix("rdfs", RDFS.getURI());
 		model.setNsPrefixes(config.getPrefixes());
 		Resource index = model.createResource(config.getWebApplicationBaseURI());
-		for (MappedResource mappedResource: resources) {
-			Resource r = model.createResource(mappedResource.getWebURI());
+		for (HypermediaResource resource: resources) {
+			Resource r = model.createResource(resource.getAbsoluteIRI());
 			if (index.equals(r)) continue;
 			index.addProperty(siocContainerOf, r);
 		}

@@ -1,6 +1,7 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,10 +10,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
@@ -27,35 +28,30 @@ import de.fuberlin.wiwiss.pubby.vocab.FOAF;
  */
 public class DataURLServlet extends BaseURLServlet {
 	
-	protected boolean doGet(MappedResource resource,
+	@Override
+	protected boolean doGet(HypermediaResource controller,
+			Collection<MappedResource> resources,
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			Configuration config) throws IOException {
 
-		String datasetURI = resource.getDatasetURI();
-		String webURI = resource.getWebURI();
-		Model description = getResourceDescription(resource);
-		
+		Model description = getResourceDescription(resources);
+
 		// Check if resource exists in dataset
 		if (description.size() == 0) {
 			response.setStatus(404);
 			response.setContentType("text/plain");
-			response.getOutputStream().println("Nothing known about <" + webURI + ">");
+			response.getOutputStream().println("Nothing known about <" + controller.getAbsoluteIRI() + ">");
 			return true;
 		}
 		
-		// Add owl:sameAs statements referring to the original dataset URI
-		Resource r = description.getResource(webURI);
-		if (resource.getDataset().getAddSameAsStatements()) {
-			r.addProperty(OWL.sameAs, description.createResource(datasetURI));
-		}
-		
 		// Add links to RDF documents with descriptions of the blank nodes
+		Resource r = description.getResource(controller.getAbsoluteIRI());
 		StmtIterator it = r.listProperties();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getObject().isAnon()) continue;
-			String pathDataURL = resource.getPathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getPathDataURL(stmt.getPredicate());
 			((Resource) stmt.getResource()).addProperty(RDFS.seeAlso, 
 					description.createResource(pathDataURL));
 		}
@@ -63,7 +59,7 @@ public class DataURLServlet extends BaseURLServlet {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getSubject().isAnon()) continue;
-			String pathDataURL = resource.getInversePathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getInversePathDataURL(stmt.getPredicate());
 			((Resource) stmt.getSubject().as(Resource.class)).addProperty(RDFS.seeAlso, 
 					description.createResource(pathDataURL));
 		}
@@ -77,14 +73,17 @@ public class DataURLServlet extends BaseURLServlet {
 				&& description.getNsPrefixURI("rdfs") == null) {
 			description.setNsPrefix("rdfs", RDFS.getURI());
 		}
-		Resource document = description.getResource(addQueryString(resource.getDataURL(), request));
+		Resource document = description.getResource(addQueryString(controller.getDataURL(), request));
 		document.addProperty(FOAF.primaryTopic, r);
 		document.addProperty(RDFS.label, 
 				"RDF description of " + 
-				new ResourceDescription(resource, description, config).getLabel());
-		resource.getDataset().addDocumentMetadata(description, document);
-		resource.getDataset().addMetadataFromTemplate(description, resource, getServletContext());
-
+				new ResourceDescription(controller, description, config).getLabel());
+		
+		// Add provenance. This seems out of place here.
+		for (MappedResource resource: resources) {
+			resource.getDataset().addDocumentMetadata(description, document);
+			resource.getDataset().addMetadataFromTemplate(description, resource, getServletContext());
+		}
 
 		ModelResponse server = new ModelResponse(description, request, response);
 		server.serve();

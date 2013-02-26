@@ -29,12 +29,9 @@ public class ModelDataSource implements DataSource {
 		return null;
 	}
 	
-	public String getResourceDescriptionURL(String resourceURI) {
-		return null;
-	}
-
 	public Model getResourceDescription(String resourceURI) {
 		Model result = ModelFactory.createDefaultModel();
+		result.setNsPrefixes(model);
 		addResourceDescription(model.getResource(resourceURI), result);
 		return result;
 	}
@@ -43,6 +40,7 @@ public class ModelDataSource implements DataSource {
 			Property property, boolean isInverse) {
 		Resource r = model.getResource(resourceURI);
 		Model result = ModelFactory.createDefaultModel();
+		result.setNsPrefixes(model);
 		StmtIterator it = isInverse
 				? model.listStatements(null, property, r)
 				: r.listProperties(property);

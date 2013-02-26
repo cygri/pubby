@@ -1,10 +1,12 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.negotiation.ContentTypeNegotiator;
@@ -23,9 +25,9 @@ public class WebURIServlet extends BaseServlet {
 
 	public boolean doGet(String relativeURI, HttpServletRequest request,
 			HttpServletResponse response, Configuration config) throws IOException {
-		MappedResource resource;
-		resource = config.getMappedResourceFromRelativeWebURI(relativeURI, true);
-		if (resource == null) return false;
+		Collection<MappedResource> resources = 
+				config.getMappedResourcesFromRelativeWebURI(relativeURI, true);
+		if (resources.isEmpty()) return false;
 
 		response.addHeader("Vary", "Accept, User-Agent");
 		ContentTypeNegotiator negotiator = PubbyNegotiator.getPubbyNegotiator();
@@ -43,13 +45,11 @@ public class WebURIServlet extends BaseServlet {
 		response.setStatus(303);
 		response.setContentType("text/plain");
 		String location;
+		HypermediaResource hypermedia = config.getController(IRIEncoder.toIRI(relativeURI), true);
 		if ("text/html".equals(bestMatch.getMediaType())) {
-			location = resource.getPageURL();
-		} else if (resource.getDataset() != null && resource.getDataset().redirectRDFRequestsToEndpoint()) {
-			location = resource.getDataset().getDataSource().getResourceDescriptionURL(
-					resource.getDatasetURI());	
+			location = hypermedia.getPageURL();
 		} else {
-			location = resource.getDataURL();
+			location = hypermedia.getDataURL();
 		}
 		response.addHeader("Location", IRIEncoder.toURI(location));
 		response.getOutputStream().println(

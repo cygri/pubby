@@ -2,7 +2,6 @@ package de.fuberlin.wiwiss.pubby;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -122,17 +121,6 @@ public class Configuration {
 		return new HypermediaResource(relativeIRI, this);
 	}
 	
-	public MappedResource getMappedResourceFromDatasetURI(String datasetURI) {
-		Iterator<Dataset> it = datasets.iterator();
-		while (it.hasNext()) {
-			Dataset dataset = (Dataset) it.next();
-			if (dataset.isDatasetURI(datasetURI)) {
-				return dataset.getMappedResourceFromDatasetURI(datasetURI, this);
-			}
-		}
-		return null;
-	}
-
 	public Collection<MappedResource> getMappedResourcesFromRelativeWebURI(String relativeWebURI, boolean isResourceURI) {
 		Collection<MappedResource> results = new ArrayList<MappedResource>();
 		for (Dataset dataset: datasets) {
@@ -171,8 +159,13 @@ public class Configuration {
 		if (!config.hasProperty(CONF.indexResource)) {
 			return null;
 		}
-		return getMappedResourceFromDatasetURI(
-				config.getProperty(CONF.indexResource).getResource().getURI()).getController();
+		String uri = config.getProperty(CONF.indexResource).getResource().getURI();
+		String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
+		if (!uri.startsWith(resourceBase)) {
+			throw new RuntimeException("conf:indexResource must start with "
+					+ resourceBase);
+		}
+		return new HypermediaResource(uri.substring(resourceBase.length()), this);
 	}
 	
 	public String getProjectLink() {

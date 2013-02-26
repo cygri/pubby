@@ -67,6 +67,7 @@ public abstract class BaseServlet extends HttpServlet {
 			Model description = new ModelTranslator(
 				resource.getDataset().getDataSource().getResourceDescription(
 						resource.getDatasetURI()),
+				resource.getDataset(),
 				config).getTranslated();
 			// Add owl:sameAs statements referring to the original dataset URI
 			// TODO: Make this a wrapper around DataSource
@@ -87,6 +88,7 @@ public abstract class BaseServlet extends HttpServlet {
 			ModelUtil.mergeModels(result, new ModelTranslator(
 					resource.getDataset().getDataSource().getAnonymousPropertyValues(
 							resource.getDatasetURI(), property, isInverse),
+					resource.getDataset(),
 					config).getTranslated());
 		} return result;
 	}

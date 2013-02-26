@@ -17,10 +17,12 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
  */
 public class ModelTranslator {
 	private final Model model;
+	private final Dataset dataset;
 	private final Configuration serverConfig;
 	
-	public ModelTranslator(Model model, Configuration configuration) {
+	public ModelTranslator(Model model, Dataset dataset, Configuration configuration) {
 		this.model = model;
+		this.dataset = dataset;
 		this.serverConfig = configuration;
 	}
 	
@@ -50,7 +52,7 @@ public class ModelTranslator {
 	}
 	
 	private String getPublicURI(String datasetURI) {
-		MappedResource resource = serverConfig.getMappedResourceFromDatasetURI(datasetURI);
+		MappedResource resource = dataset.getMappedResourceFromDatasetURI(datasetURI, serverConfig);
 		if (resource == null) return datasetURI;
 		return resource.getController().getAbsoluteIRI();
 	}

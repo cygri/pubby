@@ -120,6 +120,7 @@ public class Dataset {
 	}
 	
 	public MappedResource getMappedResourceFromDatasetURI(String datasetURI, Configuration configuration) {
+		if (!isDatasetURI(datasetURI)) return null;
 		return new MappedResource(
 				escapeURIDelimiters(datasetURI.substring(getDatasetBase().length())),
 				datasetURI,
@@ -170,7 +171,7 @@ public class Dataset {
 		for (Resource r: dataSource.getIndex()) {
 			if (!r.getURI().startsWith(datasetBase)) continue;
 			result.add(getMappedResourceFromDatasetURI(
-					r.getURI(), configuration).getController()); 
+					r.getURI(), configuration).getController());
 		}
 		return result;
 	}

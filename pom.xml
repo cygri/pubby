@@ -83,6 +83,13 @@
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
         <version>8.1.9.v20130131</version>
+<!--
+        <configuration>
+          <webApp>
+            <contextPath>/pubby</contextPath>
+          </webApp>
+        </configuration>
+-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

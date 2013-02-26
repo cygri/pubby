@@ -35,5 +35,5 @@ public class CONF {
 	public static final Property loadRDF = m.createProperty(NS + "loadRDF");
 	public static final Property rdfDocumentMetadata = m.createProperty(NS + "rdfDocumentMetadata");
 	public static final Property metadataTemplate = m.createProperty(NS + "metadataTemplate");
-	public static final Property contentType = m.createProperty(NS + "askContentType");
+	public static final Property contentType = m.createProperty(NS + "contentType");
 }

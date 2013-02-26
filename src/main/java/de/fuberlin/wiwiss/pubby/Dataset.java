@@ -99,9 +99,9 @@ public class Dataset {
 								? config.getProperty(CONF.sparqlDefaultGraph).getResource().getURI()
 								: null;
 			dataSource = new RemoteSPARQLDataSource(endpointURL, graphName);
-			if (config.hasProperty(CONF.askContentType)) {
-				((RemoteSPARQLDataSource) dataSource).setAskContentType(
-						config.getProperty(CONF.askContentType).getString());
+			if (config.hasProperty(CONF.contentType)) {
+				((RemoteSPARQLDataSource) dataSource).setContentType(
+						config.getProperty(CONF.contentType).getString());
 			}
 		} else {
 			Model data = ModelFactory.createDefaultModel();

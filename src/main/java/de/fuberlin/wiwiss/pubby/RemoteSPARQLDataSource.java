@@ -22,7 +22,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	private final String endpointURL;
 	private final String defaultGraphName;
 	private String previousDescribeQuery;
-	private String askContentType = null;
+	private String contentType = null;
 	
 	public RemoteSPARQLDataSource(String endpointURL, String graphName) {
 		this.endpointURL = endpointURL;
@@ -33,8 +33,8 @@ public class RemoteSPARQLDataSource implements DataSource {
 	 * Sets the content type to ask for in the request to the remote
 	 * SPARQL endpoint.
 	 */
-	public void setAskContentType(String mediaType) {
-		this.askContentType = mediaType;
+	public void setContentType(String mediaType) {
+		this.contentType = mediaType;
 	}
 	
 	public String getEndpointURL() {
@@ -83,6 +83,9 @@ public class RemoteSPARQLDataSource implements DataSource {
 		if (defaultGraphName != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
 		}
+		if (contentType != null) {
+			endpoint.setModelContentType(contentType);
+		}
 		return endpoint.execDescribe();
 	}
 	
@@ -90,9 +93,6 @@ public class RemoteSPARQLDataSource implements DataSource {
 		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
 		if (defaultGraphName != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphName));
-		}
-		if (askContentType != null) {
-			endpoint.setAskContentType(askContentType);
 		}
 		return endpoint.execSelect();
 	}

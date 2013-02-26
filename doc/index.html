@@ -300,6 +300,13 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
   <code>http://dbpedia.org/resource/Spätzle</code>.
   Default: <code>true</code>.</p></dd>
 
+<dt><tt>conf:contentType "<em>text/turtle</em>";</tt></dt>
+<dd><p>Changes the media type that will be requested from the remote SPARQL
+  server when executing <code>DESCRIBE</code> and <code>CONSTRUCT</code>
+  queries. This can be used to force communication to use Turtle instead
+  of RDF/XML to solve issues with non-serializable graphs, provided the
+  endpoint supports Turtle.</p></dd>
+
 <dt><tt>conf:fixUnescapedCharacters "<em>abc</em>";</tt></dt>
 <dd><p>(Only needed if you have problems with funny characters in the URIs when
   running Pubby behind an Apache proxy)</p></dd>

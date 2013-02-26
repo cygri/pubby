@@ -44,6 +44,9 @@
     conf:projectHomepage <http://dbpedia.org>;
     # The Pubby root, where the webapp is running inside the servlet container.
     conf:webBase <http://localhost:8080/>;
+    # Will be appended to the conf:webBase to form the public
+    # resource URIs; if not present, defaults to ""
+    conf:webResourcePrefix "resource/";
     # URL of an RDF file whose prefix mapping is to be used by the
     # server; defaults to <>, which is *this* file.
     conf:usePrefixesFrom <>;
@@ -65,9 +68,6 @@
         conf:sparqlDefaultGraph <http://dbpedia.org>;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://dbpedia.org/resource/>;
-        # Will be appended to the conf:webBase to form the public
-        # resource URIs; if not present, defaults to ""
-        conf:webResourcePrefix "resource/";
         # Fixes an issue with the server running behind an Apache proxy;
         # can be ignored otherwise
         conf:fixUnescapedCharacters "(),'!$&*+;=@";

@@ -71,6 +71,8 @@
         # Fixes an issue with the server running behind an Apache proxy;
         # can be ignored otherwise
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
+        # DBpedia uses URIs, not IRIs
+        conf:supportsIRIs false;
 
         # include metadata
         conf:metadataTemplate "metadata.ttl";
@@ -101,5 +103,6 @@
         # conf:webBase matches this regular expression
         conf:datasetURIPattern "(class|property)/.*";
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
+        conf:supportsIRIs false;
     ];
     .

@@ -295,6 +295,15 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
   <tt>"resource/"</tt>, which will result in a mapped URI of
   <tt>http://myserver/mydataset/resource/page</tt>.</p></dd>
 
+<dt><tt>conf:supportsIRIs <em>true/false</em>;</tt></dt>
+<dd><p>Must be set to <code>false</code> on data sources that use URIs
+  instead of IRIs in the RDF data. For example, the English-language
+  <a href="http://dbpedia.org/">DBpedia</a> dataset
+  uses the URI <code>http://dbpedia.org/resource/Sp%C3%A4tzle</code>
+  instead of the (valid, and preferrable) IRI
+  <code>http://dbpedia.org/resource/Spätzle</code>.
+  Default: <code>true</code>.</p></dd>
+
 <dt><tt>conf:fixUnescapedCharacters "<em>abc</em>";</tt></dt>
 <dd><p>(Only needed if you have problems with funny characters in the URIs when
   running Pubby behind an Apache proxy)</p></dd>

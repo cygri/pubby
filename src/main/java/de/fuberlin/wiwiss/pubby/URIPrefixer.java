@@ -1,6 +1,8 @@
 package de.fuberlin.wiwiss.pubby;
 
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -49,7 +51,11 @@ public class URIPrefixer {
 	
 	public String getLocalName() {
 		if (localName == null) {
-			return resource.getLocalName();
+			Matcher matcher = Pattern.compile("([^#/:?]+)[#/:?]*$").matcher(resource.getURI());
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
+			return "";	// Only happens if the URI contains only excluded chars
 		}
 		return localName;
 	}

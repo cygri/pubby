@@ -61,7 +61,7 @@ public class ResourceDescription {
 		String label = getBestLanguageMatch(
 				candidates, config.getDefaultLanguage());
 		if (label == null) {
-			return resource.getLocalName();
+			return new URIPrefixer(resource, getPrefixes()).getLocalName();
 		}
 		return label;
 	}

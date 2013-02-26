@@ -168,6 +168,7 @@ public class Dataset {
 	public List<HypermediaResource> getIndex(Configuration configuration) {
 		List<HypermediaResource> result = new ArrayList<HypermediaResource>();
 		for (Resource r: dataSource.getIndex()) {
+			if (!r.getURI().startsWith(datasetBase)) continue;
 			result.add(getMappedResourceFromDatasetURI(
 					r.getURI(), configuration).getController()); 
 		}

@@ -28,11 +28,12 @@ public class CONF {
 	public static final Property datasetURIPattern = m.createProperty(NS + "datasetURIPattern");
 	public static final Property webResourcePrefix = m.createProperty(NS + "webResourcePrefix"); 
 	public static final Property fixUnescapedCharacters = m.createProperty(NS + "fixUnescapedCharacters");
+	public static final Property supportsIRIs = m.createProperty(NS + "supportsIRIs");
 	public static final Property addSameAsStatements = m.createProperty(NS + "addSameAsStatements");
 	public static final Property sparqlEndpoint = m.createProperty(NS + "sparqlEndpoint"); 
 	public static final Property sparqlDefaultGraph = m.createProperty(NS + "sparqlDefaultGraph");
 	public static final Property loadRDF = m.createProperty(NS + "loadRDF");
-	public static final Property redirectRDFRequestsToEndpoint = m.createProperty(NS + "redirectRDFRequestsToEndpoint"); 
+	public static final Property redirectRDFRequestsToEndpoint = m.createProperty(NS + "redirectRDFRequestsToEndpoint");
 	public static final Property rdfDocumentMetadata = m.createProperty(NS + "rdfDocumentMetadata");
 	public static final Property metadataTemplate = m.createProperty(NS + "metadataTemplate");
 

@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.IRIEncoder;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.negotiation.ContentTypeNegotiator;
 import de.fuberlin.wiwiss.pubby.negotiation.MediaRangeSpec;
@@ -50,7 +51,7 @@ public class WebURIServlet extends BaseServlet {
 		} else {
 			location = resource.getDataURL();
 		}
-		response.addHeader("Location", location);
+		response.addHeader("Location", IRIEncoder.toURI(location));
 		response.getOutputStream().println(
 				"303 See Other: For a description of this item, see " + location);
 		return true;

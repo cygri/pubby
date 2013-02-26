@@ -137,11 +137,16 @@ public class Dataset {
 		if (!datasetURIPattern.matcher(relativeWebURI).matches()) {
 			return null;
 		}
+		String decoded = getSupportsIRIs() ? IRIEncoder.toIRI(relativeWebURI) : relativeWebURI;
 		return new MappedResource(
-				relativeWebURI,
-				getDatasetBase() + unescapeURIDelimiters(relativeWebURI),
+				decoded,
+				getDatasetBase() + unescapeURIDelimiters(decoded),
 				configuration,
 				this);
+	}
+	
+	public boolean getSupportsIRIs() {
+		return getBooleanConfigValue(CONF.supportsIRIs, true);
 	}
 	
 	private String getDatasetBase() {

@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.cvut.kbss.pubby.servlets.ResourceDescriptionProvider;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 
@@ -32,9 +33,9 @@ public class PageURLServlet extends BaseURLServlet {
 
 	public boolean doGet(HypermediaResource controller,
 			Collection<MappedResource> resources, 
-			HttpServletRequest request,
+			final HttpServletRequest request,
 			HttpServletResponse response,
-			Configuration config) throws ServletException, IOException {
+			final Configuration config) throws ServletException, IOException {
 
 		Model description = getResourceDescription(resources);
 
@@ -66,8 +67,15 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("title", resourceDescription.getLabel());
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());
-		context.put("properties", resourceDescription.getProperties());
-		
+        context.put("properties", resourceDescription.getProperties());
+        context.put("geoPoints", resourceDescription.getPoints(new ResourceDescriptionProvider() {
+            @Override
+            public Resource get(String url) {
+                return getResourceDescription(config.getMappedResourcesFromRelativeWebURI(
+                        url.substring(config.getWebApplicationBaseURI().length()), true)).getResource(url);
+            }
+        }));
+
 		try {
 			Model metadata = ModelFactory.createDefaultModel();
 			for (MappedResource resource: resources) {

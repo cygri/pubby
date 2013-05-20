@@ -19,7 +19,9 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 
-import de.fuberlin.wiwiss.pubby.Configuration;
+import cz.cvut.kbss.pubby.Point;
+import cz.cvut.kbss.pubby.servlets.ResourceDescriptionProvider;
+import cz.cvut.kbss.pubby.vocab.GEO;
 
 /**
  * A convenient interface to an RDF description of a resource.
@@ -36,8 +38,9 @@ public class ResourceDescription {
 	private final Configuration config;
 	private PrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
-	
-	public ResourceDescription(HypermediaResource resource, Model model, 
+    private List<Point> points;
+
+    public ResourceDescription(HypermediaResource resource, Model model,
 			Configuration config) {
 		this.hypermediaResource = resource;
 		this.model = model;
@@ -316,4 +319,44 @@ public class ResourceDescription {
 			return getNode().getLiteralLexicalForm().compareTo(otherValue.getNode().getLiteralLexicalForm());
 		}
 	}
+
+    private void addPoint(final Resource r) {
+        final Statement lngS = r.getProperty(GEO.P_LONG);
+        final Statement latS = r.getProperty(GEO.P_LAT);
+
+        if ( lngS != null || latS != null ) {
+            points.add(new Point(lngS.getObject().asLiteral().getDouble(),latS.getObject().asLiteral().getDouble()));
+        }
+    }
+
+    /**
+     * Adds retrieves all points connected by geo:location property to this resource.
+     *
+     * @param p provider for data of the location resources
+     */
+    private void addAllPoints(ResourceDescriptionProvider p) {
+        final StmtIterator it= resource.listProperties(GEO.P_LOCATION);
+        while(it.hasNext()) {
+            Statement s = it.nextStatement();
+            if ( !s.getObject().isAnon() ) {
+                addPoint(p.get(s.getObject().asResource().getURI()));
+            }
+        }
+        addPoint(resource);
+    }
+
+    /**
+     * Gets all points that are relevant to this resource. This includes
+     * 1) the point extracted from the geo:lat and geo:long properties of this resource
+     * 2) all the points connected to this resource by geo:location property.
+     * @param p provider for retrieving resource descriptions
+     * @return
+     */
+    public List<Point> getPoints(ResourceDescriptionProvider p) {
+        if (points == null) {
+            points = new ArrayList<Point>();
+            addAllPoints(p);
+        }
+        return points;
+    }
 }

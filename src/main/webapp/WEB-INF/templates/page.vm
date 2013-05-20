@@ -23,4 +23,34 @@
 	<a href="#meta" onclick="showAllMetadata('metadata-tables')">expand all</a>
 #end
 
+#if (!$geoPoints.isEmpty())
+<a name="geo"></a>
+<h2>Geographic location</h2>
+<div id="map">
+</div>
+<script src="${server_base}static/jquery-1.9.1.min.js"></script>
+<script src="${server_base}static/OpenLayers.js"></script>
+<script type="text/javascript">
+        map = new OpenLayers.Map('map',
+                {
+                    controls: [new OpenLayers.Control.Navigation(), new OpenLayers.Control.PanZoomBar(), new OpenLayers.Control.Attribution(),
+                        new OpenLayers.Control.PanZoom(), new OpenLayers.Control.Permalink(), new OpenLayers.Control.Navigation() ],
+                    numZoomLevels: 22//,
+                }
+        );
+        var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+        markers=new OpenLayers.Layer.Markers( "Markers" );
+        map.addLayers([new OpenLayers.Layer.OSM(),markers]);
+        #set($x = 0)
+        #foreach($i in $geoPoints)
+            #if($x == 0)
+                map.setCenter(new OpenLayers.LonLat(${i.lng},${i.lat}).transform( fromProjection, toProjection ),10);
+            #end
+            markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(${i.lng},${i.lat}).transform( fromProjection, toProjection)));
+            #set($x = $x+1)
+        #end
+</script>
+#end
+
 #parse("footer.vm")

@@ -48,28 +48,37 @@ public class HypermediaResource {
 	}
 		
 	public String getPathPageURL(Property property) {
-		return getPathURL("pathpage/", property);
+		return getPagePathURL("pathpage/", property);
 	}
 	
 	public String getPathDataURL(Property property) {
-		return getPathURL("pathdata/", property);
+		return getDataPathURL("pathdata/", property);
 	}
 	
 	public String getInversePathPageURL(Property property) {
-		return getPathURL("pathpage/-", property);
+		return getPagePathURL("pathpage/-", property);
 	}
 	
 	public String getInversePathDataURL(Property property) {
-		return getPathURL("pathdata/-", property);
+		return getDataPathURL("pathdata/-", property);
 	}
-	
-	private String getPathURL(String urlPrefix, Property property) {
+
+	private String getPagePathURL(String urlPrefix, Property property) {
 		SimplePrefixMapping spm = config.getSimplePrefixes();
 		if (spm.getNamespace(property.getURI()) == null) {
 			return null;
 		}
 		return config.getWebApplicationBaseURI() + urlPrefix +
 				spm.qnameFor(property.getURI()) + "/" +
+				relativeIRI;
+	}
+	
+	private String getDataPathURL(String urlPrefix, Property property) {
+		if (config.getPrefixes().qnameFor(property.getURI()) == null) {
+			return null;
+		}
+		return config.getWebApplicationBaseURI() + urlPrefix +
+				config.getPrefixes().qnameFor(property.getURI()) + "/" +
 				relativeIRI;
 	}
 }

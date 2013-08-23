@@ -32,6 +32,7 @@ public class Configuration {
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
+	private final SimplePrefixMapping simplePrefixMapping;
 	private final Collection<Property> labelProperties;
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
@@ -97,6 +98,9 @@ public class Configuration {
 		// have syntactic sugar in Turtle.
 		ModelUtil.addNSIfUndefined(prefixes, "rdf", RDF.getURI());
 		ModelUtil.addNSIfUndefined(prefixes, "xsd", XSD.getURI());
+		
+		this.simplePrefixMapping = new SimplePrefixMapping(this, prefixes);
+		
 		// If we don't have an indexResource, then add an index builder dataset
 		// as the first dataset. It will be responsible for handling the
 		// homepage/index resource.
@@ -193,7 +197,7 @@ public class Configuration {
 	}
 
 	public SimplePrefixMapping getSimplePrefixes() {
-		return new SimplePrefixMapping(this, getPrefixes());
+		return simplePrefixMapping;
 	}
 
 	/**

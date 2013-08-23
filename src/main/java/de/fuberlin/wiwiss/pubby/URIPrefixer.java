@@ -1,12 +1,10 @@
 package de.fuberlin.wiwiss.pubby;
 
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.PrefixMapping;
 
 /**
  * Helper class that splits URIs into prefix and local name
@@ -20,25 +18,22 @@ public class URIPrefixer {
 	private final String prefix;
 	private final String localName;
 
-	public URIPrefixer(String uri, PrefixMapping prefixes) {
+	public URIPrefixer(String uri, SimplePrefixMapping prefixes) {
 		this(ResourceFactory.createResource(uri), prefixes);
 	}
 	
-	public URIPrefixer(Resource resource, PrefixMapping prefixes) {
+	public URIPrefixer(Resource resource, SimplePrefixMapping prefixes) {
 		this.resource = resource;
 		String uri = resource.getURI();
-		Iterator<String> it = prefixes.getNsPrefixMap().keySet().iterator();
-		while (it.hasNext()) {
-			String entryPrefix = it.next();
-			String entryURI = prefixes.getNsPrefixURI(entryPrefix);
-			if (uri.startsWith(entryURI)) {
-				prefix = entryPrefix;
-				localName = uri.substring(entryURI.length());
-				return;
-			}
+		String namespaceURI = prefixes.getNamespace(uri);
+		if (namespaceURI != null) {
+			localName = uri.substring(namespaceURI.length());;
+			prefix = prefixes.lookupPrefix(namespaceURI);
+			
+		} else {
+			prefix = null;
+			localName = null;
 		}
-		prefix = null;
-		localName = null;
 	}
 	
 	public boolean hasPrefix() {

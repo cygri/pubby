@@ -32,6 +32,7 @@ public class Configuration {
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
+	private final SimplePrefixMapping simplePrefixMapping;
 	private final Collection<Property> labelProperties;
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
@@ -97,6 +98,9 @@ public class Configuration {
 		// have syntactic sugar in Turtle.
 		ModelUtil.addNSIfUndefined(prefixes, "rdf", RDF.getURI());
 		ModelUtil.addNSIfUndefined(prefixes, "xsd", XSD.getURI());
+		
+		this.simplePrefixMapping = new SimplePrefixMapping(this, prefixes);
+		
 		// If we don't have an indexResource, then add an index builder dataset
 		// as the first dataset. It will be responsible for handling the
 		// homepage/index resource.
@@ -162,8 +166,7 @@ public class Configuration {
 		String uri = config.getProperty(CONF.indexResource).getResource().getURI();
 		String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
 		if (!uri.startsWith(resourceBase)) {
-			throw new RuntimeException("conf:indexResource must start with "
-					+ resourceBase);
+			throw new RuntimeException("conf:indexResource must start with " + resourceBase);
 		}
 		return new HypermediaResource(uri.substring(resourceBase.length()), this);
 	}
@@ -187,5 +190,68 @@ public class Configuration {
 			return config.getProperty(CONF.webResourcePrefix).getString();
 		}
 		return "";
+	}
+
+	public List<Dataset> getDatasets() {
+		return datasets;
+	}
+
+	public SimplePrefixMapping getSimplePrefixes() {
+		return simplePrefixMapping;
+	}
+
+	/**
+	 * Tries to guess a URI that may be being used on the SPARQL endpoint
+	 * that corresponds to the the pubbyResourceURL being used within pubby.
+	 * {@link #mapResource(String)} is the other direction for this mapping.
+	 * Unfortunately, the mapping given by {@link #mapResource(String)}
+	 * is not necessarily one-one, so we can only do a best effort
+	 * reverse. Fortunately, this will generally be good enough, particularly
+	 * if the config file uses config:datasetURIPattern well.
+	 * @param pubbyResourceURL
+	 * @return A URI which will mapResource() to the pubbyResourceURL, or null.
+	 */
+	public String guessReverseMapping(String pubbyResourceURL) {
+		// we first check that this is a pubbyResourceURL,
+		// we guess in the following fashion
+		// 1: we look through the extended prefix mapping, to see if any prefix matches
+		// the first one that does is viewed as definitive, and we then look the prefix up in the initial prefix mapping to get the 'real' URL
+		// 2: if 1 doesn't work, we extract the relative IRI, and then use it with the first dataset whose pattern rule matches.
+		
+		if (!pubbyResourceURL.startsWith(getWebApplicationBaseURI()+getWebResourcePrefix())) {
+			return null;
+		}
+		
+		if (getSimplePrefixes().getNamespace(pubbyResourceURL)!=null) {
+			return getPrefixes().expandPrefix(getSimplePrefixes().qnameFor(pubbyResourceURL));
+		}
+		
+		String local = Dataset.unescapeURIDelimiters(pubbyResourceURL.substring(getWebApplicationBaseURI().length()+getWebResourcePrefix().length()));
+		
+		for (Dataset d:datasets) {
+			String fullURI = d.local2datasetURI(local);
+			if (fullURI != null) {
+				return fullURI;
+			}
+		}
+		return null;
+	}
+	/**
+	 * Pubby works by creating proxy resources on its own server
+	 * for a variety of resources mentioned in the SPARQL endpoint.
+	 * This method maps from the URIs used by the SPARQL endpoint to
+	 * the proxy resources exposed by Pubby.
+	 * 
+	 * @param uriInSparqlEndPoint
+	 * @return A MappedResource whose absoluteURI is the public URI from pubby
+	 */
+	public MappedResource mapResource(String uriInSparqlEndPoint) {
+		for (Dataset dataset: getDatasets()) {
+			MappedResource mapped = dataset.getMappedResourceFromDatasetURI(uriInSparqlEndPoint, this);
+			if (mapped != null) {
+				return mapped;
+			}
+		}
+		return null;
 	}
 }

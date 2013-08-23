@@ -13,10 +13,11 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.DataResourceDescription;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
-import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.AbsResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
 /**
@@ -77,7 +78,7 @@ public class DataURLServlet extends BaseURLServlet {
 		document.addProperty(FOAF.primaryTopic, r);
 		document.addProperty(RDFS.label, 
 				"RDF description of " + 
-				new ResourceDescription(controller, description, config).getLabel());
+				new DataResourceDescription(controller, description, config).getLabel());
 		
 		// Add provenance. This seems out of place here.
 		for (MappedResource resource: resources) {

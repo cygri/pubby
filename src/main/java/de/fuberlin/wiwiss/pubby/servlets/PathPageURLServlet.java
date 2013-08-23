@@ -19,7 +19,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
-import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.AbsResourceDescription;
+import de.fuberlin.wiwiss.pubby.PageResourceDescription;
 
 /**
  * A servlet for rendering an HTML page describing the blank nodes
@@ -42,20 +43,16 @@ public class PathPageURLServlet extends BasePathServlet {
 		}
 
 		Resource r = descriptions.getResource(controller.getAbsoluteIRI());
-		List<ResourceDescription> resourceDescriptions = new ArrayList<ResourceDescription>();
-		StmtIterator it = isInverse
-				? descriptions.listStatements(null, property, r)
-				: r.listProperties(property);
-		while (it.hasNext()) {
-			Statement stmt = it.nextStatement();
-			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
-			if (!value.isAnon()) continue;
-			resourceDescriptions.add(new ResourceDescription(
-					(Resource) value.as(Resource.class), descriptions, config));
+		List<AbsResourceDescription> resourceDescriptions = new ArrayList<AbsResourceDescription>();
+		for (Resource value: getPropertyValues(r, property, isInverse) ) {
+		    resourceDescriptions.add(new PageResourceDescription( value, descriptions, config));
+		}
+		for (Resource value: getPropertyValues(r, descriptions.getProperty(config.mapResource(property.getURI()).getController().getAbsoluteIRI()), isInverse) ) {
+		    resourceDescriptions.add(new PageResourceDescription( value, descriptions, config));
 		}
 		
 		Model description = getResourceDescription(resources);
-		ResourceDescription resourceDescription = new ResourceDescription(
+		AbsResourceDescription resourceDescription = new PageResourceDescription(
 				controller, description, config);
 
 		String title = resourceDescription.getLabel() + (isInverse ? " « " : " » ") +
@@ -74,6 +71,20 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("resources", resourceDescriptions);
 		template.renderXHTML("pathpage.vm");
 		return true;
+	}
+
+	Iterable<Resource> getPropertyValues(Resource r, Property property, boolean isInverse) {
+		List<Resource> result = new ArrayList<Resource>();
+		StmtIterator it = isInverse
+				? r.getModel().listStatements(null, property, r)
+				: r.listProperties(property);
+		while (it.hasNext()) {
+			Statement stmt = it.nextStatement();
+			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
+			if (!value.isAnon()) continue;
+			result.add(value.asResource());
+		}
+		return result;
 	}
 	
 	private static final long serialVersionUID = -2597664961896022667L;

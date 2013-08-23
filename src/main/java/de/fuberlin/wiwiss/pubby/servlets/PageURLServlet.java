@@ -19,7 +19,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
-import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.AbsResourceDescription;
+import de.fuberlin.wiwiss.pubby.PageResourceDescription;
 
 /**
  * A servlet for serving the HTML page describing a resource.
@@ -44,7 +45,7 @@ public class PageURLServlet extends BaseURLServlet {
 		
 		Velocity.setProperty("velocimacro.context.localscope", Boolean.TRUE);
 		
-		ResourceDescription resourceDescription = new ResourceDescription(
+		AbsResourceDescription resourceDescription = new PageResourceDescription(
 				controller, description, config);
 		String discoLink = "http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=" +
 				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
@@ -56,7 +57,7 @@ public class PageURLServlet extends BaseURLServlet {
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
-		context.put("uri", resourceDescription.getURI());
+		context.put("uri", config.guessReverseMapping(resourceDescription.getURI()));
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("rdf_link", controller.getDataURL());
 		context.put("disco_link", discoLink);

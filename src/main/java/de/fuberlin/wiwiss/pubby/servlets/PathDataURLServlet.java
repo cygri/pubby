@@ -11,10 +11,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.DataResourceDescription;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
-import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.AbsResourceDescription;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
 /**
@@ -53,7 +54,7 @@ public class PathDataURLServlet extends BasePathServlet {
 								? controller.getInversePathDataURL(property) 
 								: controller.getPathDataURL(property), request));
 		document.addProperty(FOAF.primaryTopic, r);
-		String resourceLabel = new ResourceDescription(controller, descriptions, config).getLabel();
+		String resourceLabel = new DataResourceDescription(controller, descriptions, config).getLabel();
 		String propertyLabel = config.getPrefixes().qnameFor(property.getURI());
 		if (isInverse) {
 			document.addProperty(RDFS.label, 

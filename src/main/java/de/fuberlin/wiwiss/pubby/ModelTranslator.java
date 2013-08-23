@@ -52,8 +52,11 @@ public class ModelTranslator {
 	}
 	
 	private String getPublicURI(String datasetURI) {
-		MappedResource resource = dataset.getMappedResourceFromDatasetURI(datasetURI, serverConfig);
-		if (resource == null) return datasetURI;
-		return resource.getController().getAbsoluteIRI();
+		for (Dataset dataset: serverConfig.getDatasets()) {
+			MappedResource resource = dataset.getMappedResourceFromDatasetURI(datasetURI, serverConfig);
+			if (resource != null) 
+				return resource.getController().getAbsoluteIRI();
+		}
+		return datasetURI;
 	}
 }

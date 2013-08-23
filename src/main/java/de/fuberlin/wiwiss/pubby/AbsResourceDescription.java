@@ -16,8 +16,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 
@@ -29,15 +27,15 @@ import de.fuberlin.wiwiss.pubby.Configuration;
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class ResourceDescription {
+public abstract class AbsResourceDescription {
 	private final HypermediaResource hypermediaResource;
-	private final Model model;
+	final Model model;
 	private final Resource resource;
-	private final Configuration config;
-	private PrefixMapping prefixes = null;
+	final Configuration config;
+	private SimplePrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
 	
-	public ResourceDescription(HypermediaResource resource, Model model, 
+	public AbsResourceDescription(HypermediaResource resource, Model model, 
 			Configuration config) {
 		this.hypermediaResource = resource;
 		this.model = model;
@@ -45,7 +43,7 @@ public class ResourceDescription {
 		this.config = config;
 	}
 
-	public ResourceDescription(Resource resource, Model model, Configuration config) {
+	public AbsResourceDescription(Resource resource, Model model, Configuration config) {
 		this.hypermediaResource = null;
 		this.model = model;
 		this.resource = resource;
@@ -61,7 +59,11 @@ public class ResourceDescription {
 		String label = getBestLanguageMatch(
 				candidates, config.getDefaultLanguage());
 		if (label == null) {
-			return new URIPrefixer(resource, getPrefixes()).getLocalName();
+			if (resource.isAnon()) {
+				return null;
+			} else {
+			   return new URIPrefixer(resource, getPrefixes()).getLocalName();
+			}
 		}
 		return label;
 	}
@@ -124,19 +126,19 @@ public class ResourceDescription {
 	}
 
 	/**
-	 * Returns a prefix mapping containing all prefixes from the input model
+	 * Returns a mapping from URIs to Prefixes,
+	 * with longer URIs taking precedence over shorter ones
+	 * and containing all prefixes from the input model
 	 * and from the configuration, with the configuration taking precedence.
 	 */
-	private PrefixMapping getPrefixes() {
+	private SimplePrefixMapping getPrefixes() {
 		if (prefixes == null) {
-			prefixes = new PrefixMappingImpl();
-			prefixes.setNsPrefixes(model);
-			for (String prefix: config.getPrefixes().getNsPrefixMap().keySet()) {
-				prefixes.setNsPrefix(prefix, config.getPrefixes().getNsPrefixURI(prefix));
-			}
+			prefixes = constructPrefixMapping();
 		}
 		return prefixes;
 	}
+
+	abstract SimplePrefixMapping constructPrefixMapping();
 
 	private Collection<RDFNode> getValuesFromMultipleProperties(
 			Collection<Property> properties) {
@@ -289,6 +291,11 @@ public class ResourceDescription {
 				return "?:" + datatypePrefixer.getLocalName();
 			}
 		}
+		public String getGuessedURI() {
+			String uri = config.guessReverseMapping(node.asResource().getURI());
+			return uri != null ? uri : node.asResource().getURI();
+		}
+
 		public int compareTo(Value other) {
 			if (!(other instanceof Value)) {
 				return 0;

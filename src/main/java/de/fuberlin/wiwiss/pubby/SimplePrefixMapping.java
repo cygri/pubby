@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.PrefixMapping;
 
 class SimplePrefixMapping {
@@ -24,7 +23,21 @@ class SimplePrefixMapping {
 			copyPrefixes(uri2prefix, pm);
 		}
 		if (config != null) {
-			
+			Map<String,String> newStuff = new HashMap<String,String>();
+			for (Map.Entry<String, String> ns2p : uri2prefix.entrySet() ) {
+				String uri = ns2p.getKey();
+				String prefix = ns2p.getValue();
+				newStuff.put(Dataset.escapeURIDelimiters(uri), prefix);
+				for (Dataset dataset: config.getDatasets()) {
+					MappedResource mapped = dataset.getMappedResourceFromDatasetURI(uri, config);
+					if (mapped != null) {
+						newStuff.put(mapped.getController().getAbsoluteIRI(),prefix);
+						newStuff.put(Dataset.escapeURIDelimiters(mapped.getController().getAbsoluteIRI()),prefix);
+					}
+				}
+			}
+			newStuff.putAll(uri2prefix); // these ones take precedence
+			uri2prefix = newStuff;
 		}
 		this.uri2prefix = uri2prefix.entrySet().toArray(new Map.Entry[uri2prefix.size()]);
 		Arrays.sort(this.uri2prefix, new Comparator<Map.Entry<String, String>>(){

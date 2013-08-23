@@ -380,7 +380,7 @@ public class Dataset {
 		return encoded.toString();
 	}
 
-	private String escapeURIDelimiters(String uri) {
+	public static String escapeURIDelimiters(String uri) {
 		return uri.replaceAll("#", "%23").replaceAll("\\?", "%3F");
 	}
 	

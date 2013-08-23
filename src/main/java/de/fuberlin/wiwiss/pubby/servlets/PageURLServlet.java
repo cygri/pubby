@@ -56,7 +56,7 @@ public class PageURLServlet extends BaseURLServlet {
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
-		context.put("uri", resourceDescription.getURI());
+		context.put("uri", config.guessReverseMapping(resourceDescription.getURI()));
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("rdf_link", controller.getDataURL());
 		context.put("disco_link", discoLink);

@@ -384,8 +384,15 @@ public class Dataset {
 		return uri.replaceAll("#", "%23").replaceAll("\\?", "%3F");
 	}
 	
-	private String unescapeURIDelimiters(String uri) {
+	public static String unescapeURIDelimiters(String uri) {
 		return uri.replaceAll("%23", "#").replaceAll("%3F", "?");
+	}
+
+	public String local2datasetURI(String local) {
+		if (datasetURIPattern.matcher(local).matches()) {
+			return datasetBase + local;
+		}
+		return null;
 	}
 	
 }

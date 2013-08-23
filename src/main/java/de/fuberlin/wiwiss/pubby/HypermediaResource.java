@@ -64,11 +64,12 @@ public class HypermediaResource {
 	}
 	
 	private String getPathURL(String urlPrefix, Property property) {
-		if (config.getPrefixes().qnameFor(property.getURI()) == null) {
+		SimplePrefixMapping spm = config.getSimplePrefixes();
+		if (spm.getNamespace(property.getURI()) == null) {
 			return null;
 		}
 		return config.getWebApplicationBaseURI() + urlPrefix +
-				config.getPrefixes().qnameFor(property.getURI()) + "/" +
+				spm.qnameFor(property.getURI()) + "/" +
 				relativeIRI;
 	}
 }

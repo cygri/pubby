@@ -43,15 +43,11 @@ public class PathPageURLServlet extends BasePathServlet {
 
 		Resource r = descriptions.getResource(controller.getAbsoluteIRI());
 		List<ResourceDescription> resourceDescriptions = new ArrayList<ResourceDescription>();
-		StmtIterator it = isInverse
-				? descriptions.listStatements(null, property, r)
-				: r.listProperties(property);
-		while (it.hasNext()) {
-			Statement stmt = it.nextStatement();
-			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
-			if (!value.isAnon()) continue;
-			resourceDescriptions.add(new ResourceDescription(
-					(Resource) value.as(Resource.class), descriptions, config));
+		for (Resource value: getPropertyValues(r, property, isInverse) ) {
+		    resourceDescriptions.add(new ResourceDescription( value, descriptions, config));
+		}
+		for (Resource value: getPropertyValues(r, descriptions.getProperty(config.mapResource(property.getURI()).getController().getAbsoluteIRI()), isInverse) ) {
+		    resourceDescriptions.add(new ResourceDescription( value, descriptions, config));
 		}
 		
 		Model description = getResourceDescription(resources);
@@ -74,6 +70,20 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("resources", resourceDescriptions);
 		template.renderXHTML("pathpage.vm");
 		return true;
+	}
+
+	Iterable<Resource> getPropertyValues(Resource r, Property property, boolean isInverse) {
+		List<Resource> result = new ArrayList<Resource>();
+		StmtIterator it = isInverse
+				? r.getModel().listStatements(null, property, r)
+				: r.listProperties(property);
+		while (it.hasNext()) {
+			Statement stmt = it.nextStatement();
+			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
+			if (!value.isAnon()) continue;
+			result.add(value.asResource());
+		}
+		return result;
 	}
 	
 	private static final long serialVersionUID = -2597664961896022667L;

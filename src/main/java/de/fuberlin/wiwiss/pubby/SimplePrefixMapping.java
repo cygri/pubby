@@ -28,12 +28,10 @@ class SimplePrefixMapping {
 				String uri = ns2p.getKey();
 				String prefix = ns2p.getValue();
 				newStuff.put(Dataset.escapeURIDelimiters(uri), prefix);
-				for (Dataset dataset: config.getDatasets()) {
-					MappedResource mapped = dataset.getMappedResourceFromDatasetURI(uri, config);
-					if (mapped != null) {
-						newStuff.put(mapped.getController().getAbsoluteIRI(),prefix);
-						newStuff.put(Dataset.escapeURIDelimiters(mapped.getController().getAbsoluteIRI()),prefix);
-					}
+				MappedResource mapped = config.mapResource(uri);
+				if (mapped != null) {
+					newStuff.put(mapped.getController().getAbsoluteIRI(),prefix);
+					newStuff.put(Dataset.escapeURIDelimiters(mapped.getController().getAbsoluteIRI()),prefix);
 				}
 			}
 			newStuff.putAll(uri2prefix); // these ones take precedence
@@ -71,6 +69,12 @@ class SimplePrefixMapping {
 			}
 		}
 		return null;
+	}
+
+	public String qnameFor(String uri) {
+		String ns = getNamespace(uri);
+		String prefix = lookupPrefix(ns);
+		return prefix + ":" + uri.substring(ns.length());
 	}
 
 }

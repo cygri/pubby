@@ -191,4 +191,18 @@ public class Configuration {
 	public List<Dataset> getDatasets() {
 		return datasets;
 	}
+
+	public SimplePrefixMapping getSimplePrefixes() {
+		return new SimplePrefixMapping(this, getPrefixes());
+	}
+
+	public MappedResource mapResource(String uri) {
+		for (Dataset dataset: getDatasets()) {
+			MappedResource mapped = dataset.getMappedResourceFromDatasetURI(uri, this);
+			if (mapped != null) {
+				return mapped;
+			}
+		}
+		return null;
+	}
 }

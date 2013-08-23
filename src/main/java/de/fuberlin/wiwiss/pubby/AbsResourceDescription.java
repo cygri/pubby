@@ -291,6 +291,11 @@ public abstract class AbsResourceDescription {
 				return "?:" + datatypePrefixer.getLocalName();
 			}
 		}
+		public String getGuessedURI() {
+			String uri = config.guessReverseMapping(node.asResource().getURI());
+			return uri != null ? uri : node.asResource().getURI();
+		}
+
 		public int compareTo(Value other) {
 			if (!(other instanceof Value)) {
 				return 0;

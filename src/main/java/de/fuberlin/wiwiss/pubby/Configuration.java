@@ -162,8 +162,7 @@ public class Configuration {
 		String uri = config.getProperty(CONF.indexResource).getResource().getURI();
 		String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
 		if (!uri.startsWith(resourceBase)) {
-			throw new RuntimeException("conf:indexResource must start with "
-					+ resourceBase);
+			throw new RuntimeException("conf:indexResource must start with " + resourceBase);
 		}
 		return new HypermediaResource(uri.substring(resourceBase.length()), this);
 	}
@@ -187,5 +186,9 @@ public class Configuration {
 			return config.getProperty(CONF.webResourcePrefix).getString();
 		}
 		return "";
+	}
+
+	public List<Dataset> getDatasets() {
+		return datasets;
 	}
 }

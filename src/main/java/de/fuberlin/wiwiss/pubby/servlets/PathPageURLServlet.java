@@ -19,7 +19,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
-import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.AbsResourceDescription;
+import de.fuberlin.wiwiss.pubby.PageResourceDescription;
 
 /**
  * A servlet for rendering an HTML page describing the blank nodes
@@ -42,16 +43,16 @@ public class PathPageURLServlet extends BasePathServlet {
 		}
 
 		Resource r = descriptions.getResource(controller.getAbsoluteIRI());
-		List<ResourceDescription> resourceDescriptions = new ArrayList<ResourceDescription>();
+		List<AbsResourceDescription> resourceDescriptions = new ArrayList<AbsResourceDescription>();
 		for (Resource value: getPropertyValues(r, property, isInverse) ) {
-		    resourceDescriptions.add(new ResourceDescription( value, descriptions, config));
+		    resourceDescriptions.add(new PageResourceDescription( value, descriptions, config));
 		}
 		for (Resource value: getPropertyValues(r, descriptions.getProperty(config.mapResource(property.getURI()).getController().getAbsoluteIRI()), isInverse) ) {
-		    resourceDescriptions.add(new ResourceDescription( value, descriptions, config));
+		    resourceDescriptions.add(new PageResourceDescription( value, descriptions, config));
 		}
 		
 		Model description = getResourceDescription(resources);
-		ResourceDescription resourceDescription = new ResourceDescription(
+		AbsResourceDescription resourceDescription = new PageResourceDescription(
 				controller, description, config);
 
 		String title = resourceDescription.getLabel() + (isInverse ? " « " : " » ") +

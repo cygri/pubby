@@ -27,15 +27,15 @@ import de.fuberlin.wiwiss.pubby.Configuration;
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class ResourceDescription {
+public abstract class AbsResourceDescription {
 	private final HypermediaResource hypermediaResource;
-	private final Model model;
+	final Model model;
 	private final Resource resource;
-	private final Configuration config;
+	final Configuration config;
 	private SimplePrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
 	
-	public ResourceDescription(HypermediaResource resource, Model model, 
+	public AbsResourceDescription(HypermediaResource resource, Model model, 
 			Configuration config) {
 		this.hypermediaResource = resource;
 		this.model = model;
@@ -43,7 +43,7 @@ public class ResourceDescription {
 		this.config = config;
 	}
 
-	public ResourceDescription(Resource resource, Model model, Configuration config) {
+	public AbsResourceDescription(Resource resource, Model model, Configuration config) {
 		this.hypermediaResource = null;
 		this.model = model;
 		this.resource = resource;
@@ -133,10 +133,12 @@ public class ResourceDescription {
 	 */
 	private SimplePrefixMapping getPrefixes() {
 		if (prefixes == null) {
-			prefixes = new SimplePrefixMapping(config, model, config.getPrefixes());
+			prefixes = constructPrefixMapping();
 		}
 		return prefixes;
 	}
+
+	abstract SimplePrefixMapping constructPrefixMapping();
 
 	private Collection<RDFNode> getValuesFromMultipleProperties(
 			Collection<Property> properties) {

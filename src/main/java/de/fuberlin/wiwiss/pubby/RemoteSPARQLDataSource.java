@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.riot.WebContent;
+
+import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -135,7 +141,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	private Model executeQuery(String queryString) {
-
+		Model model = ModelFactory.createDefaultModel();
 		previousDescribeQuery = queryString;
 
 		// Since we don't know the exact query type (e.g. DESCRIBE or CONSTRUCT),
@@ -149,11 +155,28 @@ public class RemoteSPARQLDataSource implements DataSource {
 		if (defaultGraphURI != null) {
 			httpQuery.addParam("default-graph-uri", defaultGraphURI);
 		}
-		httpQuery.setAccept(contentType);
 		
-		Model model = ModelFactory.createDefaultModel();
+		// The rest is more or less a copy of QueryEngineHTTP.execModel()
+		httpQuery.setAccept(contentType);
 		InputStream in = httpQuery.exec();
-		model.read(in, null);
+
+		// Don't assume the endpoint actually gives back the content type we
+		// asked for
+		String actualContentType = httpQuery.getContentType();
+
+		// If the server fails to return a Content-Type then we will assume
+		// the server returned the type we asked for
+		if (actualContentType == null || actualContentType.equals("")) {
+			actualContentType = contentType;
+		}
+
+		// Try to select language appropriately here based on the model content
+		// type
+		Lang lang = WebContent.contentTypeToLang(actualContentType);
+		if (!RDFLanguages.isTriples(lang))
+			throw new QueryException("Endpoint returned Content Type: " + actualContentType
+					+ " which is not a valid RDF Graph syntax");
+		RDFDataMgr.read(model, in, lang);
 		return model;
 	}
 	

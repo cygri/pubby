@@ -26,9 +26,9 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 public class RemoteSPARQLDataSource implements DataSource {
 	private final String endpointURL;
 	private final String defaultGraphURI;
-	private final String[] resourceQueries;
-	private final String[] anonPropertyQueries;
-	private final String[] anonInversePropertyQueries;
+	private final List<String> resourceQueries;
+	private final List<String> anonPropertyQueries;
+	private final List<String> anonInversePropertyQueries;
 	private String previousDescribeQuery;
 	private String contentType = null;
 	
@@ -37,28 +37,21 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI, 
-			String[] resourceQueries, String[] anonPropertyQueries, String[] anonInversePropertyQueries) {
+			List<String> resourceQueries, List<String> anonPropertyQueries, List<String> anonInversePropertyQueries) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
-
-		// If no resource description queries given, set them to the default.
-		if (resourceQueries==null){
-			resourceQueries = new String[1];
-			resourceQueries[0] = "DESCRIBE ?__this__";
+		if (resourceQueries == null) {
+			resourceQueries = Collections.singletonList(
+					"DESCRIBE ?__this__");
 		}
-
-		// If no anonymous property description queries given, set them to the default.
-		if (anonPropertyQueries==null){
-			anonPropertyQueries = new String[1];
-			anonPropertyQueries[0] = "DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}";
+		if (anonPropertyQueries == null) {
+			anonPropertyQueries = Collections.singletonList(
+					"DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}");
 		}
-
-		// If no anonymous inverse property description queries given, set them to the default.
-		if (anonInversePropertyQueries==null){
-			anonInversePropertyQueries = new String[1];
-			anonInversePropertyQueries[0] = "DESCRIBE ?x WHERE {?__property__ ?__this__ ?x. FILTER (isBlank(?x))}";
+		if (anonInversePropertyQueries == null){
+			anonInversePropertyQueries = Collections.singletonList(
+					"DESCRIBE ?x WHERE {?__property__ ?__this__ ?x. FILTER (isBlank(?x))}");
 		}
-
 		this.resourceQueries = resourceQueries;
 		this.anonPropertyQueries = anonPropertyQueries;
 		this.anonInversePropertyQueries = anonInversePropertyQueries;
@@ -72,6 +65,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 		this.contentType = mediaType;
 	}
 
+	@Override
 	public String getEndpointURL() {
 		return endpointURL;
 	}
@@ -87,7 +81,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 				result.append("&");
 			}
 			result.append("query=");
-			result.append(URLEncoder.encode(preProcessQuery(resourceQueries[0], resourceURI), "utf-8"));
+			result.append(URLEncoder.encode(preProcessQuery(resourceQueries.get(0), resourceURI), "utf-8"));
 			return result.toString();
 		} catch (UnsupportedEncodingException ex) {
 			// can't happen, utf-8 is always supported
@@ -95,24 +89,29 @@ public class RemoteSPARQLDataSource implements DataSource {
 		}
 	}
 
+	@Override
 	public Model getResourceDescription(String resourceURI) {
 		// Loop over resource description queries, join results in a single model.
 		// Process each query to replace place-holders of the given resource.
-		Model model = executeQuery(preProcessQuery(resourceQueries[0], resourceURI));
-		for (int i=1; i<resourceQueries.length; i++){
-			model.add(executeQuery(preProcessQuery(resourceQueries[i], resourceURI)));
+		Model model = ModelFactory.createDefaultModel();
+		for (String query: resourceQueries) {
+			Model result = executeQuery(preProcessQuery(query, resourceURI));
+			model.add(result);
+			model.setNsPrefixes(result);
 		}
 		return model;
 	}
 
+	@Override
 	public Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse) {
-		
 		// Loop over anonymous property description queries, join results in a single model.
 		// Process each query to replace place-holders of the given resource and property.
-		String[] queries = isInverse ? anonInversePropertyQueries : anonPropertyQueries;
-		Model model = executeQuery(preProcessQuery(queries[0], resourceURI, property));
-		for (int i=1; i<queries.length; i++){
-			model.add(executeQuery(preProcessQuery(queries[i], resourceURI, property)));
+		List<String> queries = isInverse ? anonInversePropertyQueries : anonPropertyQueries;
+		Model model = ModelFactory.createDefaultModel();
+		for (String query: queries) {
+			Model result = executeQuery(preProcessQuery(query, resourceURI, property));
+			model.add(result);
+			model.setNsPrefixes(result);
 		}
 		return model;
 	}

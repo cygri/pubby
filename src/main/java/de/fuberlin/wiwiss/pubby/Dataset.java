@@ -393,13 +393,12 @@ public class Dataset {
 		return uri.replaceAll("%23", "#").replaceAll("%3F", "?");
 	}
 
-	private String[] listSPARQLQueries(Property queryProperty) {
-
-		ArrayList list = new ArrayList();
+	private List<String> listSPARQLQueries(Property queryProperty) {
+		List<String> list = new ArrayList<String>();
 		StmtIterator it = config.listProperties(queryProperty);
 		while (it.hasNext()) {
 			list.add(it.nextStatement().getResource().getProperty(CONF.sparql).getString());
 		}
-		return list.isEmpty() ? null : (String[]) list.toArray(new String[list.size()]);
+		return list.isEmpty() ? null : list;
 	}
 }

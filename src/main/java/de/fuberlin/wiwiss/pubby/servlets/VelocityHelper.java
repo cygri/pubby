@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.app.event.implement.EscapeXmlReference;
 import org.apache.velocity.context.Context;
 
 /**
@@ -76,6 +77,9 @@ public class VelocityHelper {
 			// Turn off Velocity logging
 			result.setProperty("runtime.log.logsystem.class", 
 					"org.apache.velocity.runtime.log.NullLogSystem");
+			
+			// XML-escape *all* references inserted into templates
+			result.setProperty("eventhandler.referenceinsertion.class", EscapeXmlReference.class.getName());
 			
 			result.init();
 			return result;

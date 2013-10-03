@@ -36,4 +36,9 @@ public class CONF {
 	public static final Property rdfDocumentMetadata = m.createProperty(NS + "rdfDocumentMetadata");
 	public static final Property metadataTemplate = m.createProperty(NS + "metadataTemplate");
 	public static final Property contentType = m.createProperty(NS + "contentType");
+	public static final Property sparql = m.createProperty(NS + "sparql");
+	public static final Property resourceDescriptionQuery = m.createProperty(NS + "resourceDescriptionQuery");
+	public static final Property anonymousPropertyDescriptionQuery = m.createProperty(NS + "anonymousPropertyDescriptionQuery");
+	public static final Property anonymousInversePropertyDescriptionQuery = m.createProperty(NS
+			+ "anonymousInversePropertyDescriptionQuery");
 }

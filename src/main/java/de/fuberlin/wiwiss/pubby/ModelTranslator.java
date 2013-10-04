@@ -28,7 +28,6 @@ public class ModelTranslator {
 	
 	public Model getTranslated() {
 		Model result = ModelFactory.createDefaultModel();
-		result.setNsPrefixes(model);
 		for (String prefix: model.getNsPrefixMap().keySet()) {
 			// Skip prefixes ns1, ns2, etc, which are usually
 			// auto-assigned by the endpoint and do more harm than good

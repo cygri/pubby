@@ -58,7 +58,9 @@ public class ModelDataSource implements DataSource {
 		List<Resource> result = new ArrayList<Resource>();
 		ResIterator it = model.listSubjects();
 		while (it.hasNext()) {
-			result.add(it.next());
+			Resource r = it.next();
+			if (r.isAnon()) continue;
+			result.add(r);
 			if (result.size() >= DataSource.MAX_INDEX_SIZE) break; 
 		}
 		return result;

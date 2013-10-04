@@ -30,7 +30,6 @@ public abstract class BasePathServlet extends BaseServlet {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException, ServletException {
-		
 		Matcher matcher = pattern.matcher(relativeURI);
 		if (!matcher.matches()) {
 			return false;
@@ -46,8 +45,7 @@ public abstract class BasePathServlet extends BaseServlet {
 		Collection<MappedResource> resources = config.getMappedResourcesFromRelativeWebURI(
 				matcher.group(4), false);
 		HypermediaResource controller = config.getController(IRIEncoder.toIRI(matcher.group(4)), false);
-		doGet(controller, resources, property, isInverse, request, response, config);
-		return true;
+		return doGet(controller, resources, property, isInverse, request, response, config);
 	}
 
 	private static final long serialVersionUID = 7393467141233996715L;

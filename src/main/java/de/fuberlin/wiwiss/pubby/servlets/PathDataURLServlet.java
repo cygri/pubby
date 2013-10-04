@@ -33,9 +33,7 @@ public class PathDataURLServlet extends BasePathServlet {
 			Configuration config) throws IOException {
 
 		Model descriptions = getAnonymousPropertyValues(resources, property, isInverse);
-		if (descriptions.size() == 0) {
-			return false;
-		}
+		if (descriptions.isEmpty()) return false;
 		
 		// Add document metadata
 		if (descriptions.qnameFor(FOAF.primaryTopic.getURI()) == null
@@ -65,7 +63,7 @@ public class PathDataURLServlet extends BasePathServlet {
 		for (MappedResource resource: resources) {
 			resource.getDataset().addDocumentMetadata(descriptions, document);
 		}
-
+		
 		new ModelResponse(descriptions, request, response).serve();
 		return true;
 	}

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
+import com.hp.hpl.jena.n3.IRIResolver;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -117,7 +118,17 @@ public class Dataset {
 			StmtIterator it = config.listProperties(CONF.loadRDF);
 			while (it.hasNext()) {
 				Statement stmt = it.nextStatement();
-				FileManager.get().readModel(data, stmt.getResource().getURI());
+				String fileName = stmt.getResource().getURI();
+				Model m = FileManager.get().loadModel(fileName);
+				data.add(m);
+				// We'd like to do simply data.setNsPrefix(m), but that leaves relative
+				// namespace URIs like <#> unresolved, so we do a big dance to make them
+				// absolute.
+				fileName = IRIResolver.resolveGlobal(fileName);
+				for (String prefix: m.getNsPrefixMap().keySet()) {
+					String uri = IRIResolver.resolve(m.getNsPrefixMap().get(prefix), fileName);
+					data.setNsPrefix(prefix, uri);
+				}
 			}
 			dataSource = new ModelDataSource(data);
 		}
@@ -397,7 +408,7 @@ public class Dataset {
 		List<String> list = new ArrayList<String>();
 		StmtIterator it = config.listProperties(queryProperty);
 		while (it.hasNext()) {
-			list.add(it.nextStatement().getResource().getProperty(CONF.sparql).getString());
+			list.add(it.nextStatement().getString());
 		}
 		return list.isEmpty() ? null : list;
 	}

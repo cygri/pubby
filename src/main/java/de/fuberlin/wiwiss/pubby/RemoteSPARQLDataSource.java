@@ -46,15 +46,15 @@ public class RemoteSPARQLDataSource implements DataSource {
 			List<String> resourceQueries, List<String> anonPropertyQueries, List<String> anonInversePropertyQueries) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
-		if (resourceQueries == null) {
+		if (resourceQueries == null || resourceQueries.isEmpty()) {
 			resourceQueries = Collections.singletonList(
 					"DESCRIBE ?__this__");
 		}
-		if (anonPropertyQueries == null) {
+		if (anonPropertyQueries == null || anonPropertyQueries.isEmpty()) {
 			anonPropertyQueries = Collections.singletonList(
 					"DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}");
 		}
-		if (anonInversePropertyQueries == null){
+		if (anonInversePropertyQueries == null || anonInversePropertyQueries.isEmpty()) {
 			anonInversePropertyQueries = Collections.singletonList(
 					"DESCRIBE ?x WHERE {?__property__ ?__this__ ?x. FILTER (isBlank(?x))}");
 		}

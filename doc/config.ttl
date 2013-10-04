@@ -52,9 +52,12 @@
     conf:defaultLanguage "en";
     # When the homepage of the server is accessed, this resource will
     # be shown.
-    conf:indexResource <http://dbpedia.org/resource/Wikipedia>;
+    conf:indexResource <http://localhost:8080/resource/DBpedia>;
+    # Will be appended to the conf:webBase to form the public
+    # resource URIs; if not present, defaults to ""
+    conf:webResourcePrefix "resource/";
 
-# Dataset configuration section #1 (for DBpedia resources)
+# Dataset configuration section (for DBpedia resources)
 #
 # URIs in the SPARQL endpoint: http://dbpedia.org/resource/*
 # URIs on the Web:             http://localhost:8080/resource/*
@@ -65,41 +68,30 @@
         conf:sparqlDefaultGraph <http://dbpedia.org>;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://dbpedia.org/resource/>;
-        # Will be appended to the conf:webBase to form the public
-        # resource URIs; if not present, defaults to ""
-        conf:webResourcePrefix "resource/";
         # Fixes an issue with the server running behind an Apache proxy;
-        # can be ignored otherwise
+        # can be disabled otherwise
         conf:fixUnescapedCharacters "(),'!$&*+;=@";
         # DBpedia uses URIs, not IRIs
         conf:supportsIRIs false;
 
         # Queries for describing a resource denoted by "?__this__".
-        # Will be executed in the below order, and results joined.
-        conf:resourceDescriptionQuery [
-            conf:sparql "DESCRIBE ?__this__";
-        ];
-        conf:resourceDescriptionQuery [
-            conf:sparql "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o. FILTER (?o = ?__this__) }";
-        ];
+        # Multiple queries can be specified, results will be merged.
+#        conf:resourceDescriptionQuery "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }";
+#        conf:resourceDescriptionQuery "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
         
         # Queries for describing the blank nodes related to a given resource via a given property.
         # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Queries will be executed in the below order, and results joined.
-        conf:anonymousPropertyDescriptionQuery [
-            conf:sparql "DESCRIBE ?x WHERE { ?__this__ ?__property__ ?x. FILTER (isBlank(?x)) }";
-        ];
+        # Multiple queries can be specified, results will be merged.
+#        conf:anonymousPropertyDescriptionQuery "DESCRIBE ?x WHERE { ?__this__ ?__property__ ?x. FILTER (isBlank(?x)) }";
         
         # Queries for describing the blank nodes inversely related to a given resource via a given property.
         # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Queries will be executed in the below order, and results joined.
-        conf:anonymousInversePropertyDescriptionQuery [
-            conf:sparql "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
-        ];
+        # Multiple queries can be specified, results will be merged.
+#        conf:anonymousInversePropertyDescriptionQuery "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
         
         # include metadata
         conf:metadataTemplate "metadata.ttl";
-        
+
         # configure your metadata here
         # Use properties with the meta: prefix where the property name
         # corresponds to the placeholder URIs in metadata.ttl that begin
@@ -110,22 +102,5 @@
 #        meta:endpointUser <URI of the data publisher who uses the SPARQL endpoint queried by this Pubby>;
 #        meta:endpointOperator <URI of the service provider who operates the SPARQL endpoint>;
 #        meta:endpointDataset <URI of the linked dataset that is exposed via the SPARQL endpoint>;
-    ];
-
-# Dataset configuration section #2 (for DBpedia classes and properties)
-#
-# URIs in the SPARQL endpoint: http://dbpedia.org/class/*
-#                              http://dbpedia.org/property/*
-# URIs on the Web:             http://localhost:8080/class/*
-#                              http://localhost:8080/property/*
-    conf:dataset [
-        conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
-        conf:sparqlDefaultGraph <http://dbpedia.org>;
-        conf:datasetBase <http://dbpedia.org/>;
-        # Dataset URIs are mapped only if the part after the
-        # conf:webBase matches this regular expression
-        conf:datasetURIPattern "(class|property)/.*";
-        conf:fixUnescapedCharacters "(),'!$&*+;=@";
-        conf:supportsIRIs false;
     ];
     .

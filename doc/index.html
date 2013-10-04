@@ -225,8 +225,7 @@ pre { speak-punctuation: code; }
 
 <dt><tt>conf:indexResource &lt;<em>dataset_uri</em>&gt;;</tt></dt>
 <dd><p>The URI of a resource whose description will be displayed as the home page of the Pubby installation.
-  Note that you have to specify a <em>dataset URI</em>, not a mapped web URI. When this directive is missing 
-  on the configuration, a list of all available resources is generated.</p></dd>
+  If not specified in the configuration, a list of all available resources is generated.</p></dd>
 
 <dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
 <dd><p>If present, this string will be prefixed to resource URIs
@@ -253,6 +252,11 @@ pre { speak-punctuation: code; }
 <dd><p>If the data of interest is not located in the SPARQL dataset's default graph, but within
   a named graph, then its name must be specified here.</p></dd>
 
+<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data1.rdf</em>&gt;, ...;</tt></dt>
+<dd><p>Load one or more RDF documents from the Web or the file system and use them as the
+  data source. The SPARQL endpoint configured above will be ignored, as will be any custom
+  SPARQL queries. Allows using Pubby as an RDF server for publishing static RDF files.</p></dd>
+
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
 <dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
   will be mapped into the <tt>conf:webBase</tt> namespace. If not specified,
@@ -269,14 +273,35 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
   <tt>http://example.org/invoices/5395842</tt> because the URI part <tt>invoices/5395842</tt>
   does not match the regular expression.</p></dd>
 
+<dt><tt>conf:resourceDescriptionQuery <em>"SPARQL query"</em></tt></dt>
+<dd><p>Allows specification of one or more SPARQL queries that are run against the
+  target endpoint to build the description of a single resource. The resource to be
+  described is given in the placeholder variable <tt>?__this__</tt>. Only query forms
+  that return an RDF graph are allowed (that is, <tt>DESCRIBE</tt> and
+  <tt>CONSTRUCT</tt>). If unspecified, the following <tt>DESCRIBE</tt> query is used:</p>
+  <pre>DESCRIBE ?__this__</pre>
+  <p>On SPARQL endpoints that do not (propertly) support the default
+  <tt>DESCRIBE</tt> query shown above, the following <tt>CONSTRUCT</tt> setup can be
+  used:</p>
+  <pre>conf:resourceDescriptionQuery
+    "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }",
+    "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";</pre></dd>
+
+<dt><tt>conf:anonymousPropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
+<dt><tt>conf:anonymousInversePropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
+<dd><p>Allows customization of the SPARQL queries that are used to retrieve details
+  about blank nodes that appear as values of a property <tt>?__property__</tt>
+  on a resource <tt>?__this__</tt>. If unspecified, the following <tt>DESCRIBE</tt>
+  queries are used for forward and backward properties, respectively:</p>
+  <pre>conf:anonymousPropertyDescriptionQuery
+    "DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}";
+
+conf:anonymousInversePropertyDescriptionQuery
+    "DESCRIBE ?x WHERE {?x ?__property__ ?__this__. FILTER (isBlank(?x))}";</pre></dd>
+
 <dt><tt>conf:addSameAsStatements <em>"true"/"false"</em>;</tt></dt>
 <dd><p>If set to <tt>"true"</tt>, an <tt>owl:sameAs</tt> statement of the form
   <tt>&lt;web_uri&gt; owl:sameAs &lt;dataset_uri&gt;</tt> will be present in Linked Data output.</p></dd>
-
-<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data1.rdf</em>&gt;, ...;</tt></dt>
-<dd><p>Load one or more RDF documents from the Web or the file system and use them as the
-  data source. The SPARQL endpoint configured above will be ignored. Allows using Pubby as
-  an RDF server for publishing static RDF files.</p></dd>
 
 <dt><tt>conf:rdfDocumentMetadata [ <em>statement1; statement2; ...;</em> ];</tt></dt>
 <dd>

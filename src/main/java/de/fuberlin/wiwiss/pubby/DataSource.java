@@ -23,7 +23,7 @@ public interface DataSource {
 	Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse);
 	
 	/**
-	 * A list of resources to be displayed as the contents of this data source.
+	 * A list of URI resources to be displayed as the contents of this data source.
 	 * Usually the first (for some order) n subjects in the data source,
 	 * where n is some data source defined value.
 	 */

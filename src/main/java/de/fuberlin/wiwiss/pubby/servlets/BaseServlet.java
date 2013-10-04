@@ -94,7 +94,8 @@ public abstract class BaseServlet extends HttpServlet {
 							resource.getDatasetURI(), property, isInverse),
 					resource.getDataset(),
 					config).getTranslated());
-		} return result;
+		}
+		return result;
 	}
 
 	// TODO: This is crap. Should return an actual account of the provenance of all resources, regardless of data source

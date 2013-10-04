@@ -46,7 +46,7 @@
 #end
 #if ($property.BlankNodeCount > 0)
 #if ($property.BlankNodeCount == 1)
-#set ($text = "1 anonymous resource")
+#set ($text = "Anonymous resource")
 #elseif ($property.BlankNodeCount > 1)
 #set ($text = "$property.BlankNodeCount anonymous resources")
 #end

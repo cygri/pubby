@@ -64,10 +64,14 @@ public class Dataset {
 		metadataTemplate = null;
 	}
 	
-	public Dataset(Resource config) {
+	public Dataset(Resource config, String webBase) {
 		this.config = config;
 		model = config.getModel();
-		datasetBase = config.getProperty(CONF.datasetBase).getResource().getURI();
+		if (config.hasProperty(CONF.datasetBase)) {
+			datasetBase = config.getProperty(CONF.datasetBase).getResource().getURI();
+		} else {
+			datasetBase = webBase;
+		}
 		if (config.hasProperty(CONF.datasetURIPattern)) {
 			datasetURIPattern = Pattern.compile(
 					config.getProperty(CONF.datasetURIPattern).getString());
@@ -120,14 +124,14 @@ public class Dataset {
 	}
 
 	public boolean isDatasetURI(String uri) {
-		return uri.startsWith(getDatasetBase()) 
-				&& datasetURIPattern.matcher(uri.substring(getDatasetBase().length())).matches();
+		return uri.startsWith(datasetBase) 
+				&& datasetURIPattern.matcher(uri.substring(datasetBase.length())).matches();
 	}
 	
 	public MappedResource getMappedResourceFromDatasetURI(String datasetURI, Configuration configuration) {
 		if (!isDatasetURI(datasetURI)) return null;
 		return new MappedResource(
-				escapeURIDelimiters(datasetURI.substring(getDatasetBase().length())),
+				escapeURIDelimiters(datasetURI.substring(datasetBase.length())),
 				datasetURI,
 				configuration,
 				this);
@@ -150,17 +154,13 @@ public class Dataset {
 		String decoded = getSupportsIRIs() ? IRIEncoder.toIRI(relativeWebURI) : relativeWebURI;
 		return new MappedResource(
 				decoded,
-				getDatasetBase() + unescapeURIDelimiters(decoded),
+				datasetBase + unescapeURIDelimiters(decoded),
 				configuration,
 				this);
 	}
 	
 	public boolean getSupportsIRIs() {
 		return getBooleanConfigValue(CONF.supportsIRIs, true);
-	}
-	
-	private String getDatasetBase() {
-		return datasetBase;
 	}
 	
 	public boolean getAddSameAsStatements() {

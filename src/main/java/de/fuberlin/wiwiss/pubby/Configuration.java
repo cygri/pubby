@@ -32,6 +32,7 @@ public class Configuration {
 	private final Model model;
 	private final Resource config;
 	private final PrefixMapping prefixes;
+	private final String webBase;
 	private final Collection<Property> labelProperties;
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
@@ -45,10 +46,11 @@ public class Configuration {
 					"No conf:Configuration found in configuration model");
 		}
 		config = it.nextStatement().getSubject();
+		webBase = config.getProperty(CONF.webBase).getResource().getURI();
 
 		it = model.listStatements(config, CONF.dataset, (RDFNode) null);
 		while (it.hasNext()) {
-			datasets.add(new Dataset(it.nextStatement().getResource()));
+			datasets.add(new Dataset(it.nextStatement().getResource(), webBase));
 		}
 		labelProperties = new ArrayList<Property>();
 		it = model.listStatements(config, CONF.labelProperty, (RDFNode) null);
@@ -179,7 +181,7 @@ public class Configuration {
 	}
 
 	public String getWebApplicationBaseURI() {
-		return config.getProperty(CONF.webBase).getResource().getURI();
+		return webBase;
 	}
 
 	public String getWebResourcePrefix() {

@@ -124,18 +124,21 @@ pre { speak-punctuation: code; }
 <p><strong>In RDF, resources are identified by URIs.</strong> The URIs used in most SPARQL dataset are
   <strong>not dereferenceable</strong>, meaning they cannot be accessed in a Semantic Web browser,
   but return <tt>404 Not Found</tt> errors instead, or use non-dereferenceable URI schemes, as in
-  the fictional URI <tt>tag:dbpedia.org,2007:Berlin</tt>.</p>
+  the fictional URI <tt>tag:data.example.org,2007:Berlin</tt>.</p>
 
-<p>When setting up a Pubby server for a SPARQL endpoint, you will <strong>configure a mapping</strong>
-  that translates those URIs to dereferenceable URIs handled by Pubby. If your
-  server is running at <tt>http://myserver.org:8080/pubby/</tt>, then the Berlin URI above might be 
-  mapped to <tt>http://myserver.org:8080/pubby/Berlin</tt>.</p>
-
-<p>Pubby will <strong>handle requests to the mapped URIs</strong> by connecting to the SPARQL endpoint,
-  asking it for information about the original URI, and passing back the results to the client.
+<p>Pubby <strong>handles HTTP requests to URIs</strong> by connecting to the SPARQL endpoint,
+  asking it for information about the URI, and passing back the results to the client rendered
+  in an appropriate format.
   It also handles various <strong>details of the HTTP interaction</strong>, such as the
   303 redirect required by Web Architecture, and content negotiation between HTML, RDF/XML and Turtle 
   descriptions of the same resource.</p>
+
+<p>Optionally, you may <strong>configure a mapping</strong> that translates URIs in the endpoint
+  to dereferenceable URIs handled by Pubby. This is required if the URIs in the endpoint use a
+  non-dereferenceable URI scheme or if you cannot run Pubby in the main namespace of the dataset.
+  For example, if Pubby is running at <tt>http://myserver.org:8080/pubby/</tt>, then you may need
+  to configure a mapping to translate URIs of the form <tt>tag:data.example.org,2007,<em>XXX</em></tt>
+  to URIs of the form <tt>http://myserver.org:8080/pubby/<em>XXX</em></tt>.</p>
 
 <h2>Download and Installation</h2>
 
@@ -196,7 +199,8 @@ pre { speak-punctuation: code; }
 
 <dt><tt>conf:webBase &lt;<em>server_base_uri</em>&gt;;</tt></dt>
 <dd><p><strong>Required.</strong> The root URL where the Pubby web application is installed, e.g.
-  <tt>http://myserver/mydataset/</tt>.</p></dd>
+  <tt>http://myserver/mydataset/</tt>. By default, Pubby will only handle URIs from the datasets
+  that start with this prefix; see the <tt>conf:datasetBase</tt> directive below for how to change this.</p></dd>
 
 <dt><tt>conf:labelProperty <em>ex:property1</em>, <em>ex:property2</em>, ...;</tt></dt>
 <dd><p>The value of these RDF properties, if present in the dataset, will be used
@@ -250,8 +254,9 @@ pre { speak-punctuation: code; }
   a named graph, then its name must be specified here.</p></dd>
 
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
-<dd><p><strong>Required.</strong> The common URI prefix of the resource identifiers in the SPARQL dataset;
-  only resources with this prefix will be mapped and made available by Pubby.</p></dd>
+<dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
+  will be mapped into the <tt>conf:webBase</tt> namespace. If not specified,
+  only resources starting with the <tt>conf:webBase</tt> value will be handled.</p></dd>
 
 <dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
 <dd><p>If present, only dateset URIs matching this

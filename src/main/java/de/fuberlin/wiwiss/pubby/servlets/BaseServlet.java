@@ -14,6 +14,7 @@ import org.apache.velocity.context.Context;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -72,9 +73,12 @@ public abstract class BaseServlet extends HttpServlet {
 			// Add owl:sameAs statements referring to the original dataset URI
 			// TODO: Make this a wrapper around DataSource
 			if (resource.getDataset().getAddSameAsStatements()) {
-				description.getResource(resource.getController().getAbsoluteIRI()).addProperty(
-						OWL.sameAs, description.getResource(resource.getDatasetURI()));
-				ModelUtil.addNSIfUndefined(description, "owl", OWL.NS);
+				Resource r1 = description.getResource(resource.getController().getAbsoluteIRI());
+				Resource r2 = description.getResource(resource.getDatasetURI());
+				if (!r1.equals(r2)) {
+					r1.addProperty(OWL.sameAs, r2);
+					ModelUtil.addNSIfUndefined(description, "owl", OWL.NS);
+				}
 			}
 			ModelUtil.mergeModels(result, description);
 		}

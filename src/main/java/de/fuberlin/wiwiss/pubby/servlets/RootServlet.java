@@ -31,8 +31,9 @@ public class RootServlet extends BaseServlet {
 			return true;
 		}
 
-		// Homepage. If index resource is defined, redirect to it.
-		if ("".equals(relativeURI) && config.getIndexResource() != null) {
+		// Homepage. If index resource is defined, and different from the current URI, redirect to it.
+		if ("".equals(relativeURI) && config.getIndexResource() != null 
+				&& !"".equals(config.getIndexResource().getRelativeIRI())) {
 			response.sendRedirect(IRIEncoder.toURI(
 					config.getIndexResource().getAbsoluteIRI()));
 			return true;

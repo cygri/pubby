@@ -19,8 +19,8 @@ h5 { font: italic 100% sans-serif; }
 h6 { font: small-caps 100% sans-serif; }
 .hide { display: none; }
 pre { background: #fff6bb; font-family: monospace; line-height: 1.2em; padding: 1em 2em; }
-dt { font-size: 120%; font-weight: bold; margin-top: 0; margin-bottom: 0; }
-dd { margin-top: 0; margin-bottom: 0; }
+dt { font-size: 120%; margin-top: 0; margin-bottom: 0; }
+dd { margin: 0 0 1.6em; }
 dd p { margin-top: 0; }
 code, tt { font-family: monospace; }
 ul.toc { list-style-type: none; }
@@ -53,18 +53,9 @@ pre { speak-punctuation: code; }
 </head>
 <body>
 
-<div id="logo">
-  <a href="http://www.fu-berlin.de/"><img src="images/fu-logo.gif" alt="Freie Universit&auml;t Berlin Logo" /></a>
-</div>
-
 <div id="header">
   <h1 style="font-size: 250%">Pubby</h1>
   <div id="tagline">A Linked Data Frontend for SPARQL Endpoints</div>
-</div>
-
-<div id="authors">
-  <a href="http://richard.cyganiak.de/">Richard Cyganiak</a><br />
-  <a href="http://www.bizer.de/">Chris Bizer</a>
 </div>
 
 <div id="content">
@@ -314,7 +305,7 @@ conf:anonymousInversePropertyDescriptionQuery
 ];</pre>
 </dd>
 
-<dt><tt>conf:metadataTemplate "metadata.ttl";</tt></dt>
+<dt><tt>conf:metadataTemplate "<em>metadata.ttl</em>";</tt></dt>
 <dd>
 <p>Refers to a metadata template that is used by the
    <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a>.
@@ -346,13 +337,13 @@ conf:anonymousInversePropertyDescriptionQuery
 <h2>Limitations</h2>
 
 <ul>
-  <li>Only works for SPARQL endpoint that can answer <tt>DESCRIBE</tt> queries</li>
   <li>Hash URIs on the web side are not supported.</li>
 </ul>
 
 <h2><a name="support" id="support"></a>Support and feedback</h2>
 
-<p>Please email <a href="mailto:richard@cyganiak.de">richard@cyganiak.de</a>.</p>
+<p>Please <a href="http://github.com/cygri/pubby/issues">raise an issue</a>
+or email <a href="mailto:richard@cyganiak.de">richard@cyganiak.de</a>.</p>
 
 <h2 id="development">Source code and development</h2>
 <p>Pubby is open source (<a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a>). Pubby is hosted on <a href="http://github.com/">GitHub</a>.
@@ -376,23 +367,16 @@ mvn clean package
 </pre>
 
 
-<h2 id="acknowledgements">Acknowledgements</h2>
+<h2 id="acknowledgements">Contributors</h2>
 
-<dl class="acknowledgements">
-  <dt>Maintainers</dt>
-  <dd><a href="http://richard.cyganiak.de/">Richard Cyganiak</a></dd>
-
-  <dt>Contributors</dt>
-  <dd><a href="http://www.wikier.org/">Sergio Fernández</a></dd>
-  <dd><a href="http://www.linkedin.com/pub/boris-villazon-terrazas/5/601/1a">Boris Villazón-Terrazas</a></dd>
-  <dd><a href="http://olafhartig.de/">Olaf Hartig</a></dd>
-
-  <dt>Contributing organizations</dt>
-  <dd>
-    <a href="http://www.deri.ie/">DERI</a>,
-    <a href="http://www.fu-berlin.de/">FU Berlin</a>
-  </dd>
-</dl>
+<ul class="acknowledgements">
+  <li><a href="http://richard.cyganiak.de/">Richard Cyganiak</a> (Maintainer)</li>
+  <li><a href="http://www.wikier.org/">Sergio Fernández</a></li>
+  <li><a href="http://www.linkedin.com/pub/boris-villazon-terrazas/5/601/1a">Boris Villazón-Terrazas</a></li>
+  <li><a href="http://olafhartig.de/">Olaf Hartig</a></li>
+  <li><a href="http://github.com/heinlja">Jaanus Heinlaid</a></li>
+  <li><a href="http://www.linkedin.com/pub/jeremy-carroll/63/4a0/b1a">Jeremy Carroll</a></li>
+</ul>
 
 </div>
 

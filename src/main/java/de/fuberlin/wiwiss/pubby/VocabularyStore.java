@@ -27,6 +27,10 @@ public class VocabularyStore {
 		this.configuration = configuration;
 	}
 
+	public void addModel(Model model) {
+		cache.add(model);
+	}
+	
 	public void addSourceURL(String sourceURL) {
 		FileManager.get().readModel(cache, sourceURL);
 	}
@@ -36,8 +40,10 @@ public class VocabularyStore {
 	}
 
 	public String getLabel(String uri, String language) {
-		if (labelCache.containsKey(uri)) return (String) labelCache.get(uri);
-		String label = getProperty(uri, RDFS.label, uri);
+		if (labelCache.containsKey(uri)) {
+			return labelCache.get(uri);
+		}
+		String label = getProperty(uri, RDFS.label, null);
 		labelCache.put(uri, label);
 		return label;
 	}
@@ -50,7 +56,7 @@ public class VocabularyStore {
 		if (descriptionCache.containsKey(uri)) {
 			return descriptionCache.get(uri);
 		}
-		String desc = getProperty(uri, RDFS.comment, "");
+		String desc = getProperty(uri, RDFS.comment, null);
 		descriptionCache.put(uri, desc);
 		return desc;
 	}

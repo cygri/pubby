@@ -81,6 +81,7 @@ public class Configuration {
 			imageProperties.add(model.createProperty("http://xmlns.com/foaf/0.1/depiction"));
 		}
 
+		vocabularyStore.addModel(model);
 		it = model.listStatements(config, CONF.loadVocabularyFromURL, (RDFNode) null);
 		while (it.hasNext()) {
 			vocabularyStore.addSourceURL(
@@ -202,7 +203,7 @@ public class Configuration {
 		if (config.hasProperty(CONF.showLabels)) {
 			return config.getProperty(CONF.showLabels).getBoolean();
 		}
-		return false;
+		return true;
 	}
 
 	public VocabularyStore getVocabularyStore() {

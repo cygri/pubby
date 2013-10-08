@@ -58,9 +58,17 @@ public class PathPageURLServlet extends BasePathServlet {
 		ResourceDescription resourceDescription = new ResourceDescription(
 				controller, description, config);
 
-		String title = resourceDescription.getLabel() + (isInverse ? " \u00AB " : " \u00BB ") +
-				config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + ":" + 
-				property.getLocalName();
+		String propertyTitle = null;
+		if (config.showLabels()) {
+			propertyTitle = config.getVocabularyStore().getLabel(property.getURI());
+		}
+		if (propertyTitle == null) {
+			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 
+					":" + property.getLocalName();
+		}
+		String title = resourceDescription.getLabel() + 
+				(isInverse ? " \u00AB " : " \u00BB ") +
+				propertyTitle;
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
@@ -72,6 +80,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("back_label", resourceDescription.getLabel());
 		context.put("rdf_link", isInverse ? controller.getInversePathDataURL(property) : controller.getPathDataURL(property));
 		context.put("resources", resourceDescriptions);
+		context.put("showLabels", new Boolean(config.showLabels()));
 		template.renderXHTML("pathpage.vm");
 		return true;
 	}

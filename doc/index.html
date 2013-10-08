@@ -225,6 +225,30 @@ pre { speak-punctuation: code; }
   <tt>http://myserver/resource/XXX</tt>. The default is the
   empty string.</dd>
 
+<dt><tt>conf:showLabels <em>true</em>/<em>false</em></tt></dt>
+<dd><p>When enabled, Pubby attempts to show <tt>rdfs:labels</tt> instead of
+  URIs or prefixed names. Enabled by default.</p></dd>
+
+<dt><tt>conf:loadVocabularyFromURL &lt;<em>vocabularyURL</em>&gt;</tt></dt>
+<dd><p>On startup, Pubby will load vocabularies from the listed URLs, and use
+  any labels found in them instead of showing URIs or prefixed names, provided
+  <tt>conf:showLabels</tt> is <tt>true</tt>. Pubby will always use any
+  <tt>rdfs:label</tt> statements found in the mapping file itself. File
+  URLs can be used. Relative URLs are interpreted as relative to the configuration
+  file.</p></dd>
+  <pre>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;.
+&lt;&gt; a conf:Configuration;
+    conf:loadVocabularyFromURL
+        &lt;http://www.w3.org/2004/02/skos/core#&gt;,
+        rdfs:,
+        &lt;custom.ttl&gt;;
+        .
+ex:Widget rdfs:label "widget"@en.</pre>
+  <p>The example defines a label for <tt>ex:Widget</tt>, and retrieves labels
+  from the RDF Schema and SKOS namespace files off the Web, as well as from
+  one local file located in the same directory as <tt>config.ttl</tt>.</p></dd>
+
 <dt><tt>conf:dataset [ ... ];</tt></dt>
 <dd><p><strong>Required.</strong> Introduces a dataset configuration section.
   There can be one or more dataset sections.</p></dd>

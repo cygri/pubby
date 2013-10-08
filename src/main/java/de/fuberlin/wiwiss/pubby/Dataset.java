@@ -119,14 +119,20 @@ public class Dataset {
 			while (it.hasNext()) {
 				Statement stmt = it.nextStatement();
 				String fileName = stmt.getResource().getURI();
-				Model m = FileManager.get().loadModel(fileName);
+				// If the location is a local file, then use webBase as base URI
+				// to resolve relative URIs in the file. Having file:/// URIs in
+				// there would likely not be useful to anyone.
+				fileName = IRIResolver.resolveGlobal(fileName);
+				String base = (fileName.startsWith("file:/") ? webBase : fileName);
+
+				Model m = FileManager.get().loadModel(fileName, base, null);
 				data.add(m);
+				
 				// We'd like to do simply data.setNsPrefix(m), but that leaves relative
 				// namespace URIs like <#> unresolved, so we do a big dance to make them
 				// absolute.
-				fileName = IRIResolver.resolveGlobal(fileName);
 				for (String prefix: m.getNsPrefixMap().keySet()) {
-					String uri = IRIResolver.resolve(m.getNsPrefixMap().get(prefix), fileName);
+					String uri = IRIResolver.resolve(m.getNsPrefixMap().get(prefix), base);
 					data.setNsPrefix(prefix, uri);
 				}
 			}

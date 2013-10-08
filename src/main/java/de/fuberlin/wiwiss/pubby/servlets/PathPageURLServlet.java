@@ -58,7 +58,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		ResourceDescription resourceDescription = new ResourceDescription(
 				controller, description, config);
 
-		String title = resourceDescription.getLabel() + (isInverse ? " « " : " » ") +
+		String title = resourceDescription.getLabel() + (isInverse ? " \u00AB " : " \u00BB ") +
 				config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + ":" + 
 				property.getLocalName();
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);

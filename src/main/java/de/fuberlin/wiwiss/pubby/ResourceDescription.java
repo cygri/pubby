@@ -296,7 +296,14 @@ public class ResourceDescription {
 			return prefixer.getLocalName();
 		}
 		public String getLabel() {
-			return vocabularyStore.getLabel(node.asNode().getURI());
+			String result = null;
+			if (node.isURIResource()) {
+				result = vocabularyStore.getLabel(node.asNode().getURI());
+			}
+			if (result == null && node.isResource()) {
+				result = new ResourceDescription(node.asResource(), model, config).getLabel();
+			}
+			return result;
 		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(node.asNode().getURI());

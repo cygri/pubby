@@ -4,13 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 /**
  * A data source backed by a Jena model.
@@ -30,27 +26,12 @@ public class ModelDataSource implements DataSource {
 	}
 	
 	public Model getResourceDescription(String resourceURI) {
-		Model result = ModelFactory.createDefaultModel();
-		result.setNsPrefixes(model);
-		addResourceDescription(model.getResource(resourceURI), result);
-		return result;
+		return model;
 	}
 	
 	public Model getAnonymousPropertyValues(String resourceURI,
 			Property property, boolean isInverse) {
-		Resource r = model.getResource(resourceURI);
-		Model result = ModelFactory.createDefaultModel();
-		result.setNsPrefixes(model);
-		StmtIterator it = isInverse
-				? model.listStatements(null, property, r)
-				: r.listProperties(property);
-		while (it.hasNext()) {
-			Statement stmt = it.nextStatement();
-			RDFNode node = isInverse ? stmt.getSubject() : stmt.getObject();
-			if (!node.isAnon()) continue;
-			addResourceDescription((Resource) node.as(Resource.class), result); 
-		}
-		return result;
+		return model;
 	}
 	
 	@Override
@@ -64,10 +45,5 @@ public class ModelDataSource implements DataSource {
 			if (result.size() >= DataSource.MAX_INDEX_SIZE) break; 
 		}
 		return result;
-	}
-
-	private void addResourceDescription(Resource resource, Model targetModel) {
-		targetModel.add(model.listStatements(resource, null, (RDFNode) null));
-		targetModel.add(model.listStatements(null, null, resource));
 	}
 }

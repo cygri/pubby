@@ -228,13 +228,17 @@ public class ResourceDescription {
 				return 0;
 			}
 			ResourceProperty otherProperty = (ResourceProperty) other;
+			int myWeight = config.getVocabularyStore().getWeight(predicate);
+			int otherWeight = config.getVocabularyStore().getWeight(otherProperty.predicate);
+			if (myWeight < otherWeight) return -1;
+			if (myWeight > otherWeight) return 1;
 			String propertyLocalName = getLocalName();
 			String otherLocalName = otherProperty.getLocalName();
 			if (propertyLocalName.compareTo(otherLocalName) != 0) {
 				return propertyLocalName.compareTo(otherLocalName);
 			}
 			if (this.isInverse() != otherProperty.isInverse()) {
-				return (this.isInverse()) ? -1 : 1;
+				return (this.isInverse()) ? 1 : -1;
 			}
 			return 0;
 		}

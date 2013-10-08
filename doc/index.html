@@ -92,7 +92,7 @@ pre { speak-punctuation: code; }
   <li><strong>2007-06-20: Pubby 0.1 released.</strong> Today marks the release of the first alpha version of Pubby.</li>
 </ul>
 
-<h2>Features</h2>
+<h2 id="features">Features</h2>
 <div style="float:right; margin:1em 0 1em 1em"><a href="images/dbpedia-berlin.jpg"><img src="images/dbpedia-berlin-thumb.jpg" alt="Screenshot of a Pubby web page displaying information from the DBpedia SPARQL endpoint" /></a></div>
 
 <ul>
@@ -104,7 +104,7 @@ pre { speak-punctuation: code; }
   <li>Includes a <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a> to add metadata to the provided data</li>
 </ul>
 
-<h2>How It Works</h2>
+<h2 id="how">How It Works</h2>
 
 <p>Many triple stores and other SPARQL endpoints can be accessed only by SPARQL client applications
   that use the SPARQL protocol. It cannot be accessed by the growing variety of Linked Data clients.
@@ -131,7 +131,7 @@ pre { speak-punctuation: code; }
   to configure a mapping to translate URIs of the form <tt>tag:data.example.org,2007,<em>XXX</em></tt>
   to URIs of the form <tt>http://myserver.org:8080/pubby/<em>XXX</em></tt>.</p>
 
-<h2>Download and Installation</h2>
+<h2 id="setup">Download and Installation</h2>
 
 <ol>
 <li><strong><a href="download">Download Pubby</a></strong>
@@ -154,7 +154,7 @@ pre { speak-punctuation: code; }
   for a list of supported configuration directives.</li>
 </ol>
 
-<h2>Configuration</h2>
+<h2 id="config">Configuration</h2>
 
 <p>The Pubby configuration file uses <strong><a href="http://www.w3.org/TeamSubmission/turtle/">Turtle</a></strong>
   syntax. It typically starts with some boilerplate <strong>prefix declarations</strong>, followed
@@ -177,7 +177,7 @@ pre { speak-punctuation: code; }
   e.g. URIs are always enclosed in angle brackets, while literal
   values are enclosed in quotes. All directives are optional unless otherwise noted.</p>
 
-<h3>Server Configuration Section</h3>
+<h3 id="conf:Configuration">Server Configuration Section</h3>
 
 <p>Below is a list of all supported directives for the server configuration section.</p>
 
@@ -231,9 +231,9 @@ pre { speak-punctuation: code; }
 
 <dt><tt>conf:loadVocabularyFromURL &lt;<em>vocabularyURL</em>&gt;</tt></dt>
 <dd><p>On startup, Pubby will load vocabularies from the listed URLs, and use
-  any labels found in them instead of showing URIs or prefixed names, provided
-  <tt>conf:showLabels</tt> is <tt>true</tt>. Pubby will always use any
-  <tt>rdfs:label</tt> statements found in the mapping file itself. File
+  any labels and weights found in them (see <tt>conf:showLabels</tt> and
+  <tt>conf:weight</tt>). Pubby will always use any such statements
+  found in the mapping file itself. File
   URLs can be used. Relative URLs are interpreted as relative to the configuration
   file.</p></dd>
   <pre>
@@ -255,7 +255,7 @@ ex:Widget rdfs:label "widget"@en.</pre>
 </dl>
 
 
-<h3>Dataset Configuration Section</h3>
+<h3 id="conf:Dataset">Dataset Configuration Section</h3>
 
 <p>Below is a list of all supported directives for the server configuration section.</p>
 
@@ -358,7 +358,20 @@ conf:anonymousInversePropertyDescriptionQuery
 </dl>
 
 
-<h2>Limitations</h2>
+<h3 id="config-other">Other configuration</h3>
+
+<dl>
+<dt><tt><em>my:Property</em> conf:weight <em>0</em></tt></dt>
+<dd><p>Changes the order of RDF properties in the HTML property tables by assigning
+  a weight to a property. By default, all properties are considered to have weight 0.
+  Properties with lower weight rise higher in the list, those with higher weight sink
+  lower. Weights must be integer numbers and should be between -100 and +100.
+  Property weights may be managed in an external RDF file and loaded via
+  <tt>conf:loadVocabularyURL</tt>.</p></dd>
+</dl>
+
+
+<h2 id="limitations">Limitations</h2>
 
 <ul>
   <li>Hash URIs on the web side are not supported.</li>

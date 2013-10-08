@@ -15,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -57,9 +58,14 @@ public abstract class BaseServlet extends HttpServlet {
 		if (!configFile.isAbsolute()) {
 			configFile = new File(getServletContext().getRealPath("/") + "/WEB-INF/" + param);
 		}
-		return new Configuration(
-				FileManager.get().loadModel(
-						configFile.getAbsoluteFile().toURI().toString()));
+		try {
+			return new Configuration(
+					FileManager.get().loadModel(
+							configFile.getAbsoluteFile().toURI().toString()));
+		} catch (JenaException ex) {
+			throw new UnavailableException(
+					"Error loading config file " + configFile.getAbsoluteFile().toURI() + ": " + ex.getMessage());
+		}
 	}
 	
 	protected Model getResourceDescription(Collection<MappedResource> resources) {

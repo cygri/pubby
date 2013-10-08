@@ -6,8 +6,11 @@ import java.util.Map;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDFS;
+
+import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
 /**
  * The vocabulary cache is used to store labels and descriptions
@@ -19,20 +22,21 @@ import com.hp.hpl.jena.vocabulary.RDFS;
  */
 public class VocabularyStore {
 	private Configuration configuration;
-	private Model cache = ModelFactory.createDefaultModel();
+	private Model store = ModelFactory.createDefaultModel();
 	private Map<String, String> labelCache = new HashMap<String, String>();
 	private Map<String, String> descriptionCache = new HashMap<String, String>();
-
+	private Map<String, Integer> weightCache = new HashMap<String, Integer>();
+	
 	public VocabularyStore(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
 	public void addModel(Model model) {
-		cache.add(model);
+		store.add(model);
 	}
 	
 	public void addSourceURL(String sourceURL) {
-		FileManager.get().readModel(cache, sourceURL);
+		FileManager.get().readModel(store, sourceURL);
 	}
 	
 	public String getLabel(String uri) {
@@ -61,10 +65,21 @@ public class VocabularyStore {
 		return desc;
 	}
 
+	public int getWeight(Property property) {
+		if (weightCache.containsKey(property.getURI())) {
+			return weightCache.get(property.getURI());
+		}
+		Resource r = store.getResource(property.getURI());
+		int weight = r.hasProperty(CONF.weight) 
+				? r.getProperty(CONF.weight).getInt() : 0;
+		weightCache.put(property.getURI(), weight);
+		return weight;
+	}
+	
 	protected String getProperty(String uri, Property prop, String defaultValue) {
 		String result;
 		try {
-			result = cache.getResource(uri).getProperty(prop).getString();
+			result = store.getResource(uri).getProperty(prop).getString();
 			result = beautify(result);
 		} catch (Throwable t) {
 			result = defaultValue;

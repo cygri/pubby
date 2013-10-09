@@ -1,5 +1,5 @@
 @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
-@prefix cso:	<http://localhost:8080/census-2011/property/> .
+@prefix cso:	<http://data.cso.ie/census-2011/property/> .
 cso:age-group	rdfs:label	"age group"@en .
 cso:gender	rdfs:label	"gender"@en .
 cso:occupancy-status-on-census-night	rdfs:label	"occupancy status on census night"@en .

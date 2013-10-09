@@ -45,7 +45,11 @@
             "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
     ];
 
-    conf:loadVocabularyFromURL <rdf.rdf>, <rdfs.rdf>, <skos.rdf>, <qb.ttl>, <void.ttl>, <dcat.ttl>, <sd.ttl>, <dcterms.ttl>, <cso.ttl>, <sdmx-d.ttl>;
+    conf:loadVocabularyFromURL
+        <rdf.rdf>, <rdfs.rdf>, <skos.rdf>, <qb.ttl>, <void.ttl>,
+        <dcat.ttl>, <sd.ttl>, <dcterms.ttl>,
+        <sdmx-d.ttl>,
+        <cso-dim.ttl>, <cso-dim-local.ttl>, <cso-measure.ttl>, <cso-measure-local.ttl>;
     .
 
 sdmx:refArea rdfs:label "reference area"@en.

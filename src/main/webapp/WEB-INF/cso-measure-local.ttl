@@ -1,0 +1,22 @@
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cso:	<http://localhost:8080/census-2011/property/> .
+cso:population	rdfs:label	"population"@en .
+cso:irish-speakers-aged-3-or-over	rdfs:label	"Irish speakers aged 3 or over"@en .
+cso:population-aged-3-or-over	rdfs:label	"population aged 3 or over"@en .
+cso:irish-speakers-within-education	rdfs:label	"Irish speakers within education aged 3 or over"@en .
+cso:persons-at-work	rdfs:label	"persons at work"@en .
+cso:population-aged-5-years-and-over	rdfs:label	"Population aged 5 years and over"@en .
+cso:children	rdfs:label	"children under and over 15 in family"@en ,
+		"children"@en .
+cso:persons	rdfs:label	"persons"@en .
+cso:carers	rdfs:label	"carers"@en .
+cso:communal-establishment	rdfs:label	"communal establishment"@en .
+cso:families	rdfs:label	"families"@en .
+cso:family-members	rdfs:label	"family members"@en .
+cso:households	rdfs:label	"households"@en .
+cso:persons-with-disability	rdfs:label	"persons with disability"@en .
+cso:population-aged-15-years-and-over	rdfs:label	"population aged 15 years and over"@en .
+cso:females-aged-20-years-or-over	rdfs:label	"females aged 20 years or over"@en .
+cso:speakers-of-foreign-languages	rdfs:label	"speakers of foreign languages"@en .
+cso:persons-in-communal-establishments	rdfs:label	"persons in communal establishments"@en .
+cso:usually-resident-population	rdfs:label	"usually resident population"@en .

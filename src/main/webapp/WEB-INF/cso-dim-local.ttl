@@ -1,0 +1,53 @@
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cso:	<http://localhost:8080/census-2011/property/> .
+cso:age-group	rdfs:label	"age group"@en .
+cso:gender	rdfs:label	"gender"@en .
+cso:occupancy-status-on-census-night	rdfs:label	"occupancy status on census night"@en .
+cso:household-year-built	rdfs:label	"household year built"@en .
+cso:frequency-of-speaking-irish	rdfs:label	"frequency of speaking Irish"@en .
+cso:ability-to-speak-irish	rdfs:label	"ability to speak Irish"@en .
+cso:frequency-of-speaking-irish-outside-education	rdfs:label	"frequency of speaking Irish outside education"@en .
+cso:industry	rdfs:label	"industry"@en .
+cso:residence-1-year-b4-census	rdfs:label	"usual residence 1 year before Census Day"@en .
+cso:means-of-travel-to-work-school-college	rdfs:label	"means of travel to work, school or college"@en .
+cso:highest-level-of-education-completed	rdfs:label	"highest level of education completed"@en .
+cso:children	rdfs:label	"children"@en ,
+		"children under and over 15 in family"@en .
+cso:children-age	rdfs:label	"age of children"@en .
+cso:type-of-family	rdfs:label	"type of family"@en .
+cso:marital-status	rdfs:label	"marital status"@en .
+cso:place-of-birth	rdfs:label	"place of birth"@en .
+cso:principal-economic-status	rdfs:label	"principal economic status"@en .
+cso:social-class	rdfs:label	"social class"@en .
+cso:time-leaving-to-work-school-college	rdfs:label	"time leaving home to travel to work, school or college"@en .
+cso:number-of-unpaid-hours-per-week	rdfs:label	"number of unpaid hours per week"@en .
+cso:size-of-family	rdfs:label	"size of family"@en .
+cso:youngest-child-age-group	rdfs:label	"youngest child age group"@en .
+cso:children-over-15	rdfs:label	"children over 15 in family"@en .
+cso:children-under-15	rdfs:label	"children under 15 in family"@en .
+cso:family-cycle	rdfs:label	"family cycle"@en .
+cso:sewerage-facility	rdfs:label	"sewerage facility"@en .
+cso:household-size	rdfs:label	"household size"@en .
+cso:type-of-accommodation	rdfs:label	"type of accommodation"@en .
+cso:type-of-occupancy	rdfs:label	"type of occupancy"@en .
+cso:socio-economic-group-of-reference-person	rdfs:label	"socio-economic group of reference person"@en .
+cso:age-education-ceased	rdfs:label	"age education ceased"@en .
+cso:total-children-in-family	rdfs:label	"total children in family"@en .
+cso:children-born-alive	rdfs:label	"children born alive"@en .
+cso:language-spoken	rdfs:label	"language spoken"@en .
+cso:occupation	rdfs:label	"occupation"@en .
+cso:central-heating	rdfs:label	"central heating"@en .
+cso:internet	rdfs:label	"internet"@en .
+cso:have-a-personal-computer	rdfs:label	"have a personal computer"@en .
+cso:number-of-rooms	rdfs:label	"number of rooms"@en .
+cso:journey-time-to-work-school-college	rdfs:label	"journey time to work, school or college"@en .
+cso:education-status	rdfs:label	"education status"@en .
+cso:ethnic-group	rdfs:label	"ethnic group"@en .
+cso:field-of-study	rdfs:label	"field of study"@en .
+cso:general-health-status	rdfs:label	"general health status"@en .
+cso:number-of-motor-cars	rdfs:label	"number of motor cars"@en .
+cso:ability-to-speak-english	rdfs:label	"ability to speak English"@en .
+cso:water-supply	rdfs:label	"water supply"@en .
+cso:household-type	rdfs:label	"household type"@en .
+cso:nationality	rdfs:label	"nationality"@en .
+cso:religion	rdfs:label	"religion"@en .

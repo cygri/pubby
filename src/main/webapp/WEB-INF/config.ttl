@@ -1,19 +1,3 @@
-# Pubby Example Configuration
-#
-# This configuration connects to the DBpedia SPARQL endpoint and
-# re-publishes on your local machine, with dereferenceable
-# localhost URIs.
-#
-# This assumes you already have a servlet container running
-# on your machine at http://localhost:8080/ .
-#
-# Install Pubby as the root webapp of your servlet container,
-# and make sure the config-file parameter in Pubby's web.xml
-# points to this configuration file.
-#
-# Then browse to http://localhost:8080/ .
-
-# Prefix declarations to be used in RDF output
 @prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
 @prefix meta: <http://example.org/metadata#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -35,72 +19,33 @@
 @prefix doap:     <http://usefulinc.com/ns/doap#> .
 @prefix void:     <http://rdfs.org/ns/void#> .
 @prefix ir:       <http://www.ontologydesignpatterns.org/cp/owl/informationrealization.owl#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#>.
+@prefix sdmx: <http://purl.org/linked-data/sdmx#>.
+@prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension>.
 
 # Server configuration section
 <> a conf:Configuration;
     # Project name for display in page titles
-    conf:projectName "DBpedia.org";
+    conf:projectName "data.cso.ie";
     # Homepage with description of the project for the link in the page header
-    conf:projectHomepage <http://dbpedia.org>;
+    conf:projectHomepage <http://data.cso.ie/>;
     # The Pubby root, where the webapp is running inside the servlet container.
     conf:webBase <http://localhost:8080/>;
-    # URL of an RDF file whose prefix mapping is to be used by the
-    # server; defaults to <>, which is *this* file.
-    conf:usePrefixesFrom <>;
-    # If labels and descriptions are available in multiple languages,
-    # prefer this one.
-    conf:defaultLanguage "en";
     # When the homepage of the server is accessed, this resource will
     # be shown.
     conf:indexResource <http://localhost:8080/resource/DBpedia>;
-    # Will be appended to the conf:webBase to form the public
-    # resource URIs; if not present, defaults to ""
-    conf:webResourcePrefix "resource/";
 
-# Dataset configuration section (for DBpedia resources)
-#
-# URIs in the SPARQL endpoint: http://dbpedia.org/resource/*
-# URIs on the Web:             http://localhost:8080/resource/*
     conf:dataset [
         # SPARQL endpoint URL of the dataset
-        conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
-        # Default graph name to query (not necessary for most endpoints)
-        conf:sparqlDefaultGraph <http://dbpedia.org>;
+        conf:sparqlEndpoint <http://localhost:8890/sparql>;
         # Common URI prefix of all resource URIs in the SPARQL dataset
-        conf:datasetBase <http://dbpedia.org/resource/>;
-        # Fixes an issue with the server running behind an Apache proxy;
-        # can be disabled otherwise
-        conf:fixUnescapedCharacters "(),'!$&*+;=@";
-        # DBpedia uses URIs, not IRIs
-        conf:supportsIRIs false;
-
-        # Queries for describing a resource denoted by "?__this__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:resourceDescriptionQuery "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }";
-#        conf:resourceDescriptionQuery "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
-        
-        # Queries for describing the blank nodes related to a given resource via a given property.
-        # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:anonymousPropertyDescriptionQuery "DESCRIBE ?x WHERE { ?__this__ ?__property__ ?x. FILTER (isBlank(?x)) }";
-        
-        # Queries for describing the blank nodes inversely related to a given resource via a given property.
-        # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:anonymousInversePropertyDescriptionQuery "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
-        
-        # include metadata
-        conf:metadataTemplate "metadata.ttl";
-
-        # configure your metadata here
-        # Use properties with the meta: prefix where the property name
-        # corresponds to the placeholder URIs in metadata.ttl that begin
-        # with about:metadata:metadata:
-        # Examples for such properties are:
-#        meta:pubbyUser <URI of the data publisher who uses this Pubby>;
-#        meta:pubbyOperator <URI of the service provider who operates this Pubby>;
-#        meta:endpointUser <URI of the data publisher who uses the SPARQL endpoint queried by this Pubby>;
-#        meta:endpointOperator <URI of the service provider who operates the SPARQL endpoint>;
-#        meta:endpointDataset <URI of the linked dataset that is exposed via the SPARQL endpoint>;
+        conf:datasetBase <http://data.cso.ie/>;
+        conf:resourceDescriptionQuery
+            "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }",
+            "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
     ];
+
+    conf:loadVocabularyFromURL <rdf.rdf>, <rdfs.rdf>, <skos.rdf>, <qb.ttl>, <void.ttl>, <dcat.ttl>, <sd.ttl>, <dcterms.ttl>, <cso.ttl>, <sdmx-d.ttl>;
     .
+
+sdmx:refArea rdfs:label "reference area"@en.

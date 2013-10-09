@@ -1,12 +1,17 @@
 package de.fuberlin.wiwiss.pubby;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -62,9 +67,11 @@ public class ResourceDescription {
 	 */
 	public String getTitle() {
 		String label = getLabel();
-		if (label != null) return label;
-		if (resource.isAnon()) return null;
-		return new URIPrefixer(resource, getPrefixes()).getLocalName();
+		if (label == null && resource.isURIResource()) {
+			label = new URIPrefixer(resource, getPrefixes()).getLocalName();
+		}
+		// TODO: This should get the correct language from getLabel() and pass it on
+		return toTitleCase(label, null);
 	}
 
 	public String getLabel() {
@@ -207,7 +214,7 @@ public class ResourceDescription {
 			return predicatePrefixer.getLocalName();
 		}
 		public String getLabel() {
-			return vocabularyStore.getLabel(predicate.getURI());
+			return toTitleCase(vocabularyStore.getLabel(predicate.getURI()), null);
 		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(predicate.getURI());
@@ -303,10 +310,15 @@ public class ResourceDescription {
 			return prefixer.getLocalName();
 		}
 		public String getLabel() {
-			if (node.isAnon()) {
-				return null;
+			if (!node.isResource()) return null;
+			String result = null;
+			if (node.isURIResource()) {
+				result = vocabularyStore.getLabel(node.asNode().getURI());
 			}
-			return vocabularyStore.getLabel(node.asNode().getURI());
+			if (result == null) {
+				result = new ResourceDescription(node.asResource(), model, config).getLabel();
+			}
+			return toTitleCase(result, null);
 		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(node.asNode().getURI());
@@ -352,4 +364,50 @@ public class ResourceDescription {
 			return getNode().getLiteralLexicalForm().compareTo(otherValue.getNode().getLiteralLexicalForm());
 		}
 	}
+
+	/**
+	 * Converts a string to Title Case. Also trims surrounding whitespace
+	 * and collapses consecutive whitespace characters within into a single
+	 * space. If the language is English or null, English rules are used.
+	 */
+	public String toTitleCase(String s, String lang) {
+		if (s == null) return null;
+		if (lang == null) {
+			lang = config.getDefaultLanguage();
+		}
+		Set<String> uncapitalizedWords = Collections.emptySet();
+		if (lang == null || english.matcher(lang).matches()) {
+			uncapitalizedWords = englishUncapitalizedWords;
+		}
+		StringBuffer result = new StringBuffer();
+		Matcher matcher = wordPattern.matcher(s);
+		boolean first = true;
+		while (matcher.find()) {
+			if (!first) result.append(' ');
+			String word = matcher.group();
+			if ("".equals(word)) continue;
+			if (first || !uncapitalizedWords.contains(word)) {
+				word = word.substring(0, 1).toUpperCase() + word.substring(1);
+			}
+			result.append(word);
+			first = false;
+		}
+		return result.toString();
+	}
+	private static Pattern wordPattern = Pattern.compile("[^ \t\r\n]+");
+	private static Pattern english = Pattern.compile("^en(-.*)?$", Pattern.CASE_INSENSITIVE);
+	private static Set<String> englishUncapitalizedWords = 
+			new HashSet<String>(Arrays.asList(
+					// Prepositions
+					"above", "about", "across", "against", "along", "among",
+					"around", "at", "before", "behind", "below", "beneath",
+					"beside", "between", "beyond", "by", "down", "during",
+					"except", "for", "from", "in", "inside", "into", "like",
+					"near", "of", "off", "on", "since", "to", "toward", 
+					"through", "under", "until", "up", "upon", "with", "within",
+					// Articles
+					"a", "an", "the",
+					// Conjunctions
+					"and", "but", "for", "nor", "or", "so", "yet" 
+			));
 }

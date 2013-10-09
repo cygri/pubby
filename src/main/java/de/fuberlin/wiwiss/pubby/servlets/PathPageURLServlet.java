@@ -60,7 +60,8 @@ public class PathPageURLServlet extends BasePathServlet {
 
 		String propertyTitle = null;
 		if (config.showLabels()) {
-			propertyTitle = config.getVocabularyStore().getLabel(property.getURI());
+			propertyTitle = resourceDescription.toTitleCase(
+					config.getVocabularyStore().getLabel(property.getURI()), null);
 		}
 		if (propertyTitle == null) {
 			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 

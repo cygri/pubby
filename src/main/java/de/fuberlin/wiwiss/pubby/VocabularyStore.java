@@ -16,6 +16,7 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * The vocabulary cache is used to store labels and descriptions
  * of classes and properties.
  *
+ * TODO: This is not i18n aware. Needs ability to cache one label/desc per language, and return Literals incl language tag
  * @author Kai Eckert (kai@informatik.uni-mannheim.de)
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
@@ -80,16 +81,9 @@ public class VocabularyStore {
 		String result;
 		try {
 			result = store.getResource(uri).getProperty(prop).getString();
-			result = beautify(result);
 		} catch (Throwable t) {
 			result = defaultValue;
 		}
 		return result;
-	}
-
-	protected String beautify(String input) {
-		input = input.substring(0,1).toUpperCase() + input.substring(1);
-		input = input.replaceAll("([a-z]{1})([A-Z]{1})","$1 $2");
-		return input;
 	}
 }

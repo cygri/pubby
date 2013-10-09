@@ -56,7 +56,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 		}
 		if (anonInversePropertyQueries == null || anonInversePropertyQueries.isEmpty()) {
 			anonInversePropertyQueries = Collections.singletonList(
-					"DESCRIBE ?x WHERE {?__property__ ?__this__ ?x. FILTER (isBlank(?x))}");
+					"DESCRIBE ?x WHERE {?x ?__property__ ?__this__. FILTER (isBlank(?x))}");
 		}
 		this.resourceQueries = resourceQueries;
 		this.anonPropertyQueries = anonPropertyQueries;

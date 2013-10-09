@@ -49,7 +49,6 @@ public class PathPageURLServlet extends BasePathServlet {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
-			if (!value.isAnon()) continue;
 			resourceDescriptions.add(new ResourceDescription(
 					(Resource) value.as(Resource.class), descriptions, config));
 		}

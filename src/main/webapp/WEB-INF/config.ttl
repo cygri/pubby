@@ -22,6 +22,7 @@
 @prefix sd: <http://www.w3.org/ns/sparql-service-description#>.
 @prefix sdmx: <http://purl.org/linked-data/sdmx#>.
 @prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension>.
+@prefix qb: <http://purl.org/linked-data/cube#>.
 
 # Server configuration section
 <> a conf:Configuration;
@@ -53,3 +54,16 @@
     .
 
 sdmx:refArea rdfs:label "reference area"@en.
+
+rdf:type conf:weight -100.
+skos:prefLabel conf:weight -85.
+rdfs:label conf:weight -80.
+skos:altLabel conf:weight -75.
+dcterms:identifier conf:weight -20.
+skos:notation conf:weight -20.
+void:dataDump conf:weight -10.
+void:sparqlEndpoint conf:weight -10.
+sdmx:refArea conf:weight -5.
+sdmx-d:refArea conf:weight -5.
+void:subset conf:weight 10.
+qb:dataSet conf:weight 10.

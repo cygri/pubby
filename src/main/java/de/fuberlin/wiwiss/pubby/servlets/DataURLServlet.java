@@ -79,7 +79,7 @@ public class DataURLServlet extends BaseURLServlet {
 		document.addProperty(FOAF.primaryTopic, r);
 		document.addProperty(RDFS.label, 
 				"RDF description of " + 
-				new ResourceDescription(controller, description, config).getLabel());
+				new ResourceDescription(controller, description, config).getTitle());
 		
 		// Add provenance. This seems out of place here.
 		for (MappedResource resource: resources) {

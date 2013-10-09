@@ -63,7 +63,7 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("tabulator_link", tabulatorLink);
 		context.put("openlink_link", openLinkLink);
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
-		context.put("title", resourceDescription.getLabel());
+		context.put("title", resourceDescription.getTitle());
 		context.put("comment", resourceDescription.getComment());
 		context.put("image", resourceDescription.getImageURL());
 		context.put("properties", resourceDescription.getProperties());

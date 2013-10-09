@@ -54,19 +54,22 @@ public class ResourceDescription {
 	public String getURI() {
 		return resource.getURI();
 	}
-	
+
+	/**
+	 * If {@link #getLabel()} is non null, return the label. If it is null,
+	 * generate an attempt at a human-readable title from the URI. If the
+	 * resource is blank, return null.
+	 */
+	public String getTitle() {
+		String label = getLabel();
+		if (label != null) return label;
+		if (resource.isAnon()) return null;
+		return new URIPrefixer(resource, getPrefixes()).getLocalName();
+	}
+
 	public String getLabel() {
 		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getLabelProperties());
-		String label = getBestLanguageMatch(
-				candidates, config.getDefaultLanguage());
-		if (label == null) {
-			if (resource.isAnon()) {
-				return null;
-			} else {
-			   return new URIPrefixer(resource, getPrefixes()).getLocalName();
-			}
-		}
-		return label;
+		return getBestLanguageMatch(candidates, config.getDefaultLanguage());
 	}
 	
 	public String getComment() {
@@ -300,14 +303,10 @@ public class ResourceDescription {
 			return prefixer.getLocalName();
 		}
 		public String getLabel() {
-			String result = null;
-			if (node.isURIResource()) {
-				result = vocabularyStore.getLabel(node.asNode().getURI());
+			if (node.isAnon()) {
+				return null;
 			}
-			if (result == null && node.isResource()) {
-				result = new ResourceDescription(node.asResource(), model, config).getLabel();
-			}
-			return result;
+			return vocabularyStore.getLabel(node.asNode().getURI());
 		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(node.asNode().getURI());

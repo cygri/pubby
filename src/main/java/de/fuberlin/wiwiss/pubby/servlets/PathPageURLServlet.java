@@ -66,7 +66,7 @@ public class PathPageURLServlet extends BasePathServlet {
 			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 
 					":" + property.getLocalName();
 		}
-		String title = resourceDescription.getLabel() + 
+		String title = resourceDescription.getTitle() + 
 				(isInverse ? " \u00AB " : " \u00BB ") +
 				propertyTitle;
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
@@ -77,7 +77,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
 		context.put("back_uri", controller.getAbsoluteIRI());
-		context.put("back_label", resourceDescription.getLabel());
+		context.put("back_label", resourceDescription.getTitle());
 		context.put("rdf_link", isInverse ? controller.getInversePathDataURL(property) : controller.getPathDataURL(property));
 		context.put("resources", resourceDescriptions);
 		context.put("showLabels", new Boolean(config.showLabels()));

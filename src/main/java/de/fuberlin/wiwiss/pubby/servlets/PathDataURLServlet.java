@@ -51,7 +51,7 @@ public class PathDataURLServlet extends BasePathServlet {
 								? controller.getInversePathDataURL(property) 
 								: controller.getPathDataURL(property), request));
 		document.addProperty(FOAF.primaryTopic, r);
-		String resourceLabel = new ResourceDescription(controller, descriptions, config).getLabel();
+		String resourceLabel = new ResourceDescription(controller, descriptions, config).getTitle();
 		String propertyLabel = config.getPrefixes().qnameFor(property.getURI());
 		if (isInverse) {
 			document.addProperty(RDFS.label, 

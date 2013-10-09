@@ -1,0 +1,113 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix scovo:   <http://purl.org/NET/scovo#> .
+@prefix void:    <http://rdfs.org/ns/void#> .
+@prefix vcard:   <http://www.w3.org/2006/vcard/ns#> .
+@prefix sdmx:    <http://purl.org/linked-data/sdmx#> .
+@prefix sdmx-concept:    <http://purl.org/linked-data/sdmx/2009/concept#> .
+@prefix sdmx-dimension:  <http://purl.org/linked-data/sdmx/2009/dimension#> .
+@prefix sdmx-attribute:  <http://purl.org/linked-data/sdmx/2009/attribute#> .
+@prefix sdmx-measure:    <http://purl.org/linked-data/sdmx/2009/measure#> .
+@prefix sdmx-metadata:   <http://purl.org/linked-data/sdmx/2009/metadata#> .
+@prefix sdmx-code:       <http://purl.org/linked-data/sdmx/2009/code#> .
+@prefix sdmx-subject:    <http://purl.org/linked-data/sdmx/2009/subject#> .
+@prefix dcterms:         <http://purl.org/dc/terms/>.
+@prefix qb:              <http://purl.org/linked-data/cube#> .
+
+# AGE
+sdmx-dimension:age a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:age ;
+    rdfs:label "Age"@en ;
+    rdfs:comment """The length of time that a person has lived or a thing has existed."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# CIVIL_STATUS
+sdmx-dimension:civilStatus a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:civilStatus ;
+    rdfs:label "Civil Status"@en ;
+    rdfs:comment """Legal, conjugal status of each individual in relation to the marriage laws or customs of the country."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# CURRENCY
+sdmx-dimension:currency a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:currency ;
+    rdfs:label "Currency"@en ;
+    rdfs:comment """Monetary denomination of the object being measured."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# EDUCATION_LEV
+sdmx-dimension:educationLev a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:educationLev ;
+    rdfs:label "Education Level"@en ;
+    rdfs:comment """The highest level of an educational programme the person has successfully completed."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# FREQ
+sdmx-dimension:freq a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:freq ;
+    rdfs:label "Frequency"@en ;
+    rdfs:comment """The time interval at which observations occur over a given time period."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# OCCUPATION
+sdmx-dimension:occupation a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:occupation ;
+    rdfs:label "Occupation"@en ;
+    rdfs:comment """Job or position held by an individual who performs a set of tasks and duties."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# REF_AREA
+sdmx-dimension:refArea a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:refArea ;
+    rdfs:label "Reference Area"@en ;
+    rdfs:comment """The country or geographic area to which the measured statistical phenomenon relates."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# REF_PERIOD
+sdmx-dimension:refPeriod a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:refPeriod ;
+    rdfs:label "Reference Period"@en ;
+    rdfs:comment """The period of time or point in time to which the measured observation is intended to refer."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# SEX
+sdmx-dimension:sex a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:sex ;
+    rdfs:label "Sex"@en ;
+    rdfs:comment """The state of being male or female."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+# TIME_PERIOD
+sdmx-dimension:timePeriod a qb:DimensionProperty, rdf:Property ;
+    rdfs:range rdfs:Resource;
+    qb:concept sdmx-concept:timePeriod ;
+    rdfs:label "Time Period"@en ;
+    rdfs:comment """The period of time or point in time to which the measured observation refers."""@en ;
+    rdfs:isDefinedBy <http://sdmx.org/wp-content/uploads/2009/01/01_sdmx_cog_annex_1_cdc_2009.pdf> .
+
+### Binding to the corresponding COG Code lists ###
+
+sdmx-dimension:currency a qb:CodedProperty ;
+    qb:codeList sdmx-code:currency ;
+    rdfs:range sdmx-code:Currency .
+
+sdmx-dimension:freq a qb:CodedProperty ;
+    qb:codeList sdmx-code:freq ;
+    rdfs:range sdmx-code:Freq .
+
+sdmx-dimension:sex a qb:CodedProperty ;
+    qb:codeList sdmx-code:sex ;
+    rdfs:range sdmx-code:Sex .
+

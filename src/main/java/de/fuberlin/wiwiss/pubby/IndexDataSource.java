@@ -8,8 +8,10 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
@@ -48,10 +50,24 @@ public class IndexDataSource implements DataSource {
 		return describe(resources);
 	}
 
+	/**
+	 * Describe the index resource, and extract all the statements that
+	 * have our property and the right subject/object.
+	 */
 	@Override
-	public Model getAnonymousPropertyValues(String resourceURI,
-			Property property, boolean isInverse) {
-		return EMPTY_MODEL;
+	public Model listPropertyValues(String resourceURI,
+			Property property, boolean isInverse, boolean describeAnonymous) {
+		if (describeAnonymous) return EMPTY_MODEL;
+		Model all = getResourceDescription(resourceURI);
+		Resource r = all.getResource(resourceURI);
+		StmtIterator it = isInverse
+				? all.listStatements(null, property, r)
+				: all.listStatements(r, property, (RDFNode) null);
+		Model result = ModelFactory.createDefaultModel();
+		while (it.hasNext()) {
+			result.add(it.next());
+		}
+		return result;
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,24 +9,21 @@ import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
+import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 
 /**
- * A servlet for rendering an HTML page describing the blank nodes
+ * A servlet for rendering an HTML page listing resources
  * related to a given resource via a given property.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class PathPageURLServlet extends BasePathServlet {
+public class ValuesURLServlet extends BasePathServlet {
 
 	public boolean doGet(HypermediaResource controller,
 			Collection<MappedResource> resources, 
@@ -36,24 +31,13 @@ public class PathPageURLServlet extends BasePathServlet {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException {		
-		Model descriptions = listPropertyValues(resources, property, isInverse, true);
+		Model descriptions = listPropertyValues(resources, property, isInverse, false);
 		if (descriptions.isEmpty()) return false;
 
-		Resource r = descriptions.getResource(controller.getAbsoluteIRI());
-		List<ResourceDescription> resourceDescriptions = new ArrayList<ResourceDescription>();
-		StmtIterator it = isInverse
-				? descriptions.listStatements(null, property, r)
-				: r.listProperties(property);
-		while (it.hasNext()) {
-			Statement stmt = it.nextStatement();
-			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
-			resourceDescriptions.add(new ResourceDescription(
-					(Resource) value.as(Resource.class), descriptions, config));
-		}
-		
 		Model description = getResourceDescription(resources);
 		ResourceDescription resourceDescription = new ResourceDescription(
 				controller, description, config);
+		ResourceProperty prop = resourceDescription.getProperty(property);
 
 		String propertyTitle = null;
 		if (config.showLabels()) {
@@ -77,9 +61,9 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("back_uri", controller.getAbsoluteIRI());
 		context.put("back_label", resourceDescription.getTitle());
 		context.put("rdf_link", isInverse ? controller.getInversePathDataURL(property) : controller.getPathDataURL(property));
-		context.put("resources", resourceDescriptions);
+		context.put("property", prop);
 		context.put("showLabels", new Boolean(config.showLabels()));
-		template.renderXHTML("pathpage.vm");
+		template.renderXHTML("valuespage.vm");
 		return true;
 	}
 	

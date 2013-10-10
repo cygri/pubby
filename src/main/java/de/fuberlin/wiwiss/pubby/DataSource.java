@@ -20,7 +20,17 @@ public interface DataSource {
 	
 	Model getResourceDescription(String resourceURI);
 	
-	Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse);
+	/**
+	 * Returns a subgraph of the data source. It lists the values of a
+	 * particular property of a particular resource.
+	 * @param resourceURI The resource to be examined
+	 * @param property The property we're interested in
+	 * @param isInverse Are we interested in outgoing arcs (<tt>false</tt>) or incoming (<tt>true</tt>)?
+	 * @param describeAnonymous If <tt>true</tt>, list only blank nodes, and include complete descriptions
+	 * @return Model A subgraph of the data source. 
+	 */
+	Model listPropertyValues(String resourceURI, Property property, 
+			boolean isInverse, boolean describeAnonymous);
 	
 	/**
 	 * A list of URI resources to be displayed as the contents of this data source.

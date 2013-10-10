@@ -91,13 +91,13 @@ public abstract class BaseServlet extends HttpServlet {
 		return result;
 	}
 	
-	protected Model getAnonymousPropertyValues(Collection<MappedResource> resources, 
-			Property property, boolean isInverse) {
+	protected Model listPropertyValues(Collection<MappedResource> resources, 
+			Property property, boolean isInverse, boolean describeAnonymous) {
 		Model result = ModelFactory.createDefaultModel();
 		for (MappedResource resource: resources) {
 			ModelUtil.mergeModels(result, new ModelTranslator(
-					resource.getDataset().getDataSource().getAnonymousPropertyValues(
-							resource.getDatasetURI(), property, isInverse),
+					resource.getDataset().getDataSource().listPropertyValues(
+							resource.getDatasetURI(), property, isInverse, describeAnonymous),
 					resource.getDataset(),
 					config).getTranslated());
 		}

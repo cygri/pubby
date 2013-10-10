@@ -1,0 +1,65 @@
+#parse("header.vm")
+
+    <table class="description">
+      <tr>
+        <th>
+#if ($property.isInverse())
+          <small>is</small>
+#end
+#if ($showLabels && $property.label)
+          <a class="uri" href="$property.URI" title="$property.URI">$property.label</a>
+#elseif ($property.hasPrefix())
+          <a class="uri" href="$property.URI" title="$property.URI"><small>$property.Prefix:</small>$property.LocalName</a>
+#else
+          <a class="uri" href="$property.URI" title="$property.URI"><small>?:</small>$property.LocalName</a>
+#end
+#if ($property.isInverse())
+          <small>of</small>
+#end
+        </th>
+      </tr>
+      <tr class="odd">
+        <td>
+          <ul>
+#foreach ($value in $property.Values)
+            <li>
+#if ($value.Node.isURI())
+#if ($showLabels && $value.label)
+              <a class="uri" href="$value.Node.URI" title="$value.Node.URI">$value.label</a>
+#elseif ($value.hasPrefix())
+              <a class="uri" href="$value.Node.URI" title="$value.Node.URI"><small>$value.Prefix:</small>$value.LocalName</a>
+#else
+              <small>&lt;</small><a class="uri" href="$value.Node.URI">$value.Node.URI</a><small>&gt;</small>
+#end
+#elseif ($value.Node.isBlank())
+              <span class="blank">_:$value.Node.BlankNodeLabel</span>
+#elseif ($value.Node.isLiteral())
+              <span class="literal">$value.Node.LiteralLexicalForm
+#if ($value.DatatypeLabel)
+                <small> ($value.DatatypeLabel)</small>
+#end
+#if ($value.Node.LiteralLanguage != "")
+                <small> ($value.Node.LiteralLanguage)</small>
+#end
+              </span>
+#end
+            </li>
+#end
+#if ($property.BlankNodeCount > 0)
+#if ($property.BlankNodeCount == 1)
+#set ($text = "Anonymous resource")
+#elseif ($property.BlankNodeCount > 1)
+#set ($text = "$property.BlankNodeCount anonymous resources")
+#end
+#if ($property.PathPageURL)
+            <li>[<a href="$property.PathPageURL">$text</a>]</li>
+#else
+            <li>[$text]</li>
+#end
+#end
+          </ul>
+        </td>
+      </tr>
+    </table>
+
+#parse("footer.vm")

@@ -33,22 +33,34 @@ public class RemoteSPARQLDataSource implements DataSource {
 	private final String endpointURL;
 	private final String defaultGraphURI;
 	private final List<String> resourceQueries;
+	private final List<String> propertyQueries;
+	private final List<String> inversePropertyQueries;
 	private final List<String> anonPropertyQueries;
 	private final List<String> anonInversePropertyQueries;
 	private String previousDescribeQuery;
 	private String contentType = null;
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI) {
-		this(endpointURL, defaultGraphURI, null, null, null);
+		this(endpointURL, defaultGraphURI, null, null, null, null, null);
 	}
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI, 
-			List<String> resourceQueries, List<String> anonPropertyQueries, List<String> anonInversePropertyQueries) {
+			List<String> resourceQueries, 
+			List<String> propertyQueries, List<String> inversePropertyQueries,
+			List<String> anonPropertyQueries, List<String> anonInversePropertyQueries) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
 		if (resourceQueries == null || resourceQueries.isEmpty()) {
 			resourceQueries = Collections.singletonList(
 					"DESCRIBE ?__this__");
+		}
+		if (propertyQueries == null || propertyQueries.isEmpty()) {
+			propertyQueries = Collections.singletonList(
+					"CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x}");
+		}
+		if (inversePropertyQueries == null || inversePropertyQueries.isEmpty()) {
+			inversePropertyQueries = Collections.singletonList(
+					"CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__}");
 		}
 		if (anonPropertyQueries == null || anonPropertyQueries.isEmpty()) {
 			anonPropertyQueries = Collections.singletonList(
@@ -59,6 +71,8 @@ public class RemoteSPARQLDataSource implements DataSource {
 					"DESCRIBE ?x WHERE {?x ?__property__ ?__this__. FILTER (isBlank(?x))}");
 		}
 		this.resourceQueries = resourceQueries;
+		this.propertyQueries = propertyQueries;
+		this.inversePropertyQueries = inversePropertyQueries;
 		this.anonPropertyQueries = anonPropertyQueries;
 		this.anonInversePropertyQueries = anonInversePropertyQueries;
 	}
@@ -109,13 +123,17 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 
 	@Override
-	public Model getAnonymousPropertyValues(String resourceURI, Property property, boolean isInverse) {
-		// Loop over anonymous property description queries, join results in a single model.
+	public Model listPropertyValues(String resourceURI, Property property, 
+			boolean isInverse, boolean describeAnonymous) {
+		// Loop over the queries, join results in a single model.
 		// Process each query to replace place-holders of the given resource and property.
-		List<String> queries = isInverse ? anonInversePropertyQueries : anonPropertyQueries;
+		List<String> queries = describeAnonymous
+				? (isInverse ? anonInversePropertyQueries : anonPropertyQueries)
+				: (isInverse ? inversePropertyQueries : propertyQueries);
 		Model model = ModelFactory.createDefaultModel();
 		for (String query: queries) {
-			Model result = executeQuery(preProcessQuery(query, resourceURI, property));
+			String preprocessed = preProcessQuery(query, resourceURI, property);
+			Model result = executeQuery(preprocessed);
 			model.add(result);
 			model.setNsPrefixes(result);
 		}

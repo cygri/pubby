@@ -107,6 +107,8 @@ public class Dataset {
 					endpointURL,
 					defaultGraphURI,
 					listSPARQLQueries(CONF.resourceDescriptionQuery),
+					listSPARQLQueries(CONF.propertyListQuery),
+					listSPARQLQueries(CONF.inversePropertyListQuery),
 					listSPARQLQueries(CONF.anonymousPropertyDescriptionQuery),
 					listSPARQLQueries(CONF.anonymousInversePropertyDescriptionQuery));
 			if (config.hasProperty(CONF.contentType)) {

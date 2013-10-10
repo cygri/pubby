@@ -40,6 +40,17 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>ValuesURLServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesURLServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ValuesURLServlet</servlet-name>
+    <url-pattern>/values/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>DataURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.DataURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -59,6 +70,17 @@
   <servlet-mapping>
     <servlet-name>PathDataURLServlet</servlet-name>
     <url-pattern>/pathdata/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ValuesDataURLServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesDataURLServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ValuesDataURLServlet</servlet-name>
+    <url-pattern>/values.data/*</url-pattern>
   </servlet-mapping>
 
   <servlet>

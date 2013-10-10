@@ -96,6 +96,15 @@ public class ResourceDescription {
 		return null;
 	}
 	
+	public ResourceProperty getProperty(Property property) {
+		for (ResourceProperty p: getProperties()) {
+			if (p.getURI().equals(property.getURI())) {
+				return p;
+			}
+		}
+		return null;
+	}
+	
 	public List<ResourceProperty> getProperties() {
 		if (properties == null) {
 			properties = buildProperties();

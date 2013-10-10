@@ -29,6 +29,11 @@ public class ModelDataSource implements DataSource {
 		return model;
 	}
 	
+	public Model listPropertyValues(String resourceURI, Property property,
+			boolean isInverse, boolean describeAnonymous) {
+		return model;
+	}
+	
 	public Model getAnonymousPropertyValues(String resourceURI,
 			Property property, boolean isInverse) {
 		return model;

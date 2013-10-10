@@ -40,6 +40,8 @@ public class CONF {
 	public static final Property metadataTemplate = m.createProperty(NS + "metadataTemplate");
 	public static final Property contentType = m.createProperty(NS + "contentType");
 	public static final Property resourceDescriptionQuery = m.createProperty(NS + "resourceDescriptionQuery");
+	public static final Property propertyListQuery = m.createProperty(NS + "propertyListQuery");
+	public static final Property inversePropertyListQuery = m.createProperty(NS + "inversePropertyListQuery");
 	public static final Property anonymousPropertyDescriptionQuery = m.createProperty(NS + "anonymousPropertyDescriptionQuery");
 	public static final Property anonymousInversePropertyDescriptionQuery = m.createProperty(NS
 			+ "anonymousInversePropertyDescriptionQuery");

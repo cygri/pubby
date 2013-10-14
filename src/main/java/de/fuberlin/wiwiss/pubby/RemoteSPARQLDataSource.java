@@ -311,7 +311,6 @@ public class RemoteSPARQLDataSource implements DataSource {
 		for (RDFNode term: values) {
 			if (!isFirst) {
 				result.append(", ");
-				isFirst = false;
 			}
 			if (term.isURIResource()) {
 				result.append('<');
@@ -322,6 +321,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 						"toSPARQLArgumentList is only implemented for URIs; " + 
 						"called with term " + term);
 			}
+			isFirst = false;
 		}
 		result.append(')');
 		return result.toString();

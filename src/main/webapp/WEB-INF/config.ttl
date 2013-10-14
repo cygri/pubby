@@ -32,11 +32,9 @@
     conf:dataset [
         # SPARQL endpoint URL of the dataset
         conf:sparqlEndpoint <http://localhost:8890/sparql>;
+        conf:supportsSPARQL11 true;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://data.cso.ie/census-2011/>;
-        conf:resourceDescriptionQuery
-            "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }",
-            "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
     ];
 
     conf:loadVocabularyFromURL
@@ -48,9 +46,13 @@
 
 sdmx:refArea rdfs:label "reference area"@en.
 
+qb:dataSet a conf:HighIndegreeProperty.
+sd:namedGraph a conf:HighOutdegreeProperty.
+
 rdf:type conf:weight -100.
 skos:prefLabel conf:weight -85.
 rdfs:label conf:weight -80.
+dcterms:title conf:weight -79.
 skos:altLabel conf:weight -75.
 dcterms:identifier conf:weight -20.
 skos:notation conf:weight -20.

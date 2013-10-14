@@ -402,6 +402,10 @@ conf:anonymousInversePropertyDescriptionQuery
   lower. Weights must be integer numbers and should be between -100 and +100.
   Property weights may be managed in an external RDF file and loaded via
   <tt>conf:loadVocabularyURL</tt>.</p></dd>
+<dt><tt><em>my:Property</em> owl:inverseOf [ rdfs:label "<em>label</em>" ]</tt></dt>
+<dd><p>When a property occurs as an incoming arc on a resource, this label will
+  be shown instead of the default “is XXX of”. Example:</p>
+  <pre>ex:parent rdfs:label "parent"@en; owl:inverseOf [ rdfs:label "child"@en ].</pre></dd>
 <dt><tt><em>my:Property</em> a conf:HighOutdegreeProperty</tt></dt>
 <dt><tt><em>my:Property</em> a conf:HighIndegreeProperty</tt></dt>
 <dd><p>High-degree properties are properties that tend to have a large number of values

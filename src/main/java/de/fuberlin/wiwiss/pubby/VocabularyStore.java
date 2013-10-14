@@ -6,6 +6,7 @@ import java.util.Map;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
@@ -23,6 +24,7 @@ public class VocabularyStore {
 	private final Configuration configuration;
 	private final Model store;
 	private final Map<String, String> labelCache = new HashMap<String, String>();
+	private final Map<String, String> inverseLabelCache = new HashMap<String, String>();
 	private final Map<String, String> descriptionCache = new HashMap<String, String>();
 	private final Map<String, Integer> weightCache = new HashMap<String, Integer>();
 	
@@ -44,6 +46,19 @@ public class VocabularyStore {
 		return label;
 	}
 
+	public String getInverseLabel(String uri) {
+		return getInverseLabel(uri, configuration.getDefaultLanguage());
+	}
+	
+	public String getInverseLabel(String uri, String language) {
+		if (inverseLabelCache.containsKey(uri)) {
+			return inverseLabelCache.get(uri);
+		}
+		String label = getInverseProperty(uri, RDFS.label, null);
+		inverseLabelCache.put(uri, label);
+		return label;
+	}
+	
 	public String getDescription(String uri) {
 		return getDescription(uri, configuration.getDefaultLanguage());
 	}
@@ -69,12 +84,19 @@ public class VocabularyStore {
 	}
 	
 	protected String getProperty(String uri, Property prop, String defaultValue) {
-		String result;
 		try {
-			result = store.getResource(uri).getProperty(prop).getString();
+			return store.getResource(uri).getProperty(prop).getString();
 		} catch (Throwable t) {
-			result = defaultValue;
+			return defaultValue;
 		}
-		return result;
+	}
+	
+	protected String getInverseProperty(String uri, Property prop, String defaultValue) {
+		try {
+			return store.getResource(uri).getProperty(OWL.inverseOf)
+					.getResource().getProperty(prop).getString();
+		} catch (Throwable t) {
+			return defaultValue;
+		}
 	}
 }

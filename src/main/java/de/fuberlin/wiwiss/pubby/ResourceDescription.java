@@ -261,6 +261,9 @@ public class ResourceDescription {
 		public String getLabel() {
 			return toTitleCase(vocabularyStore.getLabel(predicate.getURI()), null);
 		}
+		public String getInverseLabel() {
+			return toTitleCase(vocabularyStore.getInverseLabel(predicate.getURI()), null);
+		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(predicate.getURI());
 		}

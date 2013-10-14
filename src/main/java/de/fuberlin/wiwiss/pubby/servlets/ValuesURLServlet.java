@@ -41,16 +41,26 @@ public class ValuesURLServlet extends BasePathServlet {
 		ResourceDescription description = getResourceDescription(controller, resources);
 
 		String propertyTitle = null;
+		boolean showAsInverse = isInverse;
 		if (config.showLabels()) {
-			propertyTitle = description.toTitleCase(
-					config.getVocabularyStore().getLabel(property.getURI()), null);
+			if (showAsInverse) {
+				propertyTitle = description.toTitleCase(
+						config.getVocabularyStore().getInverseLabel(property.getURI()), null);
+				if (propertyTitle != null) {
+					showAsInverse = false;
+				}
+			}
+			if (propertyTitle == null) {
+				propertyTitle = description.toTitleCase(
+						config.getVocabularyStore().getLabel(property.getURI()), null);
+			}
 		}
 		if (propertyTitle == null) {
 			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 
 					":" + property.getLocalName();
 		}
 		String title = description.getTitle() + 
-				(isInverse ? " \u00AB " : " \u00BB ") +
+				(showAsInverse ? " \u00AB " : " \u00BB ") +
 				propertyTitle;
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();

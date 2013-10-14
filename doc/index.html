@@ -395,19 +395,27 @@ conf:anonymousInversePropertyDescriptionQuery
 <h3 id="config-other">Other configuration</h3>
 
 <dl>
-<dt><tt><em>my:Property</em> conf:weight <em>0</em></tt></dt>
+<dt><tt><em>my:property</em> conf:weight <em>0</em></tt></dt>
 <dd><p>Changes the order of RDF properties in the HTML property tables by assigning
   a weight to a property. By default, all properties are considered to have weight 0.
   Properties with lower weight rise higher in the list, those with higher weight sink
   lower. Weights must be integer numbers and should be between -100 and +100.
   Property weights may be managed in an external RDF file and loaded via
   <tt>conf:loadVocabularyURL</tt>.</p></dd>
-<dt><tt><em>my:Property</em> owl:inverseOf [ rdfs:label "<em>label</em>" ]</tt></dt>
+<dt><tt><em>my:property</em> owl:inverseOf [ rdfs:label "<em>label</em>" ]</tt></dt>
 <dd><p>When a property occurs as an incoming arc on a resource, this label will
   be shown instead of the default “is XXX of”. Example:</p>
   <pre>ex:parent rdfs:label "parent"@en; owl:inverseOf [ rdfs:label "child"@en ].</pre></dd>
-<dt><tt><em>my:Property</em> a conf:HighOutdegreeProperty</tt></dt>
-<dt><tt><em>my:Property</em> a conf:HighIndegreeProperty</tt></dt>
+<dt><tt><em>my:property</em> conf:pluralLabel "<em>label</em>"</tt></dt>
+<dd><p>A label for a property to be used when the label has multiple values.
+  This should be the plural form of the property's <tt>rdfs:label</tt>.
+  An inverse plural label can also be specified using the <tt>owl:inverseOf</tt>
+  idiom. Example:</p>
+  <pre>ex:parent
+    conf:pluralLabel "parents"@en;
+    owl:inverseOf [ conf:pluralLabel "children"@en ].</pre></dd>
+<dt><tt><em>my:property</em> a conf:HighOutdegreeProperty</tt></dt>
+<dt><tt><em>my:property</em> a conf:HighIndegreeProperty</tt></dt>
 <dd><p>High-degree properties are properties that tend to have a large number of values
   on any given resource. A high in-degree property is one that tends to contribute
   lots of incoming arcs to some resources. A high-outdegree property is one that tends

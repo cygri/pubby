@@ -50,6 +50,7 @@ public class CONF {
 
 	// Terms to annotate vocabulary
 	public static final Property weight = m.createProperty(NS + "weight");
+	public static final Property pluralLabel = m.createProperty(NS + "pluralLabel");
 	public static final Resource HighOutdregreeProperty = m.createResource(NS + "HighOutdegreeProperty");
 	public static final Resource HighIndregreeProperty = m.createResource(NS + "HighIndegreeProperty");
 }

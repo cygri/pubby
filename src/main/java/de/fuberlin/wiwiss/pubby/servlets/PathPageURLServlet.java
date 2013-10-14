@@ -53,19 +53,20 @@ public class PathPageURLServlet extends BasePathServlet {
 		
 		ResourceDescription description = getResourceDescription(controller, resources);
 
+		// TODO: This is 100% duplicated with ValuesURLServlet
 		String propertyTitle = null;
 		boolean showAsInverse = isInverse;
 		if (config.showLabels()) {
 			if (showAsInverse) {
 				propertyTitle = description.toTitleCase(
-						config.getVocabularyStore().getInverseLabel(property.getURI()), null);
+						config.getVocabularyStore().getInverseLabel(property.getURI(), true), null);
 				if (propertyTitle != null) {
 					showAsInverse = false;
 				}
 			}
 			if (propertyTitle == null) {
 				propertyTitle = description.toTitleCase(
-						config.getVocabularyStore().getLabel(property.getURI()), null);
+						config.getVocabularyStore().getLabel(property.getURI(), true), null);
 			}
 		}
 		if (propertyTitle == null) {
@@ -75,6 +76,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		String title = description.getTitle() + 
 				(showAsInverse ? " \u00AB " : " \u00BB ") +
 				propertyTitle;
+		
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());

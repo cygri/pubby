@@ -259,10 +259,16 @@ public class ResourceDescription {
 			return predicatePrefixer.getLocalName();
 		}
 		public String getLabel() {
-			return toTitleCase(vocabularyStore.getLabel(predicate.getURI()), null);
+			return getLabel(isMultiValued());
+		}
+		public String getLabel(boolean preferPlural) {
+			return toTitleCase(vocabularyStore.getLabel(predicate.getURI(), preferPlural), null);
 		}
 		public String getInverseLabel() {
-			return toTitleCase(vocabularyStore.getInverseLabel(predicate.getURI()), null);
+			return getInverseLabel(isMultiValued());
+		}
+		public String getInverseLabel(boolean preferPlural) {
+			return toTitleCase(vocabularyStore.getInverseLabel(predicate.getURI(), preferPlural), null);
 		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(predicate.getURI());
@@ -278,6 +284,9 @@ public class ResourceDescription {
 		public int getHighDegreeArcCount() {
 			if (highDegreeArcCount == 0) return 0;
 			return highDegreeArcCount + blankNodeCount + values.size();
+		}
+		public boolean isMultiValued() {
+			return values.size() + highDegreeArcCount + blankNodeCount > 1;
 		}
 		public String getPathPageURL() {
 			if (hypermediaResource == null) {
@@ -380,7 +389,7 @@ public class ResourceDescription {
 			if (!node.isResource()) return null;
 			String result = null;
 			if (node.isURIResource()) {
-				result = vocabularyStore.getLabel(node.asNode().getURI());
+				result = vocabularyStore.getLabel(node.asNode().getURI(), false);
 			}
 			if (result == null) {
 				result = new ResourceDescription(node.asResource(), model, config).getLabel();

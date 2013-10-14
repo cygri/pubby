@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -30,6 +31,7 @@ public class Configuration {
 	private static final String DEFAULT_PROJECT_NAME = "Untitled Dataset";
 	
 	private final Model model;
+	private final Model modelWithImports;
 	private final Resource config;
 	private final PrefixMapping prefixes;
 	private final String webBase;
@@ -37,7 +39,7 @@ public class Configuration {
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
-	private final VocabularyStore vocabularyStore = new VocabularyStore(this);
+	private final VocabularyStore vocabularyStore;
 	
 	public Configuration(Model configurationModel) {
 		model = configurationModel;
@@ -49,9 +51,18 @@ public class Configuration {
 		config = it.nextStatement().getSubject();
 		webBase = config.getProperty(CONF.webBase).getResource().getURI();
 
+		modelWithImports = ModelFactory.createDefaultModel();
+		modelWithImports.add(model);
+		it = model.listStatements(config, CONF.loadVocabularyFromURL, (RDFNode) null);
+		while (it.hasNext()) {
+			String sourceURL = it.nextStatement().getObject().asResource().getURI();
+			FileManager.get().readModel(modelWithImports, sourceURL);
+		}
+		vocabularyStore = new VocabularyStore(modelWithImports, this);
+		
 		it = model.listStatements(config, CONF.dataset, (RDFNode) null);
 		while (it.hasNext()) {
-			datasets.add(new Dataset(it.nextStatement().getResource(), webBase));
+			datasets.add(new Dataset(it.nextStatement().getResource(), this));
 		}
 		labelProperties = new ArrayList<Property>();
 		it = model.listStatements(config, CONF.labelProperty, (RDFNode) null);
@@ -79,13 +90,6 @@ public class Configuration {
 		}
 		if (imageProperties.isEmpty()) {
 			imageProperties.add(model.createProperty("http://xmlns.com/foaf/0.1/depiction"));
-		}
-
-		vocabularyStore.addModel(model);
-		it = model.listStatements(config, CONF.loadVocabularyFromURL, (RDFNode) null);
-		while (it.hasNext()) {
-			vocabularyStore.addSourceURL(
-					it.nextStatement().getObject().asResource().getURI());
 		}
 
 		prefixes = new PrefixMappingImpl();
@@ -208,5 +212,30 @@ public class Configuration {
 
 	public VocabularyStore getVocabularyStore() {
 		return vocabularyStore;
+	}
+	
+	public Collection<Property> getHighOutdegreeProperties() {
+		if (highOutdegreePropertyCache == null) {
+			highOutdegreePropertyCache = getPropertiesByType(CONF.HighOutdregreeProperty);
+		}
+		return highOutdegreePropertyCache;
+	}
+	private Collection<Property> highOutdegreePropertyCache = null;
+
+	public Collection<Property> getHighIndegreeProperties() {
+		if (highIndegreePropertyCache == null) {
+			highIndegreePropertyCache = getPropertiesByType(CONF.HighIndregreeProperty);
+		}
+		return highIndegreePropertyCache;
+	}
+	private Collection<Property> highIndegreePropertyCache = null;
+
+	private Collection<Property> getPropertiesByType(Resource type) {
+		Collection<Property> results = new ArrayList<Property>();
+		StmtIterator it = modelWithImports.listStatements(null, RDF.type, type);
+		while (it.hasNext()) {
+			results.add(it.next().getSubject().as(Property.class));
+		}
+		return results;
 	}
 }

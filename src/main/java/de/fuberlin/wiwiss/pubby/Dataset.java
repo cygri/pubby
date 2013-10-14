@@ -36,7 +36,7 @@ public class Dataset {
 	private final static String metadataPlaceholderURIPrefix = "about:metadata:";
 
 	private final Model model;
-	private final Resource config;
+	private final Resource dataset;
 	private final DataSource dataSource;
 	private final String datasetBase;
 	private final Pattern datasetURIPattern;
@@ -57,7 +57,7 @@ public class Dataset {
 	public Dataset(DataSource dataSource, String constantURI) {
 		this.dataSource = dataSource;
 		model = ModelFactory.createDefaultModel();
-		config = model.createResource();
+		dataset = model.createResource();
 		datasetBase = constantURI;
 		datasetURIPattern = Pattern.compile("^$");
 		fixUnescapeCharacters = new char[0];
@@ -65,13 +65,13 @@ public class Dataset {
 		metadataTemplate = null;
 	}
 	
-	public Dataset(Resource config, String webBase) {
-		this.config = config;
+	public Dataset(Resource config, Configuration configuration) {
+		this.dataset = config;
 		model = config.getModel();
 		if (config.hasProperty(CONF.datasetBase)) {
 			datasetBase = config.getProperty(CONF.datasetBase).getResource().getURI();
 		} else {
-			datasetBase = webBase;
+			datasetBase = configuration.getWebApplicationBaseURI();
 		}
 		if (config.hasProperty(CONF.datasetURIPattern)) {
 			datasetURIPattern = Pattern.compile(
@@ -106,11 +106,14 @@ public class Dataset {
 			dataSource = new RemoteSPARQLDataSource(
 					endpointURL,
 					defaultGraphURI,
+					supportsSPARQL11(),
 					listSPARQLQueries(CONF.resourceDescriptionQuery),
 					listSPARQLQueries(CONF.propertyListQuery),
 					listSPARQLQueries(CONF.inversePropertyListQuery),
 					listSPARQLQueries(CONF.anonymousPropertyDescriptionQuery),
-					listSPARQLQueries(CONF.anonymousInversePropertyDescriptionQuery));
+					listSPARQLQueries(CONF.anonymousInversePropertyDescriptionQuery),
+					configuration.getHighIndegreeProperties(),
+					configuration.getHighOutdegreeProperties());
 			if (config.hasProperty(CONF.contentType)) {
 				((RemoteSPARQLDataSource) dataSource).setContentType(
 						config.getProperty(CONF.contentType).getString());
@@ -125,7 +128,8 @@ public class Dataset {
 				// to resolve relative URIs in the file. Having file:/// URIs in
 				// there would likely not be useful to anyone.
 				fileName = IRIResolver.resolveGlobal(fileName);
-				String base = (fileName.startsWith("file:/") ? webBase : fileName);
+				String base = (fileName.startsWith("file:/") ? 
+						configuration.getWebApplicationBaseURI() : fileName);
 
 				Model m = FileManager.get().loadModel(fileName, base, null);
 				data.add(m);
@@ -188,6 +192,10 @@ public class Dataset {
 	
 	public DataSource getDataSource() {
 		return dataSource;
+	}
+	
+	public boolean supportsSPARQL11() {
+		return getBooleanConfigValue(CONF.supportsSPARQL11, false);
 	}
 	
 	public List<HypermediaResource> getIndex(Configuration configuration) {
@@ -331,11 +339,11 @@ public class Dataset {
 		if (phPackage.equals("config")) {
 			// look for requested property in the dataset config
 			Property p  = model.createProperty(CONF.NS + phName);
-			if (config.hasProperty(p))
-				return config.getProperty(p).getObject();
+			if (dataset.hasProperty(p))
+				return dataset.getProperty(p).getObject();
 			
 			// find pointer to the global configuration set...
-			StmtIterator it = config.getModel().listStatements(null, CONF.dataset, config);
+			StmtIterator it = dataset.getModel().listStatements(null, CONF.dataset, dataset);
 			Statement ptrStmt = it.nextStatement();
 			if (ptrStmt == null) return null;
 			
@@ -349,11 +357,11 @@ public class Dataset {
 		if (phPackage.equals("metadata")) {
 			// look for requested property in the dataset config
 			Property p  = model.createProperty(META.NS + phName);
-			if (config.hasProperty(p))
-				return config.getProperty(p).getObject();
+			if (dataset.hasProperty(p))
+				return dataset.getProperty(p).getObject();
 			
 			// find pointer to the global configuration set...
-			StmtIterator it = config.getModel().listStatements(null, CONF.dataset, config);
+			StmtIterator it = dataset.getModel().listStatements(null, CONF.dataset, dataset);
 			Statement ptrStmt = it.nextStatement();
 			if (ptrStmt == null) return null;
 			
@@ -367,10 +375,10 @@ public class Dataset {
 	}
 	
 	private boolean getBooleanConfigValue(Property property, boolean defaultValue) {
-		if (!config.hasProperty(property)) {
+		if (!dataset.hasProperty(property)) {
 			return defaultValue;
 		}
-		Literal value = config.getProperty(property).getLiteral();
+		Literal value = dataset.getProperty(property).getLiteral();
 		if (XSD.xboolean.equals(value.getDatatype())) {
 			return value.getBoolean();
 		}
@@ -414,7 +422,7 @@ public class Dataset {
 
 	private List<String> listSPARQLQueries(Property queryProperty) {
 		List<String> list = new ArrayList<String>();
-		StmtIterator it = config.listProperties(queryProperty);
+		StmtIterator it = dataset.listProperties(queryProperty);
 		while (it.hasNext()) {
 			list.add(it.nextStatement().getString());
 		}

@@ -38,28 +38,47 @@ public class ResourceDescription {
 	private final Model model;
 	private final Resource resource;
 	private final Configuration config;
+	private final Map<Property, Integer> highIndegreeProperties;
+	private final Map<Property, Integer> highOutdegreeProperties;
 	private PrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
 	
-	public ResourceDescription(HypermediaResource resource, Model model, 
+	public ResourceDescription(HypermediaResource controller, Model model, 
 			Configuration config) {
-		this.hypermediaResource = resource;
-		this.model = model;
-		this.resource = model.getResource(hypermediaResource.getAbsoluteIRI());
-		this.config = config;
+		this(controller, model, null, null, config);
    	}
+
+	public ResourceDescription(HypermediaResource controller, Model model, 
+			Map<Property, Integer> highIndegreeProperties,
+			Map<Property, Integer> highOutdegreeProperties,
+			Configuration config) {
+		this.hypermediaResource = controller;
+		this.model = model;
+		this.resource = model.getResource(controller.getAbsoluteIRI());
+		this.config = config;
+		this.highIndegreeProperties = highIndegreeProperties == null ?
+				Collections.<Property, Integer>emptyMap() : highIndegreeProperties;
+		this.highOutdegreeProperties = highOutdegreeProperties == null ?
+				Collections.<Property, Integer>emptyMap() : highOutdegreeProperties;
+	}
 
 	public ResourceDescription(Resource resource, Model model, Configuration config) {
 		this.hypermediaResource = null;
 		this.model = model;
 		this.resource = resource;
 		this.config = config;
+		this.highIndegreeProperties = Collections.<Property, Integer>emptyMap(); 
+		this.highOutdegreeProperties = Collections.<Property, Integer>emptyMap(); 
 	}
-	
+
 	public String getURI() {
 		return resource.getURI();
 	}
 
+	public Model getModel() {
+		return model;
+	}
+	
 	/**
 	 * If {@link #getLabel()} is non null, return the label. If it is null,
 	 * generate an attempt at a human-readable title from the URI. If the
@@ -96,9 +115,9 @@ public class ResourceDescription {
 		return null;
 	}
 	
-	public ResourceProperty getProperty(Property property) {
+	public ResourceProperty getProperty(Property property, boolean isInverse) {
 		for (ResourceProperty p: getProperties()) {
-			if (p.getURI().equals(property.getURI())) {
+			if (p.getURI().equals(property.getURI()) && p.isInverse() == isInverse) {
 				return p;
 			}
 		}
@@ -123,7 +142,7 @@ public class ResourceDescription {
 			if (!propertyBuilders.containsKey(key)) {
 				propertyBuilders.put(key, new PropertyBuilder(predicate, false, config.getVocabularyStore()));
 			}
-			((PropertyBuilder) propertyBuilders.get(key)).addValue(stmt.getObject());
+			propertyBuilders.get(key).addValue(stmt.getObject());
 		}
 		it = model.listStatements(null, null, resource);
 		while (it.hasNext()) {
@@ -133,7 +152,21 @@ public class ResourceDescription {
 			if (!propertyBuilders.containsKey(key)) {
 				propertyBuilders.put(key, new PropertyBuilder(predicate, true, config.getVocabularyStore()));
 			}
-			((PropertyBuilder) propertyBuilders.get(key)).addValue(stmt.getSubject());
+			propertyBuilders.get(key).addValue(stmt.getSubject());
+		}
+		for (Property p: highIndegreeProperties.keySet()) {
+			String key = "<=" + p;
+			if (!propertyBuilders.containsKey(key)) {
+				propertyBuilders.put(key, new PropertyBuilder(p, true, config.getVocabularyStore()));
+			}
+			propertyBuilders.get(key).addHighDegreeArcs(highIndegreeProperties.get(p));
+		}
+		for (Property p: highOutdegreeProperties.keySet()) {
+			String key = "=>" + p;
+			if (!propertyBuilders.containsKey(key)) {
+				propertyBuilders.put(key, new PropertyBuilder(p, false, config.getVocabularyStore()));
+			}
+			propertyBuilders.get(key).addHighDegreeArcs(highOutdegreeProperties.get(p));
 		}
 		List<ResourceProperty> results = new ArrayList<ResourceProperty>();
 		Iterator<PropertyBuilder> it2 = propertyBuilders.values().iterator();
@@ -197,14 +230,17 @@ public class ResourceDescription {
 		private final boolean isInverse;
 		private final List<Value> values;
 		private final int blankNodeCount;
+		private final int highDegreeArcCount;
 		private final VocabularyStore vocabularyStore;
 		public ResourceProperty(Property predicate, boolean isInverse, List<Value> values,
-				int blankNodeCount, VocabularyStore vocabularyStore) {
+				int blankNodeCount, int highDegreeArcCount,
+				VocabularyStore vocabularyStore) {
 			this.predicate = predicate;
 			this.predicatePrefixer = new URIPrefixer(predicate, getPrefixes());
 			this.isInverse = isInverse;
 			this.values = values;
 			this.blankNodeCount = blankNodeCount;
+			this.highDegreeArcCount = highDegreeArcCount;
 			this.vocabularyStore = vocabularyStore;
 		}
 		public boolean isInverse() {
@@ -229,10 +265,16 @@ public class ResourceDescription {
 			return vocabularyStore.getDescription(predicate.getURI());
 		}
 		public List<Value> getValues() {
+			if (highDegreeArcCount > 0) return Collections.emptyList();
 			return values;
 		}
 		public int getBlankNodeCount() {
+			if (highDegreeArcCount > 0) return 0;
 			return blankNodeCount;
+		}
+		public int getHighDegreeArcCount() {
+			if (highDegreeArcCount == 0) return 0;
+			return highDegreeArcCount + blankNodeCount + values.size();
 		}
 		public String getPathPageURL() {
 			if (hypermediaResource == null) {
@@ -241,6 +283,14 @@ public class ResourceDescription {
 			return isInverse 
 					? hypermediaResource.getInversePathPageURL(predicate) 
 					: hypermediaResource.getPathPageURL(predicate);
+		}
+		public String getValuesPageURL() {
+			if (hypermediaResource == null) {
+				return null;
+			}
+			return isInverse
+					? hypermediaResource.getInverseValuesPageURL(predicate) 
+					: hypermediaResource.getValuesPageURL(predicate);
 		}
 		public int compareTo(ResourceProperty other) {
 			if (!(other instanceof ResourceProperty)) {
@@ -268,6 +318,7 @@ public class ResourceDescription {
 		private final boolean isInverse;
 		private final List<Value> values = new ArrayList<Value>();
 		private int blankNodeCount = 0;
+		private int highDegreeArcCount = 0;
 		private VocabularyStore vocabularyStore;
 		PropertyBuilder(Property predicate, boolean isInverse, VocabularyStore vocabularyStore) {
 			this.predicate = predicate;
@@ -281,9 +332,13 @@ public class ResourceDescription {
 			}
 			values.add(new Value(valueNode, predicate, vocabularyStore));
 		}
+		void addHighDegreeArcs(int count) {
+			highDegreeArcCount += count;
+		}
 		ResourceProperty toProperty() {
 			Collections.sort(values);
-			return new ResourceProperty(predicate, isInverse, values, blankNodeCount, vocabularyStore);
+			return new ResourceProperty(predicate, isInverse, values, 
+					blankNodeCount, highDegreeArcCount, vocabularyStore);
 		}
 	}
 	

@@ -2,6 +2,8 @@ package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -20,9 +22,12 @@ import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.DataSource;
+import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.IRITranslator;
 import de.fuberlin.wiwiss.pubby.MappedResource;
-import de.fuberlin.wiwiss.pubby.ModelTranslator;
 import de.fuberlin.wiwiss.pubby.ModelUtil;
+import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
 /**
  * An abstract base servlet for servlets that manage a namespace of resources.
@@ -32,6 +37,7 @@ import de.fuberlin.wiwiss.pubby.ModelUtil;
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
+ * @param <K>
  */
 public abstract class BaseServlet extends HttpServlet {
 	private final static String SERVER_CONFIGURATION =
@@ -68,38 +74,65 @@ public abstract class BaseServlet extends HttpServlet {
 		}
 	}
 	
-	protected Model getResourceDescription(Collection<MappedResource> resources) {
-		Model result = ModelFactory.createDefaultModel();
+	protected ResourceDescription getResourceDescription(
+			HypermediaResource controller,
+			Collection<MappedResource> resources) {
+		Model model = ModelFactory.createDefaultModel();
+		Map<Property, Integer> highIndegreeProperties = new HashMap<Property, Integer>();
+		Map<Property, Integer> highOutdegreeProperties = new HashMap<Property, Integer>();
 		for (MappedResource resource: resources) {
-			Model description = new ModelTranslator(
-				resource.getDataset().getDataSource().getResourceDescription(
-						resource.getDatasetURI()),
-				resource.getDataset(),
-				config).getTranslated();
+			IRITranslator translator = new IRITranslator(resource.getDataset(),
+					config);
+			DataSource dataSource = resource.getDataset().getDataSource();
+			Model originalDescription = dataSource.getResourceDescription(
+							resource.getDatasetURI());
+			Model translatedDescription = translator.getTranslated(originalDescription);
+
+			// TODO: Extend IRITranslator so that it can translate the Property=>Integer map to take care of URI rewriting
+			highIndegreeProperties = addIntegerMaps(highIndegreeProperties, 
+					dataSource.getHighIndegreeProperties(resource.getDatasetURI()));
+			highOutdegreeProperties = addIntegerMaps(highOutdegreeProperties, 
+					dataSource.getHighOutdegreeProperties(resource.getDatasetURI()));
+
 			// Add owl:sameAs statements referring to the original dataset URI
 			// TODO: Make this a wrapper around DataSource
 			if (resource.getDataset().getAddSameAsStatements()) {
-				Resource r1 = description.getResource(resource.getController().getAbsoluteIRI());
-				Resource r2 = description.getResource(resource.getDatasetURI());
+				Resource r1 = translatedDescription.getResource(
+						resource.getController().getAbsoluteIRI());
+				Resource r2 = translatedDescription.getResource(
+						resource.getDatasetURI());
 				if (!r1.equals(r2)) {
 					r1.addProperty(OWL.sameAs, r2);
-					ModelUtil.addNSIfUndefined(description, "owl", OWL.NS);
+					ModelUtil.addNSIfUndefined(translatedDescription, "owl", OWL.NS);
 				}
 			}
-			ModelUtil.mergeModels(result, description);
+			ModelUtil.mergeModels(model, translatedDescription);
 		}
-		return result;
+		if (model.isEmpty()) return null;
+		return new ResourceDescription(controller, model, 
+				highIndegreeProperties, highOutdegreeProperties, config);
+	}
+	
+	private <K> Map<K, Integer> addIntegerMaps(Map<K, Integer> map1, Map<K, Integer> map2) {
+		if (map1 == null) return map2;
+		if (map2 == null) return map1;
+		for (K key: map2.keySet()) {
+			int value = map2.get(key);
+			if (value == 0) continue;
+			map1.put(key, map1.containsKey(key) ? map1.get(key) + value : value);
+		}
+		return map1;
 	}
 	
 	protected Model listPropertyValues(Collection<MappedResource> resources, 
 			Property property, boolean isInverse, boolean describeAnonymous) {
 		Model result = ModelFactory.createDefaultModel();
 		for (MappedResource resource: resources) {
-			ModelUtil.mergeModels(result, new ModelTranslator(
-					resource.getDataset().getDataSource().listPropertyValues(
-							resource.getDatasetURI(), property, isInverse, describeAnonymous),
-					resource.getDataset(),
-					config).getTranslated());
+			ModelUtil.mergeModels(result, 
+					new IRITranslator(resource.getDataset(), config).getTranslated(
+							resource.getDataset().getDataSource().listPropertyValues(
+									resource.getDatasetURI(), property, isInverse, 
+									describeAnonymous)));
 		}
 		return result;
 	}

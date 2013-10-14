@@ -15,18 +15,16 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class ModelTranslator {
-	private final Model model;
+public class IRITranslator {
 	private final Dataset dataset;
 	private final Configuration serverConfig;
 	
-	public ModelTranslator(Model model, Dataset dataset, Configuration configuration) {
-		this.model = model;
+	public IRITranslator(Dataset dataset, Configuration configuration) {
 		this.dataset = dataset;
 		this.serverConfig = configuration;
 	}
 	
-	public Model getTranslated() {
+	public Model getTranslated(Model model) {
 		Model result = ModelFactory.createDefaultModel();
 		for (String prefix: model.getNsPrefixMap().keySet()) {
 			// Skip prefixes ns1, ns2, etc, which are usually

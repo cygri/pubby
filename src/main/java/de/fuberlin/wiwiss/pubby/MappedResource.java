@@ -4,6 +4,8 @@ package de.fuberlin.wiwiss.pubby;
 /**
  * A resource that is mapped between the SPARQL dataset and the Web server.
  * 
+ * TODO: This class is kind of silly. Merge with {@link IRITranslator} to a single class that can map back and forth?
+ * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */

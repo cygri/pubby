@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
@@ -22,22 +20,15 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * @version $Id$
  */
 public class VocabularyStore {
-	private Configuration configuration;
-	private Model store = ModelFactory.createDefaultModel();
-	private Map<String, String> labelCache = new HashMap<String, String>();
-	private Map<String, String> descriptionCache = new HashMap<String, String>();
-	private Map<String, Integer> weightCache = new HashMap<String, Integer>();
+	private final Configuration configuration;
+	private final Model store;
+	private final Map<String, String> labelCache = new HashMap<String, String>();
+	private final Map<String, String> descriptionCache = new HashMap<String, String>();
+	private final Map<String, Integer> weightCache = new HashMap<String, Integer>();
 	
-	public VocabularyStore(Configuration configuration) {
+	public VocabularyStore(Model model, Configuration configuration) {
+		this.store = model;
 		this.configuration = configuration;
-	}
-
-	public void addModel(Model model) {
-		store.add(model);
-	}
-	
-	public void addSourceURL(String sourceURL) {
-		FileManager.get().readModel(store, sourceURL);
 	}
 	
 	public String getLabel(String uri) {

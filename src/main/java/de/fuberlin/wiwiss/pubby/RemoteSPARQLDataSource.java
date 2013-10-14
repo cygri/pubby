@@ -4,8 +4,12 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -13,11 +17,14 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.WebContent;
 
 import com.hp.hpl.jena.query.QueryException;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.sparql.engine.http.HttpQuery;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
@@ -32,27 +39,40 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 public class RemoteSPARQLDataSource implements DataSource {
 	private final String endpointURL;
 	private final String defaultGraphURI;
+	private final boolean supportsSPARQL11;
+
 	private final List<String> resourceQueries;
 	private final List<String> propertyQueries;
 	private final List<String> inversePropertyQueries;
 	private final List<String> anonPropertyQueries;
 	private final List<String> anonInversePropertyQueries;
+	
+	private final Collection<Property> highIndegreeProperties;
+	private final Collection<Property> highOutdegreeProperties;
+	
 	private String previousDescribeQuery;
 	private String contentType = null;
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI) {
-		this(endpointURL, defaultGraphURI, null, null, null, null, null);
+		this(endpointURL, defaultGraphURI, false, null, null, null, null, null, null, null);
 	}
 	
-	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI, 
+	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI,
+			boolean supportsSPARQL11,
 			List<String> resourceQueries, 
 			List<String> propertyQueries, List<String> inversePropertyQueries,
-			List<String> anonPropertyQueries, List<String> anonInversePropertyQueries) {
+			List<String> anonPropertyQueries, List<String> anonInversePropertyQueries,
+			Collection<Property> highIndegreeProperties, Collection<Property> highOutdegreeProperties) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
+		this.supportsSPARQL11 = supportsSPARQL11;
 		if (resourceQueries == null || resourceQueries.isEmpty()) {
-			resourceQueries = Collections.singletonList(
-					"DESCRIBE ?__this__");
+			resourceQueries = supportsSPARQL11 ?
+				Arrays.asList(new String[]{
+					"CONSTRUCT {?__this__ ?p ?o} WHERE {?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__)}",
+					"CONSTRUCT {?s ?p ?__this__} WHERE {?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__)}"
+				}) :
+				Collections.singletonList("DESCRIBE ?__this__");
 		}
 		if (propertyQueries == null || propertyQueries.isEmpty()) {
 			propertyQueries = Collections.singletonList(
@@ -75,6 +95,11 @@ public class RemoteSPARQLDataSource implements DataSource {
 		this.inversePropertyQueries = inversePropertyQueries;
 		this.anonPropertyQueries = anonPropertyQueries;
 		this.anonInversePropertyQueries = anonInversePropertyQueries;
+		
+		this.highIndegreeProperties = highIndegreeProperties == null ? 
+				Collections.<Property>emptySet() : highIndegreeProperties;
+		this.highOutdegreeProperties = highOutdegreeProperties == null ? 
+				Collections.<Property>emptySet() : highOutdegreeProperties;
 	}
 	
 	/**
@@ -120,6 +145,45 @@ public class RemoteSPARQLDataSource implements DataSource {
 			model.setNsPrefixes(result);
 		}
 		return model;
+	}
+
+	@Override
+	public Map<Property, Integer> getHighIndegreeProperties(String resourceURI) {
+		return getHighDegreeProperties(
+				"SELECT ?p (COUNT(?s) AS ?count) " +
+				"WHERE { " +
+				"  ?s ?p ?__this__. " +
+				"  FILTER (?p IN ?__high_indegree_properties__)" +
+				"}" +
+				"GROUP BY ?p",
+				resourceURI);
+	}
+
+	@Override
+	public Map<Property, Integer> getHighOutdegreeProperties(String resourceURI) {
+		return getHighDegreeProperties(
+				"SELECT ?p (COUNT(?o) AS ?count) " +
+				"WHERE { " +
+				"  ?__this__ ?p ?o. " +
+				"  FILTER (?p IN ?__high_outdegree_properties__)" +
+				"}" +
+				"GROUP BY ?p", 
+				resourceURI);
+	}
+
+	private Map<Property, Integer> getHighDegreeProperties(String query, 
+			String resourceURI) {
+		if (!supportsSPARQL11) return null;
+		query = preProcessQuery(query, resourceURI);
+		ResultSet rs = execSelectQuery(query);
+		Map<Property, Integer> results = new HashMap<Property, Integer>();
+		while (rs.hasNext()) {
+			QuerySolution solution = rs.next();
+			Resource p = solution.get("p").asResource();
+			int count = solution.get("count").asLiteral().getInt();
+			results.put(ResourceFactory.createProperty(p.getURI()), count);
+		}
+		return results;
 	}
 
 	@Override
@@ -206,21 +270,23 @@ public class RemoteSPARQLDataSource implements DataSource {
 		return endpoint.execSelect();
 	}
 	
-	private String preProcessQuery(String query, String resourceURI){
+	private String preProcessQuery(String query, String resourceURI) {
 		return preProcessQuery(query, resourceURI, null);
 	}
 	
-	private String preProcessQuery(String query, String resourceURI, Property property){
-		
+	private String preProcessQuery(String query, String resourceURI, Property property) {
 		String result = replaceString(query, "?__this__", "<" + resourceURI + ">");
-		if (property!=null){
+		if (property != null) {
 			result = replaceString(result, "?__property__", "<" + property.getURI() + ">");
 		}
+		result = replaceString(result, "?__high_indegree_properties__", 
+				toSPARQLArgumentList(highIndegreeProperties));
+		result = replaceString(result, "?__high_outdegree_properties__", 
+				toSPARQLArgumentList(highOutdegreeProperties));
 		return result;
 	}
 	
 	private String replaceString(String text, String searchString, String replacement) {
-
 		int start = 0;
 		int end = text.indexOf(searchString, start);
 		if (end == -1) {
@@ -236,5 +302,28 @@ public class RemoteSPARQLDataSource implements DataSource {
 		}
 		buf.append(text.substring(start));
 		return buf.toString();
+	}
+	
+	private String toSPARQLArgumentList(Collection<? extends RDFNode> values) {
+		StringBuilder result = new StringBuilder();
+		result.append('(');
+		boolean isFirst = true;
+		for (RDFNode term: values) {
+			if (!isFirst) {
+				result.append(", ");
+				isFirst = false;
+			}
+			if (term.isURIResource()) {
+				result.append('<');
+				result.append(term.asResource().getURI());
+				result.append('>');
+			} else {
+				throw new IllegalArgumentException(
+						"toSPARQLArgumentList is only implemented for URIs; " + 
+						"called with term " + term);
+			}
+		}
+		result.append(')');
+		return result.toString();
 	}
 }

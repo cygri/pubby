@@ -48,23 +48,21 @@ public class PathPageURLServlet extends BasePathServlet {
 			Statement stmt = it.nextStatement();
 			RDFNode value = isInverse ? stmt.getSubject() : stmt.getObject();
 			resourceDescriptions.add(new ResourceDescription(
-					(Resource) value.as(Resource.class), descriptions, config));
+					value.asResource(), descriptions, config));
 		}
 		
-		Model description = getResourceDescription(resources);
-		ResourceDescription resourceDescription = new ResourceDescription(
-				controller, description, config);
+		ResourceDescription description = getResourceDescription(controller, resources);
 
 		String propertyTitle = null;
 		if (config.showLabels()) {
-			propertyTitle = resourceDescription.toTitleCase(
+			propertyTitle = description.toTitleCase(
 					config.getVocabularyStore().getLabel(property.getURI()), null);
 		}
 		if (propertyTitle == null) {
 			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 
 					":" + property.getLocalName();
 		}
-		String title = resourceDescription.getTitle() + 
+		String title = description.getTitle() + 
 				(isInverse ? " \u00AB " : " \u00BB ") +
 				propertyTitle;
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
@@ -75,7 +73,7 @@ public class PathPageURLServlet extends BasePathServlet {
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
 		context.put("back_uri", controller.getAbsoluteIRI());
-		context.put("back_label", resourceDescription.getTitle());
+		context.put("back_label", description.getTitle());
 		context.put("rdf_link", isInverse ? controller.getInversePathDataURL(property) : controller.getPathDataURL(property));
 		context.put("resources", resourceDescriptions);
 		context.put("showLabels", new Boolean(config.showLabels()));

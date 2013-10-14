@@ -261,16 +261,23 @@ ex:Widget rdfs:label "widget"@en.</pre>
 
 <dl>
 <dt><tt>conf:sparqlEndpoint &lt;<em>sparql_endpoint_url</em>&gt;;</tt></dt>
-<dd><p><strong>Required.</strong> The URL of the SPARQL endpoint whose data we want to expose.</p></dd>
+<dd><p><strong>Required</strong>, unless <tt>conf:loadRDF</tt> is used. in which case
+  The URL of the SPARQL endpoint whose data we want to expose.</p></dd>
 
 <dt><tt>conf:sparqlDefaultGraph &lt;<em>sparql_default_graph_name</em>&gt;;</tt></dt>
 <dd><p>If the data of interest is not located in the SPARQL dataset's default graph, but within
   a named graph, then its name must be specified here.</p></dd>
 
-<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data1.rdf</em>&gt;, ...;</tt></dt>
+<dt><tt>conf:supportsSPARQL11 <em>true</em>/<em>false</em>;</tt></dt>
+<dd><p>Indicates whether the SPARQL endpoint supports SPARQL 1.1, If <tt>false</tt>,
+  any features that require Pubby to issue SPARQL 1.1 queries will be disabled, and
+  Pubby will only use SPARQL 1.0. Defaults to <tt>false</tt>.</p></dd>
+
+<dt><tt>conf:loadRDF &lt;<em>data1.rdf</em>&gt;, &lt;<em>data2.ttl</em>&gt;, ...;</tt></dt>
 <dd><p>Load one or more RDF documents from the Web or the file system and use them as the
   data source. The SPARQL endpoint configured above will be ignored, as will be any custom
-  SPARQL queries. Allows using Pubby as an RDF server for publishing static RDF files.</p></dd>
+  SPARQL queries. Allows using Pubby as an RDF server for publishing static RDF files,
+  or enriching another dataset with additional triples loaded from a static file.</p></dd>
 
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
 <dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
@@ -293,14 +300,41 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
   target endpoint to build the description of a single resource. The resource to be
   described is given in the placeholder variable <tt>?__this__</tt>. Only query forms
   that return an RDF graph are allowed (that is, <tt>DESCRIBE</tt> and
-  <tt>CONSTRUCT</tt>). If unspecified, the following <tt>DESCRIBE</tt> query is used:</p>
+  <tt>CONSTRUCT</tt>). If unspecified and SPARQL 1.1 is not supported, the following
+  <tt>DESCRIBE</tt> query is used:</p>
   <pre>DESCRIBE ?__this__</pre>
   <p>On SPARQL endpoints that do not (propertly) support the default
   <tt>DESCRIBE</tt> query shown above, the following <tt>CONSTRUCT</tt> setup can be
-  used:</p>
+  used instead:</p>
   <pre>conf:resourceDescriptionQuery
     "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }",
     "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";</pre></dd>
+  <p>On SPARQL endpoints that support SPARQL 1.1, the following queries are used by
+  default. The placeholders <tt>?__high_outdegree_properties__</tt> and
+  <tt>?__high_indegree_properties__</tt> are replaced with a comma-separated list
+  in parentheses of the high-outdegree properties and high-indegree properties,
+  respectively:</p>
+  <pre>conf:resourceDescriptionQuery
+    """CONSTRUCT { ?__this__ ?p ?o }
+       WHERE { ?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__) }""",
+    """CONSTRUCT { ?s ?p ?__this__ }
+       WHERE { ?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__) }""";</pre></dd>
+
+<dt><tt>conf:propertyListQuery <em>"SPARQL query"</em></tt></dt>
+<dt><tt>conf:inversePropertyListQuery <em>"SPARQL query"</em></tt></dt>
+<dd><p>Allows customization of the SPARQL queries that are used to retrieve lists
+  of values for high-outdegree and high-indegree properties, respectively.
+  See <tt>conf:HighOutdegreeProperty</tt> and <tt>conf:HighIndegreeProperty</tt>
+  below for more information on these concepts. The resource to be described
+  is given in the placeholder variable <tt>?__this__</tt>. The property whose
+  values are to be retrieved is given in <tt>?__property__</tt>.
+  If unspecified, the following <tt>CONSTRUCT</tt>
+  queries are used for forward and backward properties, respectively:</p>
+  <pre>conf:propertyListQuery
+    "CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x}";
+
+conf:inversePropertyListQuery
+    "CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__}";</pre></dd>
 
 <dt><tt>conf:anonymousPropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
 <dt><tt>conf:anonymousInversePropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
@@ -368,6 +402,15 @@ conf:anonymousInversePropertyDescriptionQuery
   lower. Weights must be integer numbers and should be between -100 and +100.
   Property weights may be managed in an external RDF file and loaded via
   <tt>conf:loadVocabularyURL</tt>.</p></dd>
+<dt><tt><em>my:Property</em> a conf:HighOutdegreeProperty</tt></dt>
+<dt><tt><em>my:Property</em> a conf:HighIndegreeProperty</tt></dt>
+<dd><p>High-degree properties are properties that tend to have a large number of values
+  on any given resource. A high in-degree property is one that tends to contribute
+  lots of incoming arcs to some resources. A high-outdegree property is one that tends
+  to contribute lots of outgoing arcs. If this class is given to a property, then
+  Pubby puts all of its values onto a separate page. This reduces the size of the
+  resource's main page. Note that this feature has no effect on SPARQL endpoints that
+  don't support SPARQL 1.1.</p></dd>
 </dl>
 
 

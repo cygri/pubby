@@ -63,6 +63,22 @@ public class HypermediaResource {
 		return getPathURL("pathdata/-", property);
 	}
 	
+	public String getValuesPageURL(Property property) {
+		return getPathURL("values/", property);
+	}
+	
+	public String getInverseValuesPageURL(Property property) {
+		return getPathURL("values/-", property);
+	}
+	
+	public String getValuesDataURL(Property property) {
+		return getPathURL("values.data/", property);
+	}
+	
+	public String getInverseValuesDataURL(Property property) {
+		return getPathURL("values.data/-", property);
+	}
+	
 	private String getPathURL(String urlPrefix, Property property) {
 		if (config.getPrefixes().qnameFor(property.getURI()) == null) {
 			return null;

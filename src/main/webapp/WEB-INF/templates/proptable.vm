@@ -60,6 +60,18 @@
             <li>[$text]</li>
 #end
 #end
+#if ($property.HighDegreeArcCount > 0)
+#if ($property.HighDegreeArcCount == 1)
+#set ($text = "1 resource")
+#elseif ($property.HighDegreeArcCount > 1)
+#set ($text = "$property.HighDegreeArcCount resources")
+#end
+#if ($property.ValuesPageURL)
+            <li>[<a href="$property.ValuesPageURL">$text</a>]</li>
+#else
+            <li>[$text]</li>
+#end
+#end
           </ul>
         </td>
       </tr>

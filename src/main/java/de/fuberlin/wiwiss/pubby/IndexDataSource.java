@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -48,6 +49,16 @@ public class IndexDataSource implements DataSource {
 			resources.addAll(dataset.getIndex(config));
 		}
 		return describe(resources);
+	}
+
+	@Override
+	public Map<Property, Integer> getHighIndegreeProperties(String resourceURI) {
+		return null;
+	}
+
+	@Override
+	public Map<Property, Integer> getHighOutdegreeProperties(String resourceURI) {
+		return null;
 	}
 
 	/**

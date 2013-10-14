@@ -2,6 +2,7 @@ package de.fuberlin.wiwiss.pubby;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -21,21 +22,29 @@ public class ModelDataSource implements DataSource {
 		this.model = model;
 	}
 
+	@Override
 	public String getEndpointURL() {
 		return null;
 	}
 	
+	@Override
 	public Model getResourceDescription(String resourceURI) {
 		return model;
 	}
 	
+	@Override
+	public Map<Property, Integer> getHighIndegreeProperties(String resourceURI) {
+		return null;
+	}
+
+	@Override
+	public Map<Property, Integer> getHighOutdegreeProperties(String resourceURI) {
+		return null;
+	}
+
+	@Override
 	public Model listPropertyValues(String resourceURI, Property property,
 			boolean isInverse, boolean describeAnonymous) {
-		return model;
-	}
-	
-	public Model getAnonymousPropertyValues(String resourceURI,
-			Property property, boolean isInverse) {
 		return model;
 	}
 	

@@ -36,16 +36,11 @@ public class PageURLServlet extends BaseURLServlet {
 			HttpServletResponse response,
 			Configuration config) throws ServletException, IOException {
 
-		Model description = getResourceDescription(resources);
-
-		if (description.size() == 0) {
-			return false;
-		}
+		ResourceDescription description = getResourceDescription(controller, resources);
+		if (description == null) return false;
 		
 		Velocity.setProperty("velocimacro.context.localscope", Boolean.TRUE);
 		
-		ResourceDescription resourceDescription = new ResourceDescription(
-				controller, description, config);
 		String discoLink = "http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=" +
 				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
 		String tabulatorLink = "http://dig.csail.mit.edu/2005/ajar/ajaw/tab.html?uri=" +
@@ -56,17 +51,17 @@ public class PageURLServlet extends BaseURLServlet {
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
-		context.put("uri", resourceDescription.getURI());
+		context.put("uri", description.getURI());
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("rdf_link", controller.getDataURL());
 		context.put("disco_link", discoLink);
 		context.put("tabulator_link", tabulatorLink);
 		context.put("openlink_link", openLinkLink);
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
-		context.put("title", resourceDescription.getTitle());
-		context.put("comment", resourceDescription.getComment());
-		context.put("image", resourceDescription.getImageURL());
-		context.put("properties", resourceDescription.getProperties());
+		context.put("title", description.getTitle());
+		context.put("comment", description.getComment());
+		context.put("image", description.getImageURL());
+		context.put("properties", description.getProperties());
 		context.put("showLabels", new Boolean(config.showLabels()));
 
 		try {
@@ -82,7 +77,7 @@ public class PageURLServlet extends BaseURLServlet {
 			}
 
 			Map<String,String> nsSet = metadata.getNsPrefixMap();
-			nsSet.putAll(description.getNsPrefixMap());
+			nsSet.putAll(description.getModel().getNsPrefixMap());
 			context.put("prefixes", nsSet.entrySet());
 			context.put("blankNodesMap", new HashMap<Resource,String>());
 		}

@@ -4,7 +4,7 @@
       <tr>
         <th>
 #if ($property.isInverse() && !$property.InverseLabel)
-          <small>is</small>
+          <small>Is</small>
 #end
 #if ($property.isInverse() && $property.InverseLabel)
           <a class="uri" href="$property.URI" title="$property.URI">$property.InverseLabel</a>

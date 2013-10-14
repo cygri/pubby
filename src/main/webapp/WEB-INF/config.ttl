@@ -16,6 +16,7 @@
 @prefix sdmx: <http://purl.org/linked-data/sdmx#>.
 @prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension>.
 @prefix qb: <http://purl.org/linked-data/cube#>.
+@prefix cso:    <http://data.cso.ie/census-2011/property/> .
 
 # Server configuration section
 <> a conf:Configuration;
@@ -35,6 +36,9 @@
         conf:supportsSPARQL11 true;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://data.cso.ie/census-2011/>;
+        conf:resourceDescriptionQuery
+            "CONSTRUCT { ?__this__ ?p ?o. ?o rdfs:label ?label } WHERE { ?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__) OPTIONAL { ?o rdfs:label ?label } }",
+            "CONSTRUCT { ?s ?p ?__this__. ?s rdfs:label ?label } WHERE { ?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__) OPTIONAL { ?s rdfs:label ?label } }";
     ];
 
     conf:loadVocabularyFromURL
@@ -44,11 +48,23 @@
         <cso-dim.ttl>, <cso-dim-local.ttl>, <cso-measure.ttl>, <cso-measure-local.ttl>;
     .
 
-sdmx:refArea rdfs:label "reference area"@en.
+sdmx:refArea a conf:HighIndegreeProperty;
+    rdfs:label "reference area"@en.
+sdmx-d:refArea a conf:HighIndegreeProperty;
+    rdfs:label "reference area"@en.
 
-qb:dataSet a conf:HighIndegreeProperty.
-sd:namedGraph a conf:HighOutdegreeProperty.
-
+qb:dataSet a conf:HighIndegreeProperty;
+    owl:inverseOf [
+        rdfs:label "observation";
+        conf:pluralLabel "observations";
+    ].
+#sd:namedGraph a conf:HighOutdegreeProperty.
+sd:namedGraph conf:pluralLabel "named graphs"@en.
+skos:inScheme
+    owl:inverseOf [
+        rdfs:label "contains concept";
+        conf:pluralLabel "contains concepts";
+    ].
 rdf:type conf:weight -100.
 skos:prefLabel conf:weight -85.
 rdfs:label conf:weight -80.

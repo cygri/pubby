@@ -1,7 +1,13 @@
 #set ($has_text = false)
+<hr>
     <div id="footer">
+    <div class="container ">
 #if ($sparql_endpoint)
-      This page shows information obtained from the SPARQL endpoint at <a class="sparql-uri" href="$sparql_endpoint">$sparql_endpoint</a>.<br />
+      <p class="muted justify">This page shows information obtained from the SPARQL endpoint at </p>
+      <p class="muted justify">
+<a class="sparql-uri" href="$sparql_endpoint">$sparql_endpoint</a>
+</p>
+<p class="muted justify">
 #end
 #if ($rdf_link)
       <a href="$rdf_link?output=ttl">As Turtle</a> |
@@ -29,6 +35,12 @@
       <a href="$openlink_link">Browse in OpenLink Browser</a>
 #set ($has_text = true)
 #end
+</p>
     </div>
+    </div>
+	</div>
+    </div>
+   <script type="text/javascript" src="${server_base}static/script.js"></script>
+   <script src="${server_base}static/js/jquery.js"></script>
   </body>
 </html>

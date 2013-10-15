@@ -1,30 +1,58 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!Doctype html>
+<html lang="en">
   <head>
+   <meta charset="utf-8">
     <title>$title | $project_name</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Animesh Manglik">
 #if ($rdf_link)
     <link rel="alternate" type="application/rdf+xml" href="$rdf_link" title="RDF" />
 #end
     <link rel="stylesheet" type="text/css" href="${server_base}static/style.css" />
-    <script type="text/javascript" src="${server_base}static/script.js"></script>
-  </head>
-  <body onLoad="init();">
-    <div id="header">
-      <div>
-        <h1 id="title">$title</h1>
-#if ($project_link)
-        <div id="homelink">at <a href="$project_link">$project_name</a></div>
-#else
-        <div id="homelink">at <a href="$server_base">$project_name</a></div>
-#end
-      </div>
-#if ($uri)
-      <div class="page-resource-uri"><a href="$uri">$uri</a></div>
-#end
-#if ($rdf_link)
-      <div id="rdficon"><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="[This page as RDF]" /></a></div>
-#end
-    </div>
+    <link rel="stylesheet" type="text/css" href="${server_base}static/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="${server_base}static/css/bootstrap-responsive.css" />  
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 60px;
+      }
 
-#if ($back_uri)
-	<p><a href="$back_uri">Back to $back_label</a></p>
-#end
+      /* Custom container */
+      .container {
+        margin: 0 auto;
+        max-width: 1000px;
+      }
+      .container > hr {
+        margin: 40px 0;
+     </style>
+ 
+  </head>
+  <body>
+   <div id="wrap">
+   <div class="container">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="[This page as RDF]" /></a></li>
+          #if ($back_uri)
+		  <li><a href="$back_uri">Back to $back_label</a></li>
+		  #end
+        </ul>
+        <h3 class="muted">              
+               #if ($uri)
+			   <a href="$uri">$title</a>
+			   #else
+			   $title
+	  		   #end
+			   #if ($project_link)
+			   <small>at <a href="$project_link">$project_name</a></small>
+			   #else
+			   <small>at <a href="$server_base">$project_name</a></small>
+			   #end         
+        </h3>
+        #if ($uri)
+      <div class="page-resource-uri truncate"><a class="page-resource-uri" href="$uri">$uri</a></div>
+	  	#end
+      </div>
+      <hr>

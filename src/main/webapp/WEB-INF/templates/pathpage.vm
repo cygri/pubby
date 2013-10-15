@@ -2,7 +2,7 @@
 
 #foreach ($resource in $resources)
 #if ($resource.Label)
-    <h2>$resource.Title</h2>
+    <h2>$resource.Label</h2>
 #else
     <h2>Anonymous Resource #$velocityCount</h2>
 #end

@@ -42,7 +42,7 @@
 	#end
 	</div>
 
-	<table id="ele_$idadd" class="metadata-table" style="display: $style">
+	<table id="ele_$idadd" class="table table-striped table-bordered table-condensed truncate" style="display: $style">
 	#foreach  ($statement in $metadataPropList)
 		<tr>
 			<td valign="top" class="metadata-property">#prettyNode ($statement.getPredicate())</td>

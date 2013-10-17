@@ -58,6 +58,8 @@ dcterms:title conf:weight -79.
 skos:altLabel conf:weight -75.
 dcterms:identifier conf:weight -20.
 skos:notation conf:weight -20.
+rdfs:subPropertyOf conf:weight -15.
+rdfs:subClassOf conf:weight -15.
 void:dataDump conf:weight -10.
 void:sparqlEndpoint conf:weight -10.
 sdmx:refArea conf:weight -5.

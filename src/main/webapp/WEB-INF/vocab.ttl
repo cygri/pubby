@@ -14,7 +14,8 @@
 @prefix void:     <http://rdfs.org/ns/void#> .
 @prefix sd: <http://www.w3.org/ns/sparql-service-description#>.
 @prefix sdmx: <http://purl.org/linked-data/sdmx#>.
-@prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension>.
+@prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension#>.
+@prefix sdmx-m: <http://purl.org/linked-data/sdmx/2009/measure#>.
 @prefix qb: <http://purl.org/linked-data/cube#>.
 @prefix cso:    <http://data.cso.ie/census-2011/property/> .
 
@@ -22,6 +23,7 @@ sdmx:refArea a conf:HighIndegreeProperty;
     rdfs:label "reference area"@en.
 sdmx-d:refArea a conf:HighIndegreeProperty;
     rdfs:label "reference area"@en.
+sdmx-m:obsValue rdfs:label "observation value"@en.
 
 qb:dataSet a conf:HighIndegreeProperty;
     owl:inverseOf [

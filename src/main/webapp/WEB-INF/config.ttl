@@ -43,39 +43,9 @@
     ];
 
     conf:loadVocabularyFromURL
+        <vocab.ttl>,
         <rdf.rdf>, <rdfs.rdf>, <skos.rdf>, <qb.ttl>, <void.ttl>,
         <dcat.ttl>, <sd.ttl>, <dcterms.ttl>,
         <sdmx-d.ttl>,
         <cso-dim.ttl>, <cso-dim-local.ttl>, <cso-measure.ttl>, <cso-measure-local.ttl>;
     .
-
-sdmx:refArea a conf:HighIndegreeProperty;
-    rdfs:label "reference area"@en.
-sdmx-d:refArea a conf:HighIndegreeProperty;
-    rdfs:label "reference area"@en.
-
-qb:dataSet a conf:HighIndegreeProperty;
-    owl:inverseOf [
-        rdfs:label "observation";
-        conf:pluralLabel "observations";
-    ].
-sd:namedGraph a conf:HighOutdegreeProperty;
-    conf:pluralLabel "named graphs"@en.
-skos:inScheme
-    owl:inverseOf [
-        rdfs:label "contains concept";
-        conf:pluralLabel "contains concepts";
-    ].
-rdf:type conf:weight -100.
-skos:prefLabel conf:weight -85.
-rdfs:label conf:weight -80.
-dcterms:title conf:weight -79.
-skos:altLabel conf:weight -75.
-dcterms:identifier conf:weight -20.
-skos:notation conf:weight -20.
-void:dataDump conf:weight -10.
-void:sparqlEndpoint conf:weight -10.
-sdmx:refArea conf:weight -5.
-sdmx-d:refArea conf:weight -5.
-void:subset conf:weight 10.
-qb:dataSet conf:weight 10.

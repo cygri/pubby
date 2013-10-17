@@ -23,7 +23,6 @@
 
 <rdf:Property rdf:about="http://www.w3.org/2000/01/rdf-schema#subClassOf">
   <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
-  <rdfs:label>subClassOf</rdfs:label>
   <rdfs:comment>The subject is a subclass of a class.</rdfs:comment>
   <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
   <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
@@ -31,7 +30,6 @@
 
 <rdf:Property rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf">
   <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
-  <rdfs:label>subPropertyOf</rdfs:label>
   <rdfs:comment>The subject is a subproperty of a property.</rdfs:comment>
   <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
   <rdfs:domain rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>

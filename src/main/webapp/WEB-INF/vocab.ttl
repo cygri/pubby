@@ -1,0 +1,64 @@
+@prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+@prefix meta: <http://example.org/metadata#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix prv:      <http://purl.org/net/provenance/ns#> .
+@prefix prvTypes: <http://purl.org/net/provenance/types#> .
+@prefix void:     <http://rdfs.org/ns/void#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#>.
+@prefix sdmx: <http://purl.org/linked-data/sdmx#>.
+@prefix sdmx-d: <http://purl.org/linked-data/sdmx/2009/dimension>.
+@prefix qb: <http://purl.org/linked-data/cube#>.
+@prefix cso:    <http://data.cso.ie/census-2011/property/> .
+
+sdmx:refArea a conf:HighIndegreeProperty;
+    rdfs:label "reference area"@en.
+sdmx-d:refArea a conf:HighIndegreeProperty;
+    rdfs:label "reference area"@en.
+
+qb:dataSet a conf:HighIndegreeProperty;
+    owl:inverseOf [
+        rdfs:label "observation";
+        conf:pluralLabel "observations";
+    ].
+sd:namedGraph a conf:HighOutdegreeProperty;
+    conf:pluralLabel "named graphs"@en.
+skos:inScheme
+    owl:inverseOf [
+        rdfs:label "contains concept";
+        conf:pluralLabel "contains concepts";
+    ].
+rdfs:subClassOf
+    rdfs:label "superclass"@en;
+    conf:pluralLabel "superclasses"@en;
+    owl:inverseOf [
+        rdfs:label "subclass"@en;
+        conf:pluralLabel "subclasses"@en;
+    ].
+rdfs:subPropertyOf
+    rdfs:label "superproperty"@en;
+    conf:pluralLabel "superproperties"@en;
+    owl:inverseOf [
+        rdfs:label "subproperty"@en;
+        conf:pluralLabel "subproperties"@en;
+    ].
+rdf:type conf:weight -100.
+skos:prefLabel conf:weight -85.
+rdfs:label conf:weight -80.
+dcterms:title conf:weight -79.
+skos:altLabel conf:weight -75.
+dcterms:identifier conf:weight -20.
+skos:notation conf:weight -20.
+void:dataDump conf:weight -10.
+void:sparqlEndpoint conf:weight -10.
+sdmx:refArea conf:weight -5.
+sdmx-d:refArea conf:weight -5.
+void:subset conf:weight 10.
+qb:dataSet conf:weight 10.

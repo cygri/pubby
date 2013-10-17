@@ -22,19 +22,18 @@
 # Server configuration section
 <> a conf:Configuration;
     # Project name for display in page titles
-    conf:projectName "data.cso.ie";
+    conf:projectName "data.cso.local";
     # Homepage with description of the project for the link in the page header
-    conf:projectHomepage <http://data.cso.ie/>;
+    conf:projectHomepage <http://data.cso.local/>;
     # The Pubby root, where the webapp is running inside the servlet container.
-    conf:webBase <http://data.cso.ie/census-2011/>;
+    conf:webBase <http://data.cso.local/census-2011/>;
     # When the homepage of the server is accessed, this resource will
     # be shown.
-    conf:indexResource <http://data.cso.ie/census-2011/>;
+    conf:indexResource <http://data.cso.local/census-2011/>;
 
     conf:dataset [
         # SPARQL endpoint URL of the dataset
-#        conf:sparqlEndpoint <http://localhost:8890/sparql>;
-        conf:sparqlEndpoint <http://172.30.96.119:8890/sparql>;
+        conf:sparqlEndpoint <http://data.cso.ie/sparql>;
         conf:supportsSPARQL11 true;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://data.cso.ie/census-2011/>;

@@ -1,5 +1,5 @@
 @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
-@prefix cso:	<http://data.cso.ie/census-2011/property/> .
+@prefix cso:	<http://data.cso.local/census-2011/property/> .
 cso:population	rdfs:label	"population"@en .
 cso:irish-speakers-aged-3-or-over	rdfs:label	"Irish speakers aged 3 or over"@en .
 cso:population-aged-3-or-over	rdfs:label	"population aged 3 or over"@en .

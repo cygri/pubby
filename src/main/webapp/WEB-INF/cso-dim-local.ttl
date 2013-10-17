@@ -1,53 +1,104 @@
 @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
-@prefix cso:	<http://data.cso.ie/census-2011/property/> .
+@prefix cso:	<http://data.cso.local/census-2011/property/> .
+@prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+cso:age-group	a conf:HighIndegreeProperty .
 cso:age-group	rdfs:label	"age group"@en .
+cso:gender	a conf:HighIndegreeProperty .
 cso:gender	rdfs:label	"gender"@en .
+cso:occupancy-status-on-census-night	a conf:HighIndegreeProperty .
 cso:occupancy-status-on-census-night	rdfs:label	"occupancy status on census night"@en .
+cso:household-year-built	a conf:HighIndegreeProperty .
 cso:household-year-built	rdfs:label	"household year built"@en .
+cso:frequency-of-speaking-irish	a conf:HighIndegreeProperty .
 cso:frequency-of-speaking-irish	rdfs:label	"frequency of speaking Irish"@en .
+cso:ability-to-speak-irish	a conf:HighIndegreeProperty .
 cso:ability-to-speak-irish	rdfs:label	"ability to speak Irish"@en .
+cso:frequency-of-speaking-irish-outside-education	a conf:HighIndegreeProperty .
 cso:frequency-of-speaking-irish-outside-education	rdfs:label	"frequency of speaking Irish outside education"@en .
+cso:industry	a conf:HighIndegreeProperty .
 cso:industry	rdfs:label	"industry"@en .
+cso:residence-1-year-b4-census	a conf:HighIndegreeProperty .
 cso:residence-1-year-b4-census	rdfs:label	"usual residence 1 year before Census Day"@en .
+cso:means-of-travel-to-work-school-college	a conf:HighIndegreeProperty .
 cso:means-of-travel-to-work-school-college	rdfs:label	"means of travel to work, school or college"@en .
+cso:highest-level-of-education-completed	a conf:HighIndegreeProperty .
 cso:highest-level-of-education-completed	rdfs:label	"highest level of education completed"@en .
+cso:children	a conf:HighIndegreeProperty .
 cso:children	rdfs:label	"children"@en ,
 		"children under and over 15 in family"@en .
+cso:children-age	a conf:HighIndegreeProperty .
 cso:children-age	rdfs:label	"age of children"@en .
+cso:type-of-family	a conf:HighIndegreeProperty .
 cso:type-of-family	rdfs:label	"type of family"@en .
+cso:marital-status	a conf:HighIndegreeProperty .
 cso:marital-status	rdfs:label	"marital status"@en .
+cso:place-of-birth	a conf:HighIndegreeProperty .
 cso:place-of-birth	rdfs:label	"place of birth"@en .
+cso:principal-economic-status	a conf:HighIndegreeProperty .
 cso:principal-economic-status	rdfs:label	"principal economic status"@en .
+cso:social-class	a conf:HighIndegreeProperty .
 cso:social-class	rdfs:label	"social class"@en .
+cso:time-leaving-to-work-school-college	a conf:HighIndegreeProperty .
 cso:time-leaving-to-work-school-college	rdfs:label	"time leaving home to travel to work, school or college"@en .
+cso:number-of-unpaid-hours-per-week	a conf:HighIndegreeProperty .
 cso:number-of-unpaid-hours-per-week	rdfs:label	"number of unpaid hours per week"@en .
+cso:size-of-family	a conf:HighIndegreeProperty .
 cso:size-of-family	rdfs:label	"size of family"@en .
+cso:youngest-child-age-group	a conf:HighIndegreeProperty .
 cso:youngest-child-age-group	rdfs:label	"youngest child age group"@en .
+cso:children-over-15	a conf:HighIndegreeProperty .
 cso:children-over-15	rdfs:label	"children over 15 in family"@en .
+cso:children-under-15	a conf:HighIndegreeProperty .
 cso:children-under-15	rdfs:label	"children under 15 in family"@en .
+cso:family-cycle	a conf:HighIndegreeProperty .
 cso:family-cycle	rdfs:label	"family cycle"@en .
+cso:sewerage-facility	a conf:HighIndegreeProperty .
 cso:sewerage-facility	rdfs:label	"sewerage facility"@en .
+cso:household-size	a conf:HighIndegreeProperty .
 cso:household-size	rdfs:label	"household size"@en .
+cso:type-of-accommodation	a conf:HighIndegreeProperty .
 cso:type-of-accommodation	rdfs:label	"type of accommodation"@en .
+cso:type-of-occupancy	a conf:HighIndegreeProperty .
 cso:type-of-occupancy	rdfs:label	"type of occupancy"@en .
+cso:socio-economic-group-of-reference-person	a conf:HighIndegreeProperty .
 cso:socio-economic-group-of-reference-person	rdfs:label	"socio-economic group of reference person"@en .
+cso:age-education-ceased	a conf:HighIndegreeProperty .
 cso:age-education-ceased	rdfs:label	"age education ceased"@en .
+cso:total-children-in-family	a conf:HighIndegreeProperty .
 cso:total-children-in-family	rdfs:label	"total children in family"@en .
+cso:children-born-alive	a conf:HighIndegreeProperty .
 cso:children-born-alive	rdfs:label	"children born alive"@en .
+cso:language-spoken	a conf:HighIndegreeProperty .
 cso:language-spoken	rdfs:label	"language spoken"@en .
+cso:occupation	a conf:HighIndegreeProperty .
 cso:occupation	rdfs:label	"occupation"@en .
+cso:central-heating	a conf:HighIndegreeProperty .
 cso:central-heating	rdfs:label	"central heating"@en .
+cso:internet	a conf:HighIndegreeProperty .
 cso:internet	rdfs:label	"internet"@en .
+cso:have-a-personal-computer	a conf:HighIndegreeProperty .
 cso:have-a-personal-computer	rdfs:label	"have a personal computer"@en .
+cso:number-of-rooms	a conf:HighIndegreeProperty .
 cso:number-of-rooms	rdfs:label	"number of rooms"@en .
+cso:journey-time-to-work-school-college	a conf:HighIndegreeProperty .
 cso:journey-time-to-work-school-college	rdfs:label	"journey time to work, school or college"@en .
+cso:education-status	a conf:HighIndegreeProperty .
 cso:education-status	rdfs:label	"education status"@en .
+cso:ethnic-group	a conf:HighIndegreeProperty .
 cso:ethnic-group	rdfs:label	"ethnic group"@en .
+cso:field-of-study	a conf:HighIndegreeProperty .
 cso:field-of-study	rdfs:label	"field of study"@en .
+cso:general-health-status	a conf:HighIndegreeProperty .
 cso:general-health-status	rdfs:label	"general health status"@en .
+cso:number-of-motor-cars	a conf:HighIndegreeProperty .
 cso:number-of-motor-cars	rdfs:label	"number of motor cars"@en .
+cso:ability-to-speak-english	a conf:HighIndegreeProperty .
 cso:ability-to-speak-english	rdfs:label	"ability to speak English"@en .
+cso:water-supply	a conf:HighIndegreeProperty .
 cso:water-supply	rdfs:label	"water supply"@en .
+cso:household-type	a conf:HighIndegreeProperty .
 cso:household-type	rdfs:label	"household type"@en .
+cso:nationality	a conf:HighIndegreeProperty .
 cso:nationality	rdfs:label	"nationality"@en .
+cso:religion	a conf:HighIndegreeProperty .
 cso:religion	rdfs:label	"religion"@en .

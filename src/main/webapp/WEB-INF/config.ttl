@@ -47,6 +47,6 @@
         <vocab.ttl>,
         <rdf.rdf>, <rdfs.rdf>, <skos.rdf>, <qb.ttl>, <void.ttl>,
         <dcat.ttl>, <sd.ttl>, <dcterms.ttl>,
-        <sdmx-d.ttl>,
+        <sdmx-d.ttl>, <sdmx-m.ttl>,
         <cso-dim.ttl>, <cso-dim-local.ttl>, <cso-measure.ttl>, <cso-measure-local.ttl>;
     .

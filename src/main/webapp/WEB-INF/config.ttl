@@ -32,7 +32,8 @@
 
     conf:dataset [
         # SPARQL endpoint URL of the dataset
-        conf:sparqlEndpoint <http://localhost:8890/sparql>;
+#        conf:sparqlEndpoint <http://localhost:8890/sparql>;
+        conf:sparqlEndpoint <http://172.30.96.119:8890/sparql>;
         conf:supportsSPARQL11 true;
         # Common URI prefix of all resource URIs in the SPARQL dataset
         conf:datasetBase <http://data.cso.ie/census-2011/>;
@@ -58,8 +59,8 @@ qb:dataSet a conf:HighIndegreeProperty;
         rdfs:label "observation";
         conf:pluralLabel "observations";
     ].
-#sd:namedGraph a conf:HighOutdegreeProperty.
-sd:namedGraph conf:pluralLabel "named graphs"@en.
+sd:namedGraph a conf:HighOutdegreeProperty;
+    conf:pluralLabel "named graphs"@en.
 skos:inScheme
     owl:inverseOf [
         rdfs:label "contains concept";

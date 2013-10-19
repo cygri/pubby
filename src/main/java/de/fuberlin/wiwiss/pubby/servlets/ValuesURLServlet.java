@@ -18,62 +18,44 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 
 /**
  * A servlet for rendering an HTML page listing resources
- * related to a given resource via a given property.
+ * related to a given resource via a given property. URIs and
+ * literals are displayed as simple values. Blank nodes are
+ * displayed as complete resource descriptions.
  * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class ValuesURLServlet extends BasePathServlet {
+public class ValuesURLServlet extends ValuesBaseServlet {
 
 	public boolean doGet(HypermediaResource controller,
 			Collection<MappedResource> resources, 
-			Property property, boolean isInverse, 
+			Property predicate, boolean isInverse, 
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException {		
-		Model descriptions = listPropertyValues(resources, property, isInverse, false);
+		ResourceDescription resource = getResourceDescription(controller, resources);
+		if (resource == null) return false;
+
+		Model descriptions = listPropertyValues(resources, predicate, isInverse);
 		if (descriptions.isEmpty()) return false;
-
-		ResourceProperty prop = new ResourceDescription(
-				controller, descriptions, config).getProperty(property, isInverse);
-
-		// Description of the main resource, for title etc.
-		ResourceDescription description = getResourceDescription(controller, resources);
-
-		String propertyTitle = null;
-		boolean showAsInverse = isInverse;
-		if (config.showLabels()) {
-			if (showAsInverse) {
-				propertyTitle = description.toTitleCase(
-						config.getVocabularyStore().getInverseLabel(property.getURI(), true), null);
-				if (propertyTitle != null) {
-					showAsInverse = false;
-				}
-			}
-			if (propertyTitle == null) {
-				propertyTitle = description.toTitleCase(
-						config.getVocabularyStore().getLabel(property.getURI(), true), null);
-			}
-		}
-		if (propertyTitle == null) {
-			propertyTitle = config.getPrefixes().getNsURIPrefix(property.getNameSpace()) + 
-					":" + property.getLocalName();
-		}
-		String title = description.getTitle() + 
-				(showAsInverse ? " \u00AB " : " \u00BB ") +
-				propertyTitle;
+		ResourceProperty property = new ResourceDescription(
+				controller, descriptions, config).getProperty(predicate, isInverse);
+		if (property == null) return false;	// Can happen if prefix is declared in URI space of a data source rather than in web space
+		
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
 		context.put("project_link", config.getProjectLink());
-		context.put("title", title);
+		context.put("uri", resource.getURI());
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
+		context.put("title", resource.getTitle());
+		context.put("head_title", resource.getTitle() + " \u00BB " + property.getCompleteLabel());
+		context.put("property", property);
 		context.put("back_uri", controller.getAbsoluteIRI());
-		context.put("back_label", description.getTitle());
-		context.put("rdf_link", isInverse ? controller.getInverseValuesDataURL(property) : controller.getValuesDataURL(property));
-		context.put("property", prop);
-		context.put("showLabels", new Boolean(config.showLabels()));
+		context.put("back_label", resource.getTitle());
+		context.put("rdf_link", isInverse ? controller.getInverseValuesDataURL(predicate) : controller.getValuesDataURL(predicate));
+		context.put("showLabels", config.showLabels());
 		template.renderXHTML("valuespage.vm");
 		return true;
 	}

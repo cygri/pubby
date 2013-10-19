@@ -16,7 +16,14 @@ import de.fuberlin.wiwiss.pubby.HypermediaResource;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
 import de.fuberlin.wiwiss.pubby.MappedResource;
 
-public abstract class BasePathServlet extends BaseServlet {
+/**
+ * Abstract base servlet for servlets that handle a property of a given
+ * resource. The base servlet takes care of extracting the resource's URI
+ * and the property's URI from the requested URL, and mapping everything to
+ * the data sources. Concrete subclasses then take care of generating the
+ * response.
+ */
+public abstract class ValuesBaseServlet extends BaseServlet {
 	private static Pattern pattern = Pattern.compile("(-?)([^:/]*):([^:/]*)/(.*)");
 
 	public abstract boolean doGet(HypermediaResource controller,
@@ -36,15 +43,19 @@ public abstract class BasePathServlet extends BaseServlet {
 		}
 		boolean isInverse = "-".equals(matcher.group(1));
 		String prefix = matcher.group(2);
-		String localName = matcher.group(3);
 		if (config.getPrefixes().getNsPrefixURI(prefix) == null) {
 			return false;
 		}
+		String localName = matcher.group(3);
+		relativeURI = matcher.group(4);	// Keep just last part
 		Property property = ResourceFactory.createProperty(
 				config.getPrefixes().getNsPrefixURI(prefix), localName);
+
 		Collection<MappedResource> resources = config.getMappedResourcesFromRelativeWebURI(
-				matcher.group(4), false);
-		HypermediaResource controller = config.getController(IRIEncoder.toIRI(matcher.group(4)), false);
+				relativeURI, false);
+		if (resources.isEmpty()) return false;
+		HypermediaResource controller = config.getController(IRIEncoder.toIRI(relativeURI), false);
+
 		return doGet(controller, resources, property, isInverse, request, response, config);
 	}
 

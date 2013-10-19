@@ -1,6 +1,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <title>$title | $project_name</title>
+    <title>
+#if ($head_title)
+      $head_title
+#else
+      $title
+#end
+      | $project_name</title>
 #if ($rdf_link)
     <link rel="alternate" type="application/rdf+xml" href="$rdf_link" title="RDF" />
 #end
@@ -24,7 +30,3 @@
       <div id="rdficon"><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="[This page as RDF]" /></a></div>
 #end
     </div>
-
-#if ($back_uri)
-	<p><a href="$back_uri">Back to $back_label</a></p>
-#end

@@ -327,14 +327,15 @@ conf:datasetURIPattern "(users|documents)/.*";</pre>
   See <tt>conf:HighOutdegreeProperty</tt> and <tt>conf:HighIndegreeProperty</tt>
   below for more information on these concepts. The resource to be described
   is given in the placeholder variable <tt>?__this__</tt>. The property whose
-  values are to be retrieved is given in <tt>?__property__</tt>.
+  values are to be retrieved is given in <tt>?__property__</tt>. Blank node
+  values must be excluded.
   If unspecified, the following <tt>CONSTRUCT</tt>
   queries are used for forward and backward properties, respectively:</p>
   <pre>conf:propertyListQuery
-    "CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x}";
+    "CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x. FILTER (!isBlank(?x))}";
 
 conf:inversePropertyListQuery
-    "CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__}";</pre></dd>
+    "CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__. FILTER (!isBlank(?x))}";</pre></dd>
 
 <dt><tt>conf:anonymousPropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
 <dt><tt>conf:anonymousInversePropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>

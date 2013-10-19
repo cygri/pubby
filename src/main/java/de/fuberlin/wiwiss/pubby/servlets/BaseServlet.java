@@ -125,14 +125,13 @@ public abstract class BaseServlet extends HttpServlet {
 	}
 	
 	protected Model listPropertyValues(Collection<MappedResource> resources, 
-			Property property, boolean isInverse, boolean describeAnonymous) {
+			Property property, boolean isInverse) {
 		Model result = ModelFactory.createDefaultModel();
 		for (MappedResource resource: resources) {
 			ModelUtil.mergeModels(result, 
 					new IRITranslator(resource.getDataset(), config).getTranslated(
 							resource.getDataset().getDataSource().listPropertyValues(
-									resource.getDatasetURI(), property, isInverse, 
-									describeAnonymous)));
+									resource.getDatasetURI(), property, isInverse)));
 		}
 		return result;
 	}

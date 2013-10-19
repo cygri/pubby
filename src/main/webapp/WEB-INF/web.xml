@@ -29,17 +29,6 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PathPageURLServlet</servlet-name>
-    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathPageURLServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>PathPageURLServlet</servlet-name>
-    <url-pattern>/pathpage/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>ValuesURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -61,17 +50,6 @@
     <url-pattern>/data/*</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-    <servlet-name>PathDataURLServlet</servlet-name>
-    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathDataURLServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>PathDataURLServlet</servlet-name>
-    <url-pattern>/pathdata/*</url-pattern>
-  </servlet-mapping>
-
   <servlet>
     <servlet-name>ValuesDataURLServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesDataURLServlet</servlet-class>

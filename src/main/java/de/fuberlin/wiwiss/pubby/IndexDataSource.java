@@ -67,8 +67,7 @@ public class IndexDataSource implements DataSource {
 	 */
 	@Override
 	public Model listPropertyValues(String resourceURI,
-			Property property, boolean isInverse, boolean describeAnonymous) {
-		if (describeAnonymous) return EMPTY_MODEL;
+			Property property, boolean isInverse) {
 		Model all = getResourceDescription(resourceURI);
 		Resource r = all.getResource(resourceURI);
 		StmtIterator it = isInverse

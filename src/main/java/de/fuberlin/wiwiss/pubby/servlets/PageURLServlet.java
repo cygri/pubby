@@ -1,6 +1,5 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -39,14 +37,6 @@ public class PageURLServlet extends BaseURLServlet {
 		ResourceDescription description = getResourceDescription(controller, resources);
 		if (description == null) return false;
 		
-		Velocity.setProperty("velocimacro.context.localscope", Boolean.TRUE);
-		
-		String discoLink = "http://www4.wiwiss.fu-berlin.de/rdf_browser/?browse_uri=" +
-				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
-		String tabulatorLink = "http://dig.csail.mit.edu/2005/ajar/ajaw/tab.html?uri=" +
-				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
-		String openLinkLink = "http://linkeddata.uriburner.com/ode/?uri=" +
-				URLEncoder.encode(controller.getAbsoluteIRI(), "utf-8");
 		VelocityHelper template = new VelocityHelper(getServletContext(), response);
 		Context context = template.getVelocityContext();
 		context.put("project_name", config.getProjectName());
@@ -54,15 +44,12 @@ public class PageURLServlet extends BaseURLServlet {
 		context.put("uri", description.getURI());
 		context.put("server_base", config.getWebApplicationBaseURI());
 		context.put("rdf_link", controller.getDataURL());
-		context.put("disco_link", discoLink);
-		context.put("tabulator_link", tabulatorLink);
-		context.put("openlink_link", openLinkLink);
 		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
 		context.put("title", description.getTitle());
 		context.put("comment", description.getComment());
 		context.put("image", description.getImageURL());
 		context.put("properties", description.getProperties());
-		context.put("showLabels", new Boolean(config.showLabels()));
+		context.put("showLabels", config.showLabels());
 
 		try {
 			Model metadata = ModelFactory.createDefaultModel();

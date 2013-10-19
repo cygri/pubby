@@ -76,11 +76,11 @@ public class RemoteSPARQLDataSource implements DataSource {
 		}
 		if (propertyQueries == null || propertyQueries.isEmpty()) {
 			propertyQueries = Collections.singletonList(
-					"CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x}");
+					"CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x. FILTER (!isBlank(?x))}");
 		}
 		if (inversePropertyQueries == null || inversePropertyQueries.isEmpty()) {
 			inversePropertyQueries = Collections.singletonList(
-					"CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__}");
+					"CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__. FILTER (!isBlank(?x))}");
 		}
 		if (anonPropertyQueries == null || anonPropertyQueries.isEmpty()) {
 			anonPropertyQueries = Collections.singletonList(
@@ -188,12 +188,12 @@ public class RemoteSPARQLDataSource implements DataSource {
 
 	@Override
 	public Model listPropertyValues(String resourceURI, Property property, 
-			boolean isInverse, boolean describeAnonymous) {
+			boolean isInverse) {
 		// Loop over the queries, join results in a single model.
 		// Process each query to replace place-holders of the given resource and property.
-		List<String> queries = describeAnonymous
-				? (isInverse ? anonInversePropertyQueries : anonPropertyQueries)
-				: (isInverse ? inversePropertyQueries : propertyQueries);
+		List<String> queries = new ArrayList<String>();
+		queries.addAll(isInverse ? inversePropertyQueries : propertyQueries);
+		queries.addAll(isInverse ? anonInversePropertyQueries : anonPropertyQueries);
 		Model model = ModelFactory.createDefaultModel();
 		for (String query: queries) {
 			String preprocessed = preProcessQuery(query, resourceURI, property);

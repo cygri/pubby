@@ -1,0 +1,18 @@
+## Renders the name of a ResourceProperty, given in $property
+<span class="property-name">
+#if ($property.isInverse() && !$property.InverseLabel)
+  <small>Is</small>
+#end
+#if ($showLabels && $property.isInverse() && $property.InverseLabel)
+  <a class="uri" href="$property.URI" title="$property.URI">$property.InverseLabel</a>
+#elseif ($showLabels && $property.label)
+  <a class="uri" href="$property.URI" title="$property.URI">$property.label</a>
+#elseif ($property.hasPrefix())
+  <a class="uri" href="$property.URI" title="$property.URI"><small>$property.Prefix:</small>$property.LocalName</a>
+#else
+  <a class="uri" href="$property.URI" title="$property.URI"><small>?:</small>$property.LocalName</a>
+#end
+#if ($property.isInverse() && !$property.InverseLabel)
+  <small>of</small>
+#end
+</span>

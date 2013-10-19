@@ -73,6 +73,7 @@ public class VelocityHelper {
 			result.setProperty("output.encoding", "utf-8");
 			result.setProperty("file.resource.loader.path", 
 					servletContext.getRealPath("/") + "/WEB-INF/templates/");
+			result.setProperty("velocimacro.context.localscope", true);
 			
 			// Turn off Velocity logging
 			result.setProperty("runtime.log.logsystem.class", 

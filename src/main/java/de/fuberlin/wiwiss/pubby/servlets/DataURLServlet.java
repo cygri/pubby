@@ -51,7 +51,7 @@ public class DataURLServlet extends BaseURLServlet {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getObject().isAnon()) continue;
-			String pathDataURL = controller.getPathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getValuesDataURL(stmt.getPredicate());
 			if (pathDataURL == null) continue;
 			((Resource) stmt.getResource()).addProperty(RDFS.seeAlso, 
 					model.createResource(pathDataURL));
@@ -60,7 +60,7 @@ public class DataURLServlet extends BaseURLServlet {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getSubject().isAnon()) continue;
-			String pathDataURL = controller.getInversePathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getInverseValuesDataURL(stmt.getPredicate());
 			if (pathDataURL == null) continue;
 			((Resource) stmt.getSubject().as(Resource.class)).addProperty(RDFS.seeAlso, 
 					model.createResource(pathDataURL));

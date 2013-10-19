@@ -47,22 +47,6 @@ public class HypermediaResource {
 		return config.getWebApplicationBaseURI() + "data/" + relativeIRI;
 	}
 		
-	public String getPathPageURL(Property property) {
-		return getPathURL("pathpage/", property);
-	}
-	
-	public String getPathDataURL(Property property) {
-		return getPathURL("pathdata/", property);
-	}
-	
-	public String getInversePathPageURL(Property property) {
-		return getPathURL("pathpage/-", property);
-	}
-	
-	public String getInversePathDataURL(Property property) {
-		return getPathURL("pathdata/-", property);
-	}
-	
 	public String getValuesPageURL(Property property) {
 		return getPathURL("values/", property);
 	}

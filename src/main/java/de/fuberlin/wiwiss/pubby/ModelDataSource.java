@@ -44,7 +44,7 @@ public class ModelDataSource implements DataSource {
 
 	@Override
 	public Model listPropertyValues(String resourceURI, Property property,
-			boolean isInverse, boolean describeAnonymous) {
+			boolean isInverse) {
 		return model;
 	}
 	

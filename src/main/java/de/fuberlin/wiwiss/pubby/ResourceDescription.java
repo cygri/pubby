@@ -140,8 +140,14 @@ public class ResourceDescription {
 			Property predicate = stmt.getPredicate();
 			String key = "=>" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(predicate, false, config.getVocabularyStore()));
+				propertyBuilders.put(key, new PropertyBuilder(
+						predicate, false, config.getVocabularyStore()));
 			}
+			// TODO: Should distinguish clearly here between adding a
+			//       simple value, adding a complex (inlined) value, and
+			//       omitting a value. But how to decide whether blank nodes
+			//       are omitted or included as complex value? The decision has
+			//       already been made earlier when the model was built.
 			propertyBuilders.get(key).addValue(stmt.getObject());
 		}
 		it = model.listStatements(null, null, resource);
@@ -150,21 +156,25 @@ public class ResourceDescription {
 			Property predicate = stmt.getPredicate();
 			String key = "<=" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(predicate, true, config.getVocabularyStore()));
+				propertyBuilders.put(key, new PropertyBuilder(
+						predicate, true, config.getVocabularyStore()));
 			}
+			// TODO: See TODO above
 			propertyBuilders.get(key).addValue(stmt.getSubject());
 		}
 		for (Property p: highIndegreeProperties.keySet()) {
 			String key = "<=" + p;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(p, true, config.getVocabularyStore()));
+				propertyBuilders.put(key, new PropertyBuilder(
+						p, true, config.getVocabularyStore()));
 			}
 			propertyBuilders.get(key).addHighDegreeArcs(highIndegreeProperties.get(p));
 		}
 		for (Property p: highOutdegreeProperties.keySet()) {
 			String key = "=>" + p;
 			if (!propertyBuilders.containsKey(key)) {
-				propertyBuilders.put(key, new PropertyBuilder(p, false, config.getVocabularyStore()));
+				propertyBuilders.put(key, new PropertyBuilder(
+						p, false, config.getVocabularyStore()));
 			}
 			propertyBuilders.get(key).addHighDegreeArcs(highOutdegreeProperties.get(p));
 		}
@@ -228,19 +238,19 @@ public class ResourceDescription {
 		private final Property predicate;
 		private final URIPrefixer predicatePrefixer;
 		private final boolean isInverse;
-		private final List<Value> values;
-		private final int blankNodeCount;
-		private final int highDegreeArcCount;
+		private final List<Value> simpleValues;
+		private final List<ResourceDescription> complexValues;
+		private final int omittedValues;
 		private final VocabularyStore vocabularyStore;
-		public ResourceProperty(Property predicate, boolean isInverse, List<Value> values,
-				int blankNodeCount, int highDegreeArcCount,
+		public ResourceProperty(Property predicate, boolean isInverse, List<Value> simpleValues,
+				List<ResourceDescription> complexVaues, int omittedValues,
 				VocabularyStore vocabularyStore) {
 			this.predicate = predicate;
 			this.predicatePrefixer = new URIPrefixer(predicate, getPrefixes());
 			this.isInverse = isInverse;
-			this.values = values;
-			this.blankNodeCount = blankNodeCount;
-			this.highDegreeArcCount = highDegreeArcCount;
+			this.simpleValues = simpleValues;
+			this.complexValues = complexVaues;
+			this.omittedValues = omittedValues;
 			this.vocabularyStore = vocabularyStore;
 		}
 		public boolean isInverse() {
@@ -270,31 +280,41 @@ public class ResourceDescription {
 		public String getInverseLabel(boolean preferPlural) {
 			return toTitleCase(vocabularyStore.getInverseLabel(predicate.getURI(), preferPlural), null);
 		}
+		/**
+		 * Note: This bypasses conf:showLabels, always assuming <code>true</code>
+		 * @return "Is Widget Of", "Widgets", "ex:widget", whatever is most appropriate
+		 */
+		public String getCompleteLabel() {
+			if (isInverse && getInverseLabel() != null) {
+				return getInverseLabel();
+			}
+			String result;
+			if (getLabel() != null) {
+				result = getLabel();
+			} else if (hasPrefix()) {
+				result = getPrefix() + ":" + getLocalName();
+			} else {
+				result = "?:" + getLocalName();
+			}
+			return isInverse ? "Is " + result + " of" : result;
+		}
 		public String getDescription() {
 			return vocabularyStore.getDescription(predicate.getURI());
 		}
-		public List<Value> getValues() {
-			if (highDegreeArcCount > 0) return Collections.emptyList();
-			return values;
+		public List<Value> getSimpleValues() {
+			return simpleValues;
 		}
-		public int getBlankNodeCount() {
-			if (highDegreeArcCount > 0) return 0;
-			return blankNodeCount;
+		public List<ResourceDescription> getComplexValues() {
+			return complexValues;
 		}
-		public int getHighDegreeArcCount() {
-			if (highDegreeArcCount == 0) return 0;
-			return highDegreeArcCount + blankNodeCount + values.size();
+		public boolean hasOnlySimpleValues() {
+			return omittedValues == 0 && complexValues.isEmpty();
+		}
+		public int getValueCount() {
+			return omittedValues + complexValues.size() + simpleValues.size();
 		}
 		public boolean isMultiValued() {
-			return values.size() + highDegreeArcCount + blankNodeCount > 1;
-		}
-		public String getPathPageURL() {
-			if (hypermediaResource == null) {
-				return null;
-			}
-			return isInverse 
-					? hypermediaResource.getInversePathPageURL(predicate) 
-					: hypermediaResource.getPathPageURL(predicate);
+			return simpleValues.size() + omittedValues + complexValues.size() > 1;
 		}
 		public String getValuesPageURL() {
 			if (hypermediaResource == null) {
@@ -329,7 +349,8 @@ public class ResourceDescription {
 		private final Property predicate;
 		private final boolean isInverse;
 		private final List<Value> values = new ArrayList<Value>();
-		private int blankNodeCount = 0;
+		private final List<ResourceDescription> blankNodeDescriptions = 
+				new ArrayList<ResourceDescription>();
 		private int highDegreeArcCount = 0;
 		private VocabularyStore vocabularyStore;
 		PropertyBuilder(Property predicate, boolean isInverse, VocabularyStore vocabularyStore) {
@@ -339,7 +360,8 @@ public class ResourceDescription {
 		}
 		void addValue(RDFNode valueNode) {
 			if (valueNode.isAnon()) {
-				blankNodeCount++;
+				blankNodeDescriptions.add(new ResourceDescription(
+						valueNode.asResource(), getModel(), config));
 				return;
 			}
 			values.add(new Value(valueNode, predicate, vocabularyStore));
@@ -350,7 +372,7 @@ public class ResourceDescription {
 		ResourceProperty toProperty() {
 			Collections.sort(values);
 			return new ResourceProperty(predicate, isInverse, values, 
-					blankNodeCount, highDegreeArcCount, vocabularyStore);
+					blankNodeDescriptions, highDegreeArcCount, vocabularyStore);
 		}
 	}
 	

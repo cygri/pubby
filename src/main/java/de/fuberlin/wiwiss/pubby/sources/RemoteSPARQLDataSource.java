@@ -1,15 +1,15 @@
-package de.fuberlin.wiwiss.pubby;
+package de.fuberlin.wiwiss.pubby.sources;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -41,11 +41,11 @@ public class RemoteSPARQLDataSource implements DataSource {
 	private final String defaultGraphURI;
 	private final boolean supportsSPARQL11;
 
-	private final List<String> resourceQueries;
-	private final List<String> propertyQueries;
-	private final List<String> inversePropertyQueries;
-	private final List<String> anonPropertyQueries;
-	private final List<String> anonInversePropertyQueries;
+	private final Set<String> resourceQueries;
+	private final Set<String> propertyQueries;
+	private final Set<String> inversePropertyQueries;
+	private final Set<String> anonPropertyQueries;
+	private final Set<String> anonInversePropertyQueries;
 	
 	private final Collection<Property> highIndegreeProperties;
 	private final Collection<Property> highOutdegreeProperties;
@@ -59,35 +59,35 @@ public class RemoteSPARQLDataSource implements DataSource {
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI,
 			boolean supportsSPARQL11,
-			List<String> resourceQueries, 
-			List<String> propertyQueries, List<String> inversePropertyQueries,
-			List<String> anonPropertyQueries, List<String> anonInversePropertyQueries,
+			Set<String> resourceQueries, 
+			Set<String> propertyQueries, Set<String> inversePropertyQueries,
+			Set<String> anonPropertyQueries, Set<String> anonInversePropertyQueries,
 			Collection<Property> highIndegreeProperties, Collection<Property> highOutdegreeProperties) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
 		this.supportsSPARQL11 = supportsSPARQL11;
 		if (resourceQueries == null || resourceQueries.isEmpty()) {
 			resourceQueries = supportsSPARQL11 ?
-				Arrays.asList(new String[]{
+				new HashSet<String>(Arrays.asList(new String[]{
 					"CONSTRUCT {?__this__ ?p ?o} WHERE {?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__)}",
 					"CONSTRUCT {?s ?p ?__this__} WHERE {?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__)}"
-				}) :
-				Collections.singletonList("DESCRIBE ?__this__");
+				})) :
+				Collections.singleton("DESCRIBE ?__this__");
 		}
 		if (propertyQueries == null || propertyQueries.isEmpty()) {
-			propertyQueries = Collections.singletonList(
+			propertyQueries = Collections.singleton(
 					"CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x. FILTER (!isBlank(?x))}");
 		}
 		if (inversePropertyQueries == null || inversePropertyQueries.isEmpty()) {
-			inversePropertyQueries = Collections.singletonList(
+			inversePropertyQueries = Collections.singleton(
 					"CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__. FILTER (!isBlank(?x))}");
 		}
 		if (anonPropertyQueries == null || anonPropertyQueries.isEmpty()) {
-			anonPropertyQueries = Collections.singletonList(
+			anonPropertyQueries = Collections.singleton(
 					"DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}");
 		}
 		if (anonInversePropertyQueries == null || anonInversePropertyQueries.isEmpty()) {
-			anonInversePropertyQueries = Collections.singletonList(
+			anonInversePropertyQueries = Collections.singleton(
 					"DESCRIBE ?x WHERE {?x ?__property__ ?__this__. FILTER (isBlank(?x))}");
 		}
 		this.resourceQueries = resourceQueries;
@@ -111,31 +111,12 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 
 	@Override
-	public String getEndpointURL() {
-		return endpointURL;
-	}
-
-	public String getResourceDescriptionURL(String resourceURI) {
-		try {
-			StringBuffer result = new StringBuffer();
-			result.append(endpointURL);
-			result.append("?");
-			if (defaultGraphURI != null) {
-				result.append("default-graph-uri=");
-				result.append(URLEncoder.encode(defaultGraphURI, "utf-8"));
-				result.append("&");
-			}
-			result.append("query=");
-			result.append(URLEncoder.encode(preProcessQuery(resourceQueries.get(0), resourceURI), "utf-8"));
-			return result.toString();
-		} catch (UnsupportedEncodingException ex) {
-			// can't happen, utf-8 is always supported
-			throw new RuntimeException(ex);
-		}
+	public boolean canDescribe(String absoluteIRI) {
+		return true;
 	}
 
 	@Override
-	public Model getResourceDescription(String resourceURI) {
+	public Model describeResource(String resourceURI) {
 		// Loop over resource description queries, join results in a single model.
 		// Process each query to replace place-holders of the given resource.
 		Model model = ModelFactory.createDefaultModel();
@@ -259,6 +240,15 @@ public class RemoteSPARQLDataSource implements DataSource {
 			throw new QueryException("Endpoint returned Content Type: " + actualContentType
 					+ " which is not a valid RDF Graph syntax");
 		RDFDataMgr.read(model, in, lang);
+
+		// Skip prefixes ns1, ns2, etc, which are usually
+		// auto-assigned by the endpoint and do more harm than good
+		for (String prefix: model.getNsPrefixMap().keySet()) {
+            if (prefix.matches("^ns[0-9]+$")) {
+            	model.removeNsPrefix(prefix);
+            }
+        }
+		
 		return model;
 	}
 	

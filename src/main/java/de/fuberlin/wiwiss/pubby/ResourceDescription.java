@@ -30,6 +30,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * Provides access to its label, a textual comment, detailed
  * representations of its properties, and so on.
  * 
+ * TODO: Sort out who constructs these. Perhaps only the data source and this class itself should?
+ * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */

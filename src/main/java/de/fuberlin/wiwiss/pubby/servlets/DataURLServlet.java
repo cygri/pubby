@@ -1,7 +1,6 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +13,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
-import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
-import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
 /**
  * Servlet for serving RDF documents containing a description
@@ -26,16 +23,17 @@ import de.fuberlin.wiwiss.pubby.vocab.FOAF;
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
-public class DataURLServlet extends BaseURLServlet {
+public class DataURLServlet extends BaseServlet {
 	
 	@Override
-	protected boolean doGet(HypermediaResource controller,
-			Collection<MappedResource> resources,
+	protected boolean doGet(String relativeURI,
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			Configuration config) throws IOException {
+		HypermediaResource controller = config.getController(relativeURI, false);
 
-		ResourceDescription description = getResourceDescription(controller, resources);
+		ResourceDescription description = controller == null ? 
+				null : controller.getResourceDescription();
 		// Check if resource exists in dataset
 		if (description == null) {
 			response.setStatus(404);
@@ -45,6 +43,19 @@ public class DataURLServlet extends BaseURLServlet {
 		}
 		Model model = description.getModel();
 		
+		addHighDegreePropertyLinks(model, controller);
+		
+		addDocumentMetadata(model, controller, 
+				addQueryString(controller.getDataURL(), request),
+				"RDF description of " + description.getTitle());
+		
+		ModelResponse server = new ModelResponse(model, request, response);
+		server.serve();
+		return true;
+	}
+	
+	private void addHighDegreePropertyLinks(Model model, HypermediaResource controller) {
+		// TODO: This should re-use the logic from ResourceDescription and ResourceProperty to decide where to create these links
 		// Add links to RDF documents with descriptions of the blank nodes
 		Resource r = model.getResource(controller.getAbsoluteIRI());
 		StmtIterator it = r.listProperties();
@@ -65,30 +76,6 @@ public class DataURLServlet extends BaseURLServlet {
 			((Resource) stmt.getSubject().as(Resource.class)).addProperty(RDFS.seeAlso, 
 					model.createResource(pathDataURL));
 		}
-		
-		// Add document metadata
-		if (model.qnameFor(FOAF.primaryTopic.getURI()) == null
-				&& model.getNsPrefixURI("foaf") == null) {
-			model.setNsPrefix("foaf", FOAF.NS);
-		}
-		if (model.qnameFor(RDFS.label.getURI()) == null
-				&& model.getNsPrefixURI("rdfs") == null) {
-			model.setNsPrefix("rdfs", RDFS.getURI());
-		}
-		Resource document = model.getResource(addQueryString(controller.getDataURL(), request));
-		document.addProperty(FOAF.primaryTopic, r);
-		document.addProperty(RDFS.label, 
-				"RDF description of " + description.getTitle());
-		
-		// Add provenance. This seems out of place here.
-		for (MappedResource resource: resources) {
-			resource.getDataset().addDocumentMetadata(model, document);
-			resource.getDataset().addMetadataFromTemplate(model, resource, getServletContext());
-		}
-
-		ModelResponse server = new ModelResponse(model, request, response);
-		server.serve();
-		return true;
 	}
 	
 	private static final long serialVersionUID = 6825866213915066364L;

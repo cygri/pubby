@@ -6,7 +6,10 @@
 #else
       $title
 #end
-      | $project_name</title>
+#if ($project_name)
+      | $project_name
+#end
+    </title>
 #if ($rdf_link)
     <link rel="alternate" type="application/rdf+xml" href="$rdf_link" title="RDF" />
 #end
@@ -17,10 +20,12 @@
     <div id="header">
       <div>
         <h1 id="title">$title</h1>
+#if ($project_name)
 #if ($project_link)
         <div id="homelink">at <a href="$project_link">$project_name</a></div>
 #else
         <div id="homelink">at <a href="$server_base">$project_name</a></div>
+#end
 #end
       </div>
 #if ($uri)

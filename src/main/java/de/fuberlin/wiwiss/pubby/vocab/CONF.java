@@ -31,7 +31,6 @@ public class CONF {
 	public static final Property datasetBase = m.createProperty(NS + "datasetBase");
 	public static final Property datasetURIPattern = m.createProperty(NS + "datasetURIPattern");
 	public static final Property webResourcePrefix = m.createProperty(NS + "webResourcePrefix"); 
-	public static final Property fixUnescapedCharacters = m.createProperty(NS + "fixUnescapedCharacters");
 	public static final Property supportsIRIs = m.createProperty(NS + "supportsIRIs");
 	public static final Property addSameAsStatements = m.createProperty(NS + "addSameAsStatements");
 	public static final Property sparqlEndpoint = m.createProperty(NS + "sparqlEndpoint"); 

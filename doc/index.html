@@ -84,7 +84,7 @@ pre { speak-punctuation: code; }
 <ul>
   <li><strong>2011-01-26: Pubby 0.3.3 released.</strong> This version switches Pubby from using N3 syntax to the (almost identical) Turtle syntax. Configuration files now use the <code>.ttl</code> extension instead of <code>.n3</code>. The source code was also moved to <a href="http://github.com/cygri/pubby">a Github repository</a>.</li>
   <li><strong>2011-01-25: Pubby 0.3.2 released.</strong> This version fixes a bug in the metadata extension. This bug caused problems generating RDF/XML output.</li>
-  <li><strong>2011-01-20: Alternaitve tool released. </strong>Epimorphics has released <a href="http://elda.googlecode.com/hg/deliver-elda/src/main/docs/index.html">Elda</a>, a Linked Data publishing tool which can be used as an alternative to Pubby. </li>
+  <li><strong>2011-01-20: Alternative tool released. </strong>Epimorphics has released <a href="http://elda.googlecode.com/hg/deliver-elda/src/main/docs/index.html">Elda</a>, a Linked Data publishing tool which can be used as an alternative to Pubby. </li>
   <li><strong>2010-07-27: Pubby 0.3.1 released.</strong> The default metadata template in this version is updated to release v0.5 of the <a href="http://purl.org/net/provenance/">Provenance Vocabulary</a>.</li>
   <li><strong>2009-09-26: Pubby 0.3 released.</strong> This version adds a <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a> that -by default- provides provenance information.</li>
   <li><strong>2007-10-22: Pubby 0.2 released.</strong> This version adds multi-dataset support, has improved content negotiation,
@@ -223,7 +223,9 @@ pre { speak-punctuation: code; }
   on the web server. For example, if set to “<tt>resource/</tt>”,
   then the resulting web URIs will be of the form
   <tt>http://myserver/resource/XXX</tt>. The default is the
-  empty string.</dd>
+  empty string. This is a legacy feature and its use
+  is discouraged.</p></dd>
+
 
 <dt><tt>conf:showLabels <em>true</em>/<em>false</em></tt></dt>
 <dd><p>When enabled, Pubby attempts to show <tt>rdfs:labels</tt> instead of
@@ -364,11 +366,12 @@ conf:anonymousInversePropertyDescriptionQuery
 ];</pre>
 </dd>
 
-<dt><tt>conf:metadataTemplate "<em>metadata.ttl</em>";</tt></dt>
+<dt><tt>conf:metadataTemplate &lt;<em>metadata.ttl</em>&gt;</tt></dt>
 <dd>
-<p>Refers to a metadata template that is used by the
+<p>Specifies a metadata template that is used by the
    <a href="http://sourceforge.net/apps/mediawiki/trdf/index.php?title=Pubby_Metadata_Extension">metadata extension</a>.
-   This file is expected in directory <tt>./WEB-INF/templates/</tt>.</p>
+  A relative URL may be used and is interpreted relative to the location of
+  the configuration file.</p>
 </dd>
 
 <dt><tt>conf:supportsIRIs <em>true/false</em>;</tt></dt>
@@ -386,10 +389,6 @@ conf:anonymousInversePropertyDescriptionQuery
   queries. This can be used to force communication to use Turtle instead
   of RDF/XML to solve issues with non-serializable graphs, provided the
   endpoint supports Turtle.</p></dd>
-
-<dt><tt>conf:fixUnescapedCharacters "<em>abc</em>";</tt></dt>
-<dd><p>(Only needed if you have problems with funny characters in the URIs when
-  running Pubby behind an Apache proxy)</p></dd>
 </dl>
 
 

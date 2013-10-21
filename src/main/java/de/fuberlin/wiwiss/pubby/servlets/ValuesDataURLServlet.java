@@ -1,21 +1,17 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
-import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
-import de.fuberlin.wiwiss.pubby.vocab.FOAF;
+import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 
 /**
  * A servlet for serving an RDF document describing resources
@@ -28,37 +24,31 @@ import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 public class ValuesDataURLServlet extends ValuesBaseServlet {
 
 	public boolean doGet(HypermediaResource controller,
-			Collection<MappedResource> resources, Property property, boolean isInverse, 
+			Property predicate, boolean isInverse, 
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException {
-
-		Model descriptions = listPropertyValues(resources, property, isInverse);
-		if (descriptions.isEmpty()) return false;
+		// TODO: If no data ("return false"), respond with plain text like the PageURLServlet, not with HTML
 		
-		// Add document metadata
-		if (descriptions.qnameFor(FOAF.primaryTopic.getURI()) == null
-				&& descriptions.getNsPrefixURI("foaf") == null) {
-			descriptions.setNsPrefix("foaf", FOAF.NS);
-		}
-		if (descriptions.qnameFor(RDFS.label.getURI()) == null
-				&& descriptions.getNsPrefixURI("rdfs") == null) {
-			descriptions.setNsPrefix("rdfs", RDFS.getURI());
-		}
-		Resource r = descriptions.getResource(controller.getAbsoluteIRI());
-		Resource document = descriptions.getResource(
+		// TODO: Good bit of duplication with ValuesURLServlet here
+		ResourceDescription resource = controller.getResourceDescription();
+		if (resource == null) return false;
+
+		Model descriptions = config.getDataSource().listPropertyValues(
+				controller.getAbsoluteIRI(), predicate, isInverse);
+		if (descriptions.isEmpty()) return false;
+		ResourceProperty property = new ResourceDescription(
+				controller, descriptions, config).getProperty(predicate, isInverse);
+		if (property == null) return false;	// Can happen if prefix is declared in URI space of a data source rather than in web space
+
+		addDocumentMetadata(descriptions, controller, 
 				addQueryString(
 						isInverse 
-								? controller.getInverseValuesDataURL(property) 
-								: controller.getValuesDataURL(property), request));
-		document.addProperty(FOAF.primaryTopic, r);
-		String resourceLabel = new ResourceDescription(controller, descriptions, config).getTitle();
-		String propertyLabel = config.getPrefixes().qnameFor(property.getURI());
-		document.addProperty(RDFS.label, 
-				getDocumentTitle(resourceLabel, propertyLabel, isInverse));
-		for (MappedResource resource: resources) {
-			resource.getDataset().addDocumentMetadata(descriptions, document);
-		}
+								? controller.getInverseValuesDataURL(predicate) 
+								: controller.getValuesDataURL(predicate),
+						request),
+				getDocumentTitle(
+						resource.getTitle(), property.getCompleteLabel(), isInverse));
 		
 		new ModelResponse(descriptions, request, response).serve();
 		return true;

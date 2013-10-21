@@ -11,6 +11,10 @@
     <param-value>config.ttl</param-value>
   </context-param>
   
+  <listener>
+    <listener-class>de.fuberlin.wiwiss.pubby.servlets.ServletContextInitializer</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>WebURIServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.WebURIServlet</servlet-class>

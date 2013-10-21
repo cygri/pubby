@@ -1,6 +1,5 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Property;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
-import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 
@@ -28,15 +26,15 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 public class ValuesURLServlet extends ValuesBaseServlet {
 
 	public boolean doGet(HypermediaResource controller,
-			Collection<MappedResource> resources, 
 			Property predicate, boolean isInverse, 
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Configuration config) throws IOException {		
-		ResourceDescription resource = getResourceDescription(controller, resources);
+		ResourceDescription resource = controller.getResourceDescription();
 		if (resource == null) return false;
 
-		Model descriptions = listPropertyValues(resources, predicate, isInverse);
+		Model descriptions = config.getDataSource().listPropertyValues(
+				controller.getAbsoluteIRI(), predicate, isInverse);
 		if (descriptions.isEmpty()) return false;
 		ResourceProperty property = new ResourceDescription(
 				controller, descriptions, config).getProperty(predicate, isInverse);
@@ -48,7 +46,6 @@ public class ValuesURLServlet extends ValuesBaseServlet {
 		context.put("project_link", config.getProjectLink());
 		context.put("uri", resource.getURI());
 		context.put("server_base", config.getWebApplicationBaseURI());
-		context.put("sparql_endpoint", getFirstSPARQLEndpoint(resources));
 		context.put("title", resource.getTitle());
 		context.put("head_title", resource.getTitle() + " \u00BB " + property.getCompleteLabel());
 		context.put("property", property);
@@ -56,6 +53,9 @@ public class ValuesURLServlet extends ValuesBaseServlet {
 		context.put("back_label", resource.getTitle());
 		context.put("rdf_link", isInverse ? controller.getInverseValuesDataURL(predicate) : controller.getValuesDataURL(predicate));
 		context.put("showLabels", config.showLabels());
+
+		addPageMetadata(context, controller, resource.getModel());
+		
 		template.renderXHTML("valuespage.vm");
 		return true;
 	}

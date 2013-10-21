@@ -1,4 +1,4 @@
-package de.fuberlin.wiwiss.pubby;
+package de.fuberlin.wiwiss.pubby.sources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,12 @@ import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
+import de.fuberlin.wiwiss.pubby.ModelUtil;
 
 /**
  * A data source backed by a Jena model.
@@ -23,13 +27,17 @@ public class ModelDataSource implements DataSource {
 	}
 
 	@Override
-	public String getEndpointURL() {
-		return null;
+	public boolean canDescribe(String absoluteIRI) {
+		return true;
 	}
-	
+
 	@Override
-	public Model getResourceDescription(String resourceURI) {
-		return model;
+	public Model describeResource(String resourceURI) {
+		Resource r = ResourceFactory.createResource(resourceURI);
+		if (model.contains(r, null, (RDFNode) null) || model.contains(null, null, r)) {
+			return model;
+		}
+		return ModelUtil.EMPTY_MODEL;
 	}
 	
 	@Override

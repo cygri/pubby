@@ -1,6 +1,5 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,8 +12,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.HypermediaResource;
-import de.fuberlin.wiwiss.pubby.IRIEncoder;
-import de.fuberlin.wiwiss.pubby.MappedResource;
 
 /**
  * Abstract base servlet for servlets that handle a property of a given
@@ -27,7 +24,6 @@ public abstract class ValuesBaseServlet extends BaseServlet {
 	private static Pattern pattern = Pattern.compile("(-?)([^:/]*):([^:/]*)/(.*)");
 
 	public abstract boolean doGet(HypermediaResource controller,
-			Collection<MappedResource> resources, 
 			Property property, boolean isInverse,
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -50,13 +46,9 @@ public abstract class ValuesBaseServlet extends BaseServlet {
 		relativeURI = matcher.group(4);	// Keep just last part
 		Property property = ResourceFactory.createProperty(
 				config.getPrefixes().getNsPrefixURI(prefix), localName);
-
-		Collection<MappedResource> resources = config.getMappedResourcesFromRelativeWebURI(
-				relativeURI, false);
-		if (resources.isEmpty()) return false;
-		HypermediaResource controller = config.getController(IRIEncoder.toIRI(relativeURI), false);
-
-		return doGet(controller, resources, property, isInverse, request, response, config);
+		HypermediaResource controller = config.getController(relativeURI, false);
+		if (controller == null) return false;
+		return doGet(controller, property, isInverse, request, response, config);
 	}
 
 	private static final long serialVersionUID = 7393467141233996715L;

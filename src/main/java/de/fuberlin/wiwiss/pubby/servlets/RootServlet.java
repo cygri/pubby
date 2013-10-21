@@ -31,12 +31,21 @@ public class RootServlet extends BaseServlet {
 			return true;
 		}
 
-		// Homepage. If index resource is defined, and different from the current URI, redirect to it.
-		if ("".equals(relativeURI) && config.getIndexResource() != null 
-				&& !"".equals(config.getIndexResource().getRelativeIRI())) {
-			response.sendRedirect(IRIEncoder.toURI(
-					config.getIndexResource().getAbsoluteIRI()));
-			return true;
+		// Homepage.
+		if ("".equals(relativeURI)) {
+			if (config.getIndexResource() != null && !"".equals(config.getIndexResource().getRelativeIRI())) {
+				// We have an index resource and need to forward to it.
+				response.sendRedirect(IRIEncoder.toURI(
+						config.getIndexResource().getAbsoluteIRI()));
+				return true;
+			} else if (!"".equals(config.getWebResourcePrefix())) {
+				// We have a web resource prefix, so we will forward to it.
+				response.sendRedirect(config.getWebResourcePrefix());
+				return true;
+			}
+			// Index resource is absent or equals home resource, and no
+			// web resource prefix, so let's simply 303-redirect to the
+			// variant.
 		}
 		
 		// Assume it's a resource URI -- will produce 404 if not

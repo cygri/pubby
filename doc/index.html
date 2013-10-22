@@ -282,9 +282,14 @@ ex:Widget rdfs:label "widget"@en.</pre>
   or enriching another dataset with additional triples loaded from a static file.</p></dd>
 
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
-<dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
+<dd><p>Only resources starting with this IRI prefix will be handled by Pubby, and
   will be mapped into the <tt>conf:webBase</tt> namespace. If not specified,
-  only resources starting with the <tt>conf:webBase</tt> value will be handled.</p></dd>
+  only resources starting with the <tt>conf:webBase</tt> value will be handled.</p>
+  <p><em>Note:</em> In the configuration file and any imported vocabularies,
+  references to resources in the dataset must be made using IRIs in the rewritten
+  form, that is, using IRIs that start with the <tt>conf:webBase</tt>. Using
+  namespace declarations or vocabulary declarations for IRIs that start with
+  the <tt>conf:datasetBase</tt> is likely a mistake.</p></dd>
 
 <dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
 <dd><p>If present, only dateset URIs matching this

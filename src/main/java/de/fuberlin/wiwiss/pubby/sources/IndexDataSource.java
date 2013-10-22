@@ -1,6 +1,5 @@
 package de.fuberlin.wiwiss.pubby.sources;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,16 +39,8 @@ public class IndexDataSource implements DataSource {
 		Resource index = result.createResource(indexIRI);
 		// TODO: Get label from the vocabulary store, and make it i18nable
 		index.addProperty(RDFS.label, "Index of Resources", "en");
-		int count = 0;
 		for (Resource r: wrapped.getIndex()) {
-			if (index.equals(r)) continue;
 			index.addProperty(siocContainerOf, r);
-			count++;
-		}
-		if (count == 0) {
-			index.addProperty(RDFS.comment, "The index is empty. " +
-					"Perhaps a misconfiguration excludes all resources " +
-					"from all datasets?", "en");
 		}
 		return result;
 	}
@@ -91,10 +82,10 @@ public class IndexDataSource implements DataSource {
 
 	@Override
 	public List<Resource> getIndex() {
-		List<Resource> wrappedIndex = wrapped.getIndex();
-		List<Resource> result = new ArrayList<Resource>(wrappedIndex.size() + 1);
-		result.add(ResourceFactory.createResource(indexIRI));
-		result.addAll(wrappedIndex);
-		return result;
+		// We could add the indexIRI as an additional resource here, but we
+		// don't want it to show up in the list of resources generated in
+		// describeResource(), and we don't want it turn an otherwise
+		// empty dataset into a non-empty one. 
+		return wrapped.getIndex();
 	}
 }

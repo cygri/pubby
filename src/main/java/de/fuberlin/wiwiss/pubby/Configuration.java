@@ -50,6 +50,7 @@ public class Configuration extends ResourceReader {
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
 	private final VocabularyStore vocabularyStore;
 	private final DataSource dataSource;
+	private final HypermediaResource indexController;
 	
 	public Configuration(Resource configuration) {
 		super(configuration);
@@ -98,6 +99,34 @@ public class Configuration extends ResourceReader {
 		ModelUtil.addNSIfUndefined(prefixes, "rdf", RDF.getURI());
 		ModelUtil.addNSIfUndefined(prefixes, "xsd", XSD.getURI());
 		dataSource = buildDataSource();
+
+		// Sanity check to spot typical configuration problem
+		if (dataSource.getIndex().isEmpty()) {
+			throw new ConfigurationException("The index is empty. " + 
+					"Try adding conf:datasetBase to your datasets, " + 
+					"check any conf:datasetURIPatterns, " + 
+					"and check that all data sources actually contain data.");
+		}
+		String indexIRI = getIRI(CONF.indexResource);
+		if (indexIRI == null) {
+			indexController = null;
+		} else {
+			String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
+			// Sanity check to spot typical configuration problem
+			if (!indexIRI.startsWith(resourceBase)) {
+				throw new ConfigurationException(
+						"conf:indexResource must start with <" + resourceBase + 
+						"> but was <" + indexIRI + ">");
+			}
+			// Sanity check to spot typical configuration problem
+			if (dataSource.describeResource(indexIRI).isEmpty()) {
+				throw new ConfigurationException(
+						"conf:indexResource <" + indexIRI + 
+						"> not found in data sets. " + 
+						"Try disabling the conf:indexResource.");
+			}
+			indexController = new HypermediaResource(indexIRI, this);
+		}
 	}
 
 	private DataSource buildDataSource() {
@@ -172,14 +201,7 @@ public class Configuration extends ResourceReader {
 	}
 	
 	public HypermediaResource getIndexResource() {
-		String indexIRI = getIRI(CONF.indexResource);
-		if (indexIRI == null) return null;
-		String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
-		if (!indexIRI.startsWith(resourceBase)) {
-			throw new RuntimeException("conf:indexResource must start with <"
-					+ resourceBase + ">");
-		}
-		return new HypermediaResource(indexIRI, this);
+		return indexController;
 	}
 	
 	public String getProjectLink() {

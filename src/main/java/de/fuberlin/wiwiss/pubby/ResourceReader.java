@@ -148,7 +148,7 @@ public abstract class ResourceReader {
 				if (found == null) {
 					found = p;
 				} else {
-					throw new IllegalArgumentException("Can't have both " +
+					throw new ConfigurationException("Can't have both " +
 							pretty(found) + " and " + pretty(p) + 
 							" on resource " + pretty(resource));
 				}
@@ -160,7 +160,7 @@ public abstract class ResourceReader {
 			first = false;
 		}
 		if (found == null) {
-			throw new IllegalArgumentException("One of " + s.toString() + 
+			throw new ConfigurationException("One of " + s.toString() + 
 					" required on resource " + pretty(resource));
 		}
 	}
@@ -168,12 +168,12 @@ public abstract class ResourceReader {
 	private void assertHasOneValue(Property p) {
 		StmtIterator it = resource.listProperties(p);
 		if (!it.hasNext()) {
-			throw new IllegalArgumentException("Missing property " + pretty(p) + 
+			throw new ConfigurationException("Missing property " + pretty(p) + 
 					" on resource " + pretty(resource));
 		}
 		it.next();
 		if (it.hasNext()) {
-			throw new IllegalArgumentException("Too many values for property " +
+			throw new ConfigurationException("Too many values for property " +
 					pretty(p) + " on resource " + pretty(resource));
 		}
 	}
@@ -184,7 +184,7 @@ public abstract class ResourceReader {
 	
 	private void assertResourceValue(Statement stmt) {
 		if (stmt.getObject().isLiteral()) {
-			throw new IllegalArgumentException(
+			throw new ConfigurationException(
 					"Expected resource object, found literal: " + pretty(stmt));
 		}
 	}
@@ -195,11 +195,11 @@ public abstract class ResourceReader {
 	
 	private void assertIRIValue(Statement stmt) {
 		if (stmt.getObject().isLiteral()) {
-			throw new IllegalArgumentException(
+			throw new ConfigurationException(
 					"Expected IRI object, found literal: " + pretty(stmt));
 		}
 		if (stmt.getObject().isAnon()) {
-			throw new IllegalArgumentException(
+			throw new ConfigurationException(
 					"Expected IRI object, found blank node: " + pretty(stmt));
 		}
 	}
@@ -210,11 +210,11 @@ public abstract class ResourceReader {
 	
 	private void assertLiteralValue(Statement stmt) {
 		if (stmt.getObject().isURIResource()) {
-			throw new IllegalArgumentException(
+			throw new ConfigurationException(
 					"Expected literal object, found IRI: " + pretty(stmt));
 		}
 		if (stmt.getObject().isAnon()) {
-			throw new IllegalArgumentException(
+			throw new ConfigurationException(
 					"Expected literal object, found blank node: " + pretty(stmt));
 		}
 	}
@@ -248,12 +248,12 @@ public abstract class ResourceReader {
 	}
 
 	private void raiseMissingProperty(Property p) {
-		throw new IllegalArgumentException("Missing property " + 
+		throw new ConfigurationException("Missing property " + 
 				pretty(p) + " on resource " + pretty(resource));
 	}
 	
 	private void raiseUnexpectedDatatype(String expectedDatatype, Statement stmt) {
-		throw new IllegalArgumentException(
+		throw new ConfigurationException(
 				"Expected " + expectedDatatype + 
 				" object, found other datatype: " + 
 				pretty(stmt));

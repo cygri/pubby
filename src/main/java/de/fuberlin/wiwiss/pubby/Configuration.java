@@ -141,11 +141,16 @@ public class Configuration extends ResourceReader {
 				return absoluteIRI.startsWith(webBase);
 			}
 		};
-		// If we don't have an indexResource, then add an
+		// If we don't have an indexResource, and there is no resource
+		// at the home URL in any of the datasets, then add an
 		// index builder. It will be responsible for handling the
 		// homepage/index resource.
-		if (!hasProperty(CONF.indexResource)) {
-			result = new IndexDataSource(webBase + getWebResourcePrefix(), result);
+		// TODO: Shouldn't we make the index data source available even if there
+		//       is an indexResource?
+		String indexIRI = webBase + getWebResourcePrefix();
+		if (!hasProperty(CONF.indexResource) && 
+				result.describeResource(indexIRI).isEmpty()) {
+			result = new IndexDataSource(indexIRI, result);
 		}
 		return result;
 	}

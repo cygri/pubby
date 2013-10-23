@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -59,12 +60,17 @@ public class ModelDataSource implements DataSource {
 	@Override
 	public List<Resource> getIndex() {
 		List<Resource> result = new ArrayList<Resource>();
-		ResIterator it = model.listSubjects();
-		while (it.hasNext()) {
-			Resource r = it.next();
+		ResIterator subjects = model.listSubjects();
+		while (subjects.hasNext() && result.size() < DataSource.MAX_INDEX_SIZE) {
+			Resource r = subjects.next();
 			if (r.isAnon()) continue;
 			result.add(r);
-			if (result.size() >= DataSource.MAX_INDEX_SIZE) break; 
+		}
+		NodeIterator objects = model.listObjects();
+		while (objects.hasNext() && result.size() < DataSource.MAX_INDEX_SIZE) {
+			RDFNode o = objects.next();
+			if (!o.isURIResource()) continue;
+			result.add(o.asResource());
 		}
 		return result;
 	}

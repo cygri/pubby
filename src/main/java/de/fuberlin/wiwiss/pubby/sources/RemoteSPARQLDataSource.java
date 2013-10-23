@@ -196,6 +196,16 @@ public class RemoteSPARQLDataSource implements DataSource {
 		while (rs.hasNext()) {
 			result.add(rs.next().getResource("s"));
 		}
+		if (result.size() < DataSource.MAX_INDEX_SIZE) {
+			rs = execSelectQuery(
+					"SELECT DISTINCT ?o { " +
+					"?s ?p ?o " +
+					"FILTER (isURI(?o)) " +
+					"} LIMIT " + (DataSource.MAX_INDEX_SIZE - result.size()));
+			while (rs.hasNext()) {
+				result.add(rs.next().getResource("o"));
+			}
+		}
 		return result;
 	}
 

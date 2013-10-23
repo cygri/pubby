@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
 
 /**
@@ -33,19 +34,13 @@ public class RootServlet extends BaseServlet {
 
 		// Homepage.
 		if ("".equals(relativeURI)) {
-			if (config.getIndexResource() != null && !"".equals(config.getIndexResource().getRelativeIRI())) {
-				// We have an index resource and need to forward to it.
-				response.sendRedirect(IRIEncoder.toURI(
-						config.getIndexResource().getAbsoluteIRI()));
-				return true;
-			} else if (!"".equals(config.getWebResourcePrefix())) {
-				// We have a web resource prefix, so we will forward to it.
-				response.sendRedirect(config.getWebResourcePrefix());
+			// Get the URL where a description of the index resource may be found
+			String indexURL = HypermediaControls.createFromIRI(config.getIndexIRI(), config).getBrowsableURL();
+			if (!config.getWebApplicationBaseURI().equals(indexURL)) {
+				// We need to redirect to the URL
+				response.sendRedirect(IRIEncoder.toURI(indexURL));
 				return true;
 			}
-			// Index resource is absent or equals home resource, and no
-			// web resource prefix, so let's simply 303-redirect to the
-			// variant.
 		}
 		
 		// Assume it's a resource URI -- will produce 404 if not

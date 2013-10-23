@@ -46,7 +46,8 @@ public class CONF {
 	public static final Property anonymousPropertyDescriptionQuery = m.createProperty(NS + "anonymousPropertyDescriptionQuery");
 	public static final Property anonymousInversePropertyDescriptionQuery = m.createProperty(NS
 			+ "anonymousInversePropertyDescriptionQuery");
-
+	public static final Property browsableNamespace = m.createProperty(NS + "browsableNamespace");
+	
 	// Terms to annotate vocabulary
 	public static final Property weight = m.createProperty(NS + "weight");
 	public static final Property pluralLabel = m.createProperty(NS + "pluralLabel");

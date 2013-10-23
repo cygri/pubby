@@ -18,7 +18,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
 import de.fuberlin.wiwiss.pubby.Dataset;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.MetadataConfiguration;
 import de.fuberlin.wiwiss.pubby.ModelUtil;
 import de.fuberlin.wiwiss.pubby.vocab.FOAF;
@@ -46,7 +46,7 @@ public abstract class BaseServlet extends HttpServlet {
 	}
 	
 	// TODO: This should be somewhere else, doesn't fit here
-	protected void addDocumentMetadata(Model model, HypermediaResource controller,
+	protected void addDocumentMetadata(Model model, HypermediaControls controller,
 			String documentURL, String title) {
 		ModelUtil.addNSIfUndefined(model, "foaf", FOAF.getURI());
 		ModelUtil.addNSIfUndefined(model, "rdfs", RDFS.getURI());
@@ -67,7 +67,7 @@ public abstract class BaseServlet extends HttpServlet {
 
 	// TODO: This should be somewhere else, doesn't fit here
 	protected void addPageMetadata(Context context, 
-			HypermediaResource controller, PrefixMapping prefixes) {
+			HypermediaControls controller, PrefixMapping prefixes) {
 		try {
 			Model metadataModel = ModelFactory.createDefaultModel();
 			for (Dataset dataset: config.getDatasets()) {

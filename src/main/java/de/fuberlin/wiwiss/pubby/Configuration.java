@@ -3,6 +3,7 @@ package de.fuberlin.wiwiss.pubby;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -19,7 +20,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.fuberlin.wiwiss.pubby.sources.DataSource;
-import de.fuberlin.wiwiss.pubby.sources.FilteredDataSource;
 import de.fuberlin.wiwiss.pubby.sources.IndexDataSource;
 import de.fuberlin.wiwiss.pubby.sources.MergeDataSource;
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
@@ -50,7 +50,7 @@ public class Configuration extends ResourceReader {
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
 	private final VocabularyStore vocabularyStore;
 	private final DataSource dataSource;
-	private final HypermediaResource indexController;
+	private final String indexIRI;
 	
 	public Configuration(Resource configuration) {
 		super(configuration);
@@ -107,25 +107,19 @@ public class Configuration extends ResourceReader {
 					"check any conf:datasetURIPatterns, " + 
 					"and check that all data sources actually contain data.");
 		}
-		String indexIRI = getIRI(CONF.indexResource);
-		if (indexIRI == null) {
-			indexController = null;
-		} else {
-			String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
-			// Sanity check to spot typical configuration problem
-			if (!indexIRI.startsWith(resourceBase)) {
-				throw new ConfigurationException(
-						"conf:indexResource must start with <" + resourceBase + 
-						"> but was <" + indexIRI + ">");
-			}
+		String resourceBase = getWebApplicationBaseURI() + getWebResourcePrefix();
+		if (hasProperty(CONF.indexResource)) {
+			indexIRI = getIRI(CONF.indexResource);
 			// Sanity check to spot typical configuration problem
 			if (dataSource.describeResource(indexIRI).isEmpty()) {
 				throw new ConfigurationException(
 						"conf:indexResource <" + indexIRI + 
 						"> not found in data sets. " + 
-						"Try disabling the conf:indexResource.");
+						"Try disabling the conf:indexResource to get " +
+						"a list of found resources.");
 			}
-			indexController = new HypermediaResource(indexIRI, this);
+		} else {
+			indexIRI = resourceBase;
 		}
 	}
 
@@ -135,12 +129,6 @@ public class Configuration extends ResourceReader {
 			sources.add(dataset.getDataSource());
 		}
 		DataSource result = new MergeDataSource(sources, prefixes);
-		result = new FilteredDataSource(result) {
-			@Override
-			public boolean canDescribe(String absoluteIRI) {
-				return absoluteIRI.startsWith(webBase);
-			}
-		};
 		// If we don't have an indexResource, and there is no resource
 		// at the home URL in any of the datasets, then add an
 		// index builder. It will be responsible for handling the
@@ -176,13 +164,15 @@ public class Configuration extends ResourceReader {
 	 *        to some non-resource namespace such as <code>/page/</code>. The
 	 *        distinction matters if <code>conf:webResourcePrefix</code> is set.
 	 */
-	public HypermediaResource getController(String relativeRequestURI, 
+	public HypermediaControls getControls(String relativeRequestURI, 
 			boolean isRelativeToPubbyRoot) {
 		String relativeIRI = IRIEncoder.toIRI(relativeRequestURI);
-		if (isRelativeToPubbyRoot && !relativeIRI.startsWith(getWebResourcePrefix())) {
-			return null;
+		if (isRelativeToPubbyRoot) {
+			if (!relativeIRI.startsWith(getWebResourcePrefix())) return null;
+		} else {
+			relativeIRI = relativeIRI.substring(getWebResourcePrefix().length());
 		}
-		return new HypermediaResource(relativeIRI, isRelativeToPubbyRoot, this);
+		return HypermediaControls.createFromPubbyPath(relativeIRI, this);
 	}
 	
 	public PrefixMapping getPrefixes() {
@@ -205,8 +195,12 @@ public class Configuration extends ResourceReader {
 		return getString(CONF.defaultLanguage);
 	}
 	
-	public HypermediaResource getIndexResource() {
-		return indexController;
+	/**
+	 * The "home" resource. If its IRI is not the web server base, then the
+	 * web server will redirect there.
+	 */
+	public String getIndexIRI() {
+		return indexIRI;
 	}
 	
 	public String getProjectLink() {
@@ -249,6 +243,17 @@ public class Configuration extends ResourceReader {
 	}
 	private Collection<Property> highIndegreePropertyCache = null;
 
+	/**
+	 * Gets all values of <tt>conf:browsableNamespace</tt> declared on the
+	 * configuration resource. Does not include values declared on specific
+	 * datasets.
+	 *  
+	 * @return Namespace IRIs of browsable namespaces
+	 */
+	public Set<String> getBrowsableNamespaces() {
+		return getIRIs(CONF.browsableNamespace);
+	}
+	
 	private Collection<Property> getPropertiesByType(Resource type) {
 		Collection<Property> results = new ArrayList<Property>();
 		StmtIterator it = modelWithImports.listStatements(null, RDF.type, type);

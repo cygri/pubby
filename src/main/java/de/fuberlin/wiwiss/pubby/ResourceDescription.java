@@ -36,7 +36,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * @version $Id$
  */
 public class ResourceDescription {
-	private final HypermediaResource hypermediaResource;
+	private final HypermediaControls hypermediaResource;
 	private final Model model;
 	private final Resource resource;
 	private final Configuration config;
@@ -45,12 +45,12 @@ public class ResourceDescription {
 	private PrefixMapping prefixes = null;
 	private List<ResourceProperty> properties = null;
 	
-	public ResourceDescription(HypermediaResource controller, Model model, 
+	public ResourceDescription(HypermediaControls controller, Model model, 
 			Configuration config) {
 		this(controller, model, null, null, config);
    	}
 
-	public ResourceDescription(HypermediaResource controller, Model model, 
+	public ResourceDescription(HypermediaControls controller, Model model, 
 			Map<Property, Integer> highIndegreeProperties,
 			Map<Property, Integer> highOutdegreeProperties,
 			Configuration config) {
@@ -87,9 +87,13 @@ public class ResourceDescription {
 	 * resource is blank, return null.
 	 */
 	public String getTitle() {
+		if (!resource.isURIResource()) return null;
 		String label = getLabel();
-		if (label == null && resource.isURIResource()) {
+		if (label == null) {
 			label = new URIPrefixer(resource, getPrefixes()).getLocalName();
+		}
+		if ("".equals(label)) { // Prefix mapping assigns an empty local name
+			label = resource.getURI();
 		}
 		// TODO: This should get the correct language from getLabel() and pass it on
 		return toTitleCase(label, null);
@@ -261,6 +265,12 @@ public class ResourceDescription {
 		public String getURI() {
 			return predicate.getURI();
 		}
+		public String getBrowsableURL() {
+			HypermediaControls controls = HypermediaControls.createFromIRI(
+					predicate.getURI(), config);
+			if (controls == null) return predicate.getURI();
+			return controls.getBrowsableURL();
+		}
 		public boolean hasPrefix() {
 			return predicatePrefixer.hasPrefix();
 		}
@@ -393,6 +403,13 @@ public class ResourceDescription {
 		}
 		public Node getNode() {
 			return node.asNode();
+		}
+		public String getBrowsableURL() {
+			if (!node.isURIResource()) return null;
+			HypermediaControls controls = HypermediaControls.createFromIRI(
+					node.asResource().getURI(), config);
+			if (controls == null) return node.asResource().getURI();
+			return controls.getPageURL();
 		}
 		public boolean hasPrefix() {
 			return prefixer != null && prefixer.hasPrefix();

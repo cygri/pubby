@@ -218,14 +218,9 @@ pre { speak-punctuation: code; }
 <dd><p>The URI of a resource whose description will be displayed as the home page of the Pubby installation.
   If not specified in the configuration, a list of all available resources is generated.</p></dd>
 
-<dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
-<dd><p>If present, this string will be prefixed to resource URIs
-  on the web server. For example, if set to “<tt>resource/</tt>”,
-  then the resulting web URIs will be of the form
-  <tt>http://myserver/resource/XXX</tt>. The default is the
-  empty string. This is a legacy feature and its use
-  is discouraged.</p></dd>
-
+<dt><tt>conf:browsableNamespace &lt;<em>namespace_uri</em>&gt;</tt></dt>
+<dd><p>Equivalent to declaring a <tt>conf:browsableNamespace</tt> property
+  (see below) in all <tt>conf:dataset</tt> blocks.</p></dd>
 
 <dt><tt>conf:showLabels <em>true</em>/<em>false</em></tt></dt>
 <dd><p>When enabled, Pubby attempts to show <tt>rdfs:labels</tt> instead of
@@ -250,6 +245,14 @@ ex:Widget rdfs:label "widget"@en.</pre>
   <p>The example defines a label for <tt>ex:Widget</tt>, and retrieves labels
   from the RDF Schema and SKOS namespace files off the Web, as well as from
   one local file located in the same directory as <tt>config.ttl</tt>.</p></dd>
+
+<dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
+<dd><p>If present, this string will be prefixed to resource URIs
+  on the web server. For example, if set to “<tt>resource/</tt>”,
+  then the resulting web URIs will be of the form
+  <tt>http://myserver/resource/XXX</tt>. The default is the
+  empty string. This is a legacy feature and its use
+  is discouraged.</p></dd>
 
 <dt><tt>conf:dataset [ ... ];</tt></dt>
 <dd><p><strong>Required.</strong> Introduces a dataset configuration section.
@@ -291,16 +294,29 @@ ex:Widget rdfs:label "widget"@en.</pre>
   namespace declarations or vocabulary declarations for IRIs that start with
   the <tt>conf:datasetBase</tt> is likely a mistake.</p></dd>
 
+<dt><tt>conf:browsableNamespace &lt;<em>namespace_iri</em>&gt;</tt></dt>
+<dd><p>Makes all IRIs that start with that namespace IRI browsable in Pubby.
+  Unlike <tt>conf:datasetBase</tt>, Pubby will not attempt to make these
+  IRIs dereferenceable; it merely creates
+  web pages that show descriptions of the resources and allow browsing.</p>
+  <pre>conf:browsableNamespace &lt;http://www.w3.org/&gt;;</pre>
+  <p>The example means that clicking on any resource whose IRI starts with
+  <tt>http://www.w3.org/</tt> takes the user to another Pubby page, rather
+  than taking them away from Pubby and to the <tt>w3.org</tt> website.
+  This is useful if you have loaded vocabularies from <tt>w3.org</tt>
+  into your dataset.</p>
+  <p>The value <tt>&lt;http://&gt;</tt> can be used to make Pubby handle
+  <em>all</em> (HTTP) URIs.</p></dd>
+
 <dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
-<dd><p>If present, only dateset URIs matching this
+<dd><p>If present, only dateset IRIs matching this
   <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">Java-style regular expression</a>
-  will be mapped and made available by Pubby. The regular expression must match
-  <em>everything after the <tt>datasetBase</tt> part of the URI</em>.</p>
-  <pre>conf:datasetBase &lt;http://example.org/&gt;;
-conf:datasetURIPattern "(users|documents)/.*";</pre>
+  will be made available by Pubby. The regular expression must match
+  <em>somwehere within the IRI as it appears in the data source</em>.</p>
+  <pre>conf:datasetURIPattern "/(users|documents)/";</pre>
   <p>This example configuration will publish the dataset URI <tt>http://example.org/users/alice</tt>, but not
-  <tt>http://example.org/invoices/5395842</tt> because the URI part <tt>invoices/5395842</tt>
-  does not match the regular expression.</p></dd>
+  <tt>http://example.org/invoices/5395842</tt> because the IRI part <tt>invoices/5395842</tt>
+  does not match the regular expression. It would also publish <tt>http://othersite.com/users/12345</tt> if that IRI happens to appear in the data source.</p></dd>
 
 <dt><tt>conf:resourceDescriptionQuery <em>"SPARQL query"</em></tt></dt>
 <dd><p>Allows specification of one or more SPARQL queries that are run against the

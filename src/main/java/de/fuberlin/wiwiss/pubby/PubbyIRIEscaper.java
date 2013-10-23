@@ -32,7 +32,7 @@ public class PubbyIRIEscaper extends IRIRewriter {
 				// absoluteIRI is really a URI
 				absoluteIRI = IRIEncoder.toIRI(absoluteIRI);
 			}
-			return absoluteIRI.replace("#", "%23").replace("?", "%3F");
+			return escapeSpecialCharacters(absoluteIRI);
 		}
 		return absoluteIRI;
 	}
@@ -44,8 +44,23 @@ public class PubbyIRIEscaper extends IRIRewriter {
 				absoluteIRI = IRIEncoder.toURI(absoluteIRI);
 				// It's now really a URI, not an IRI
 			}
-			return absoluteIRI.replace("%23", "#").replace("%3F", "?");
+			return unescapeSpecialCharacters(absoluteIRI);
 		}
 		return absoluteIRI;
+	}
+	
+	/**
+	 * Escapes any characters that have special meaning in IRIs so that
+	 * they are safe for use in a Pubby path
+	 */
+	public static String escapeSpecialCharacters(String absoluteIRI) {
+		return absoluteIRI.replace("#", "%23").replace("?", "%3F");		
+	}
+
+	/**
+	 * Reverses the escaping done by {@link #unescapeSpecialCharacters(String)}.
+	 */
+	public static String unescapeSpecialCharacters(String absoluteIRI) {
+		return absoluteIRI.replace("%23", "#").replace("%3F", "?");
 	}
 }

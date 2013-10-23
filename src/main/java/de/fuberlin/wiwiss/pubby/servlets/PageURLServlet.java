@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.context.Context;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
 /**
@@ -25,7 +25,7 @@ public class PageURLServlet extends BaseServlet {
 			HttpServletResponse response,
 			Configuration config) throws ServletException, IOException {
 
-		HypermediaResource controller = config.getController(relativeURI, false);
+		HypermediaControls controller = config.getControls(relativeURI, false);
 		if (controller == null) return false;
 		ResourceDescription description = controller.getResourceDescription();
 		if (description == null) return false;

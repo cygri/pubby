@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
 import de.fuberlin.wiwiss.pubby.negotiation.ContentTypeNegotiator;
 import de.fuberlin.wiwiss.pubby.negotiation.MediaRangeSpec;
@@ -16,6 +16,8 @@ import de.fuberlin.wiwiss.pubby.negotiation.PubbyNegotiator;
  * It redirects either to the page URL or to the data URL,
  * based on content negotiation.
  * 
+ * TODO: This should provide only a 303 service. The conneg stuff should happen in new generic versions of the representation-producing servlets.
+ * 
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */
@@ -24,10 +26,12 @@ public class WebURIServlet extends BaseServlet {
 	public boolean doGet(String relativeURI, HttpServletRequest request,
 			HttpServletResponse response, Configuration config) throws IOException {
 		
-		HypermediaResource controller = config.getController(relativeURI, true);
+		HypermediaControls controller = config.getControls(relativeURI, true);
+		// It's a resource with an IRI we can't handle
 		if (controller == null) return false;
-		String absoluteIRI = controller.getAbsoluteIRI();
-		if (!config.getDataSource().canDescribe(absoluteIRI)) return false;
+		// It's a resource that's not in our namespace.
+		// We don't provide a 303 service for those, only browsable pages. 
+		if (!controller.isHosted()) return false;
 
 		response.addHeader("Vary", "Accept, User-Agent");
 		ContentTypeNegotiator negotiator = PubbyNegotiator.getPubbyNegotiator();

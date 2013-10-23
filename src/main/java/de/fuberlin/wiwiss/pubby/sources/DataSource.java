@@ -24,6 +24,10 @@ public interface DataSource {
 	 * {@link #describeResource(String)}. This method is to allow for
 	 * optimizations and should respond very fast.
 	 * 
+	 * It is also used by
+	 * the UI to decide whether a click on a resource should go to a Pubby
+	 * page (if <code>true</code>) or out to the Web (if <code>false</code>).
+	 * 
 	 * @param absoluteIRI The IRI of a resource to be described
 	 * @return <code>true</code> if this data source might have something about it
 	 */

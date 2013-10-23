@@ -12,7 +12,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 
@@ -30,7 +30,7 @@ public class DataURLServlet extends BaseServlet {
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			Configuration config) throws IOException {
-		HypermediaResource controller = config.getController(relativeURI, false);
+		HypermediaControls controller = config.getControls(relativeURI, false);
 
 		ResourceDescription description = controller == null ? 
 				null : controller.getResourceDescription();
@@ -54,7 +54,7 @@ public class DataURLServlet extends BaseServlet {
 		return true;
 	}
 	
-	private void addHighDegreePropertyLinks(Model model, HypermediaResource controller) {
+	private void addHighDegreePropertyLinks(Model model, HypermediaControls controller) {
 		// TODO: This should re-use the logic from ResourceDescription and ResourceProperty to decide where to create these links
 		// Add links to RDF documents with descriptions of the blank nodes
 		Resource r = model.getResource(controller.getAbsoluteIRI());

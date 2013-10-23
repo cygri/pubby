@@ -11,7 +11,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 
 /**
  * Abstract base servlet for servlets that handle a property of a given
@@ -23,7 +23,7 @@ import de.fuberlin.wiwiss.pubby.HypermediaResource;
 public abstract class ValuesBaseServlet extends BaseServlet {
 	private static Pattern pattern = Pattern.compile("(-?)([^:/]*):([^:/]*)/(.*)");
 
-	public abstract boolean doGet(HypermediaResource controller,
+	public abstract boolean doGet(HypermediaControls controller,
 			Property property, boolean isInverse,
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -46,7 +46,7 @@ public abstract class ValuesBaseServlet extends BaseServlet {
 		relativeURI = matcher.group(4);	// Keep just last part
 		Property property = ResourceFactory.createProperty(
 				config.getPrefixes().getNsPrefixURI(prefix), localName);
-		HypermediaResource controller = config.getController(relativeURI, false);
+		HypermediaControls controller = config.getControls(relativeURI, false);
 		if (controller == null) return false;
 		return doGet(controller, property, isInverse, request, response, config);
 	}

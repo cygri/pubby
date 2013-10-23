@@ -45,6 +45,7 @@ public class MergeDataSource implements DataSource {
 	public Model describeResource(String iri) {
 		Model result = ModelFactory.createDefaultModel();
 		for (DataSource source: sources) {
+			if (!source.canDescribe(iri)) continue;
 			ModelUtil.mergeModels(result, source.describeResource(iri));
 		}
 		ModelUtil.mergePrefixes(result, prefixes);

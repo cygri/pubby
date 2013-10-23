@@ -9,6 +9,6 @@
 
     <p>Pubby failed to properly initialize. This is probably due to an error in the configuration file. The message was:</p>
 
-    <pre>$message</pre>
+    <p style="border: 2px solid black; padding: 1em 1.6em">$message</p>
   </body>
 </html>

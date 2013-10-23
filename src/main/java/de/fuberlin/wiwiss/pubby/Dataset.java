@@ -1,5 +1,7 @@
 package de.fuberlin.wiwiss.pubby;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.hp.hpl.jena.n3.IRIResolver;
@@ -107,21 +109,13 @@ public class Dataset extends ResourceReader {
 			result = new ModelDataSource(data);
 		}
 
-		String fullWebBase = configuration.getWebApplicationBaseURI() + 
-				configuration.getWebResourcePrefix();
-		
-		// Base IRI for IRIs considered to be "in" the data source
-		String datasetBase = getIRI(CONF.datasetBase, 
-				fullWebBase);
-
 		// If conf:datasetURIPattern is set, then filter the dataset accordingly.
 		if (hasProperty(CONF.datasetURIPattern)) {
 			final Pattern pattern = Pattern.compile(getString(CONF.datasetURIPattern));
-			final int datasetBaseLength = datasetBase.length();
 			result = new FilteredDataSource(result) {
 				@Override
 				public boolean canDescribe(String absoluteIRI) {
-					return pattern.matcher(absoluteIRI.substring(datasetBaseLength)).matches();
+					return pattern.matcher(absoluteIRI).find();
 				}
 			};
 		}
@@ -130,16 +124,40 @@ public class Dataset extends ResourceReader {
 		
 		// If conf:datasetBase is set (and different from conf:webBase),
 		// rewrite the IRIs accordingly
+		// Base IRI for IRIs considered to be "in" the data source
+		String fullWebBase = configuration.getWebApplicationBaseURI() + 
+				configuration.getWebResourcePrefix();
+		String datasetBase = getIRI(CONF.datasetBase, 
+				fullWebBase);
 		if (!datasetBase.equals(fullWebBase)) {
 			rewriter = IRIRewriter.createNamespaceBased(datasetBase, fullWebBase);
 		}
 
 		// Escape special characters in IRIs
 		rewriter = IRIRewriter.chain(rewriter, new PubbyIRIEscaper(
-				configuration.getWebApplicationBaseURI(),
-				!supportsIRIs()));
+				fullWebBase, !supportsIRIs()));
 
-		return new RewrittenDataSource(
+		result = new RewrittenDataSource(
 				result, rewriter, addSameAsStatements());
+
+		// Filter the dataset to keep only those resources in the datasetBase
+		// and in browsable namespaces
+		final Set<String> browsableNamespaces = new HashSet<String>();
+		browsableNamespaces.add(fullWebBase);
+		for (String iri: getIRIs(CONF.browsableNamespace)) {
+			browsableNamespaces.add(iri);
+		}
+		browsableNamespaces.addAll(configuration.getBrowsableNamespaces());
+		result = new FilteredDataSource(result) {
+			@Override
+			public boolean canDescribe(String absoluteIRI) {
+				for (String namespace: browsableNamespaces) {
+					if (absoluteIRI.startsWith(namespace)) return true;
+				}
+				return false;
+			}
+		};
+		
+		return result;
 	}
 }

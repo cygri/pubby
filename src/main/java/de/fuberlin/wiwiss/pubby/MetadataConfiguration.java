@@ -54,7 +54,7 @@ public class MetadataConfiguration extends ResourceReader {
 		}
 	}
 	
-	public Resource addMetadataFromTemplate(Model document, HypermediaResource controller) {
+	public Resource addMetadataFromTemplate(Model document, HypermediaControls controller) {
 		if (metadataTemplate == null) {
 			return null;
 		}
@@ -125,7 +125,7 @@ public class MetadataConfiguration extends ResourceReader {
 		return currentDocRepr;
 	}
 	
-	private RDFNode parsePlaceholder(RDFNode phRes, HypermediaResource controller, 
+	private RDFNode parsePlaceholder(RDFNode phRes, HypermediaControls controller, 
 			Calendar currentTime, Resource currentDocRepr) {
 		String phURI = phRes.asNode().getURI();
 		// get package name and placeholder name from placeholder URI

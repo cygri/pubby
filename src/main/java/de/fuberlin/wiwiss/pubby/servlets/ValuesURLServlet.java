@@ -10,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
 import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
 
@@ -25,7 +25,7 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
  */
 public class ValuesURLServlet extends ValuesBaseServlet {
 
-	public boolean doGet(HypermediaResource controller,
+	public boolean doGet(HypermediaControls controller,
 			Property predicate, boolean isInverse, 
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -49,7 +49,7 @@ public class ValuesURLServlet extends ValuesBaseServlet {
 		context.put("title", resource.getTitle());
 		context.put("head_title", resource.getTitle() + " \u00BB " + property.getCompleteLabel());
 		context.put("property", property);
-		context.put("back_uri", controller.getAbsoluteIRI());
+		context.put("back_uri", controller.getBrowsableURL());
 		context.put("back_label", resource.getTitle());
 		context.put("rdf_link", isInverse ? controller.getInverseValuesDataURL(predicate) : controller.getValuesDataURL(predicate));
 		context.put("showLabels", config.showLabels());

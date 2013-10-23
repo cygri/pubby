@@ -92,7 +92,13 @@ public class Dataset extends ResourceReader {
 					configuration.getVocabularyStore().getHighIndegreeProperties(),
 					configuration.getVocabularyStore().getHighOutdegreeProperties());
 			if (hasProperty(CONF.contentType)) {
-				sparqlDataSource.setContentType(getString(CONF.contentType));
+				sparqlDataSource.setGraphContentType(getString(CONF.contentType));
+			}
+			for (String param: getStrings(CONF.queryParamSelect)) {
+				sparqlDataSource.addSelectQueryParam(param);
+			}
+			for (String param: getStrings(CONF.queryParamGraph)) {
+				sparqlDataSource.addGraphQueryParam(param);
 			}
 			result = sparqlDataSource;
 			

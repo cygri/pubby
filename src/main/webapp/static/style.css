@@ -16,8 +16,8 @@ img { border: none; }
 table.description { border-collapse: collapse; clear: left; font-size: 100%; margin: 0 0 1em; width: 100%; }
 table.description th { background: white; text-align: left; }
 table.description td, table.description th { line-height: 1.2em; padding: 0.2em 0.4em; vertical-align: top; }
-table.description ul { margin: 0; padding-left: 0em; }
-table.description li { list-style-position: inside; list-style-type: square; margin-left: 0; padding-left: 0; }
+table.description ul { margin: 0; padding-left: 1.4em; }
+table.description li { list-style-position: outside; list-style-type: square; margin-left: 0; padding-left: 0; }
 .uri { white-space: nowrap; }
 .uri a, a.uri { text-decoration: none; }
 .unbound { color: #888; }

@@ -2,6 +2,7 @@ package de.fuberlin.wiwiss.pubby;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class VocabularyStore {
 		// TODO: Use language!
 		if (preferPlural) {
 			String pluralLabel = inversePluralLabels.get(iri);
-			return pluralLabel == null ? getLabel(iri, false) : pluralLabel;
+			return pluralLabel == null ? getInverseLabel(iri, false) : pluralLabel;
 		}
 		return inverseLabels.get(iri);
 	}
@@ -113,6 +114,7 @@ public class VocabularyStore {
 			this.type = type;
 		}
 		public Collection<Property> get() {
+			if (dataSource == null) return Collections.emptyList();
 			if (cache != null) return cache;
 			cache = new ArrayList<Property>();
 			Model result = dataSource.listPropertyValues(type.getURI(), RDF.type, true);

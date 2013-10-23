@@ -346,7 +346,8 @@ ex:Widget rdfs:label "widget"@en.</pre>
   target endpoint to build the description of a single resource. The resource to be
   described is given in the placeholder variable <tt>?__this__</tt>. Only query forms
   that return an RDF graph are allowed (that is, <tt>DESCRIBE</tt> and
-  <tt>CONSTRUCT</tt>). If unspecified and SPARQL 1.1 is not supported, the following
+  <tt>CONSTRUCT</tt>). If unspecified and SPARQL 1.1 is not supported
+  (see <tt>conf:supportsSPARQL11</tt>, then the following
   <tt>DESCRIBE</tt> query is used:</p>
   <pre>DESCRIBE ?__this__</pre>
   <p>On SPARQL endpoints that do not (propertly) support the default
@@ -433,6 +434,16 @@ conf:anonymousInversePropertyDescriptionQuery
   queries. This can be used to force communication to use Turtle instead
   of RDF/XML to solve issues with non-serializable graphs, provided the
   endpoint supports Turtle.</p></dd>
+
+<dt><tt>conf:queryParamSelect "<em>param=value</em>";</tt></dt>
+<dd><p>Specifies an additional request parameter that will be sent to
+  the remote SPARQL endpoint in the URL for SPARQL protocol requests
+  for <code>SELECT</code> queries.</p></dd>
+
+<dt><tt>conf:queryParamGraph "<em>param=value</em>";</tt></dt>
+<dd><p>Specifies an additional request parameter that will be sent to
+  the remote SPARQL endpoint in the URL for SPARQL protocol requests
+  for <code>CONSTRUCT</code> and <code>DESCRIBE</code> queries.</p></dd>
 </dl>
 
 
@@ -466,7 +477,7 @@ conf:anonymousInversePropertyDescriptionQuery
   to contribute lots of outgoing arcs. If this class is given to a property, then
   Pubby puts all of its values onto a separate page. This reduces the size of the
   resource's main page. Note that this feature has no effect on SPARQL endpoints that
-  don't support SPARQL 1.1.</p></dd>
+  don't support SPARQL 1.1 (see <tt>conf:supportsSPARQL11</tt>).</p></dd>
 </dl>
 
 

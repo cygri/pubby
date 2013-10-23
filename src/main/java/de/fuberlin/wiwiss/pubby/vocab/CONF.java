@@ -50,6 +50,8 @@ public class CONF {
 	public static final Property anonymousInversePropertyDescriptionQuery = m.createProperty(NS
 			+ "anonymousInversePropertyDescriptionQuery");
 	public static final Property browsableNamespace = m.createProperty(NS + "browsableNamespace");
+	public static final Property queryParamSelect = m.createProperty(NS + "queryParamSelect");
+	public static final Property queryParamGraph = m.createProperty(NS + "queryParamGraph");
 	
 	// Terms to annotate vocabulary
 	public static final Property weight = m.createProperty(NS + "weight");

@@ -15,7 +15,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * @version $Id$
  */
 public interface DataSource {
-	static final int MAX_INDEX_SIZE = 1000;
+	static final int MAX_INDEX_SIZE = 100;
 	
 	/**
 	 * Indicates whether this data source may have some information about

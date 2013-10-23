@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -28,6 +30,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.sparql.engine.http.HttpQuery;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
+import de.fuberlin.wiwiss.pubby.ConfigurationException;
 import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
 
 /**
@@ -54,6 +57,8 @@ public class RemoteSPARQLDataSource implements DataSource {
 	
 	private String previousDescribeQuery;
 	private String contentType = null;
+	private final Set<String[]> queryParamsSelect = new HashSet<String[]>();
+	private final Set<String[]> queryParamsGraph = new HashSet<String[]>();
 	
 	public RemoteSPARQLDataSource(String endpointURL, String defaultGraphURI) {
 		this(endpointURL, defaultGraphURI, false, null, null, null, null, null, null, null);
@@ -103,13 +108,32 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	/**
-	 * Sets the content type to ask for in the request to the remote
-	 * SPARQL endpoint.
+	 * Sets the content type to ask for in graph requests (CONSTRUCT and
+	 * DESCRIBE) to the remote SPARQL endpoint.
 	 */
-	public void setContentType(String mediaType) {
+	public void setGraphContentType(String mediaType) {
 		this.contentType = mediaType;
 	}
 
+	public void addGraphQueryParam(String param) {
+		queryParamsGraph.add(parseQueryParam(param));
+	}
+	
+	public void addSelectQueryParam(String param) {
+		queryParamsSelect.add(parseQueryParam(param));
+	}
+	
+	private String[] parseQueryParam(String param) {
+		Matcher match = queryParamPattern.matcher(param);
+		if (!match.matches()) {
+			throw new ConfigurationException("Query parameter \"" + param + 
+					"\" is not in \"param=value\" form");
+		}
+		return new String[]{match.group(1), match.group(2)};
+	}
+	
+	private Pattern queryParamPattern = Pattern.compile("(.*?)=(.*)");
+			
 	@Override
 	public boolean canDescribe(String absoluteIRI) {
 		return true;
@@ -121,7 +145,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 		// Process each query to replace place-holders of the given resource.
 		Model model = ModelFactory.createDefaultModel();
 		for (String query: resourceQueries) {
-			Model result = executeQuery(preProcessQuery(query, resourceURI));
+			Model result = execQueryGraph(preProcessQuery(query, resourceURI));
 			model.add(result);
 			model.setNsPrefixes(result);
 		}
@@ -156,7 +180,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 			String resourceURI) {
 		if (!supportsSPARQL11) return null;
 		query = preProcessQuery(query, resourceURI);
-		ResultSet rs = execSelectQuery(query);
+		ResultSet rs = execQuerySelect(query);
 		Map<Property, Integer> results = new HashMap<Property, Integer>();
 		while (rs.hasNext()) {
 			QuerySolution solution = rs.next();
@@ -178,7 +202,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 		Model model = ModelFactory.createDefaultModel();
 		for (String query: queries) {
 			String preprocessed = preProcessQuery(query, resourceURI, property);
-			Model result = executeQuery(preprocessed);
+			Model result = execQueryGraph(preprocessed);
 			model.add(result);
 			model.setNsPrefixes(result);
 		}
@@ -188,7 +212,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	@Override
 	public List<Resource> getIndex() {
 		List<Resource> result = new ArrayList<Resource>();
-		ResultSet rs = execSelectQuery(
+		ResultSet rs = execQuerySelect(
 				"SELECT DISTINCT ?s { " +
 				"?s ?p ?o " +
 				"FILTER (isURI(?s)) " +
@@ -197,7 +221,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 			result.add(rs.next().getResource("s"));
 		}
 		if (result.size() < DataSource.MAX_INDEX_SIZE) {
-			rs = execSelectQuery(
+			rs = execQuerySelect(
 					"SELECT DISTINCT ?o { " +
 					"?s ?p ?o " +
 					"FILTER (isURI(?o)) " +
@@ -213,9 +237,9 @@ public class RemoteSPARQLDataSource implements DataSource {
 		return previousDescribeQuery;
 	}
 	
-	private Model executeQuery(String queryString) {
+	private Model execQueryGraph(String query) {
 		Model model = ModelFactory.createDefaultModel();
-		previousDescribeQuery = queryString;
+		previousDescribeQuery = query;
 
 		// Since we don't know the exact query type (e.g. DESCRIBE or CONSTRUCT),
 		// and com.hp.hpl.jena.query.QueryFactory could throw exceptions on
@@ -224,9 +248,12 @@ public class RemoteSPARQLDataSource implements DataSource {
 		// read the results into model.
 		
 		HttpQuery httpQuery = new HttpQuery(endpointURL);
-		httpQuery.addParam("query", queryString);
+		httpQuery.addParam("query", query);
 		if (defaultGraphURI != null) {
 			httpQuery.addParam("default-graph-uri", defaultGraphURI);
+		}
+		for (String[] param: queryParamsGraph) {
+			httpQuery.addParam(param[0], param[1]);
 		}
 		
 		// The rest is more or less a copy of QueryEngineHTTP.execModel()
@@ -247,8 +274,9 @@ public class RemoteSPARQLDataSource implements DataSource {
 		// type
 		Lang lang = WebContent.contentTypeToLang(actualContentType);
 		if (!RDFLanguages.isTriples(lang))
-			throw new QueryException("Endpoint returned Content Type: " + actualContentType
-					+ " which is not a valid RDF Graph syntax");
+			throw new QueryException("Endpoint <" + endpointURL + 
+					"> returned Content Type: " + actualContentType
+					+ " which is not a supported RDF graph syntax");
 		RDFDataMgr.read(model, in, lang);
 
 		// Skip prefixes ns1, ns2, etc, which are usually
@@ -262,10 +290,13 @@ public class RemoteSPARQLDataSource implements DataSource {
 		return model;
 	}
 	
-	private ResultSet execSelectQuery(String query) {
+	private ResultSet execQuerySelect(String query) {
 		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
 		if (defaultGraphURI != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphURI));
+		}
+		for (String[] param: queryParamsSelect) {
+			endpoint.addParam(param[0], param[1]);
 		}
 		return endpoint.execSelect();
 	}

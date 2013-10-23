@@ -1,19 +1,31 @@
 package de.fuberlin.wiwiss.pubby;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
+import de.fuberlin.wiwiss.pubby.sources.DataSource;
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
 /**
- * The vocabulary cache is used to store labels and descriptions
- * of classes and properties.
+ * A store for labels, descriptions and other metadata of classes and
+ * properties. Values are retrieved from a {@link DataSource} and
+ * cached.
  *
  * TODO: This is not i18n aware. Needs ability to cache one label/desc per language, and return Literals incl language tag
  * 
@@ -22,100 +34,175 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * @version $Id$
  */
 public class VocabularyStore {
-	private final Configuration configuration;
-	private final Model store;
-	private final Map<String, String> labelCache = new HashMap<String, String>();
-	private final Map<String, String> inverseLabelCache = new HashMap<String, String>();
-	private final Map<String, String> pluralLabelCache = new HashMap<String, String>();
-	private final Map<String, String> inversePluralLabelCache = new HashMap<String, String>();
-	private final Map<String, String> descriptionCache = new HashMap<String, String>();
-	private final Map<String, Integer> weightCache = new HashMap<String, Integer>();
+	private DataSource dataSource;
+	private String defaultLanguage = "en";
 	
-	public VocabularyStore(Model model, Configuration configuration) {
-		this.store = model;
-		this.configuration = configuration;
+	/**
+	 * Needs to be set before the instance is used! This is to allow creation
+	 * of the store before the dataset is fully assembled.
+	 */
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
-	public String getLabel(String uri, boolean preferPlural) {
-		return getLabel(uri, preferPlural, configuration.getDefaultLanguage());
+	public void setDefaultLanguage(String defaultLanguage) {
+		this.defaultLanguage = defaultLanguage;
+	}
+	
+	private final StringValueCache labels = new StringValueCache(RDFS.label, false);
+	private final StringValueCache pluralLabels = new StringValueCache(CONF.pluralLabel, false);
+	private final StringValueCache inverseLabels = new StringValueCache(RDFS.label, true);
+	private final StringValueCache inversePluralLabels = new StringValueCache(CONF.pluralLabel, true);
+	private final StringValueCache descriptions = new StringValueCache(RDFS.comment, false);
+	private final IntegerValueCache weights = new IntegerValueCache(CONF.weight, false);
+	private final CachedPropertyCollection highIndegreeProperties = new CachedPropertyCollection(CONF.HighIndregreeProperty);
+	private final CachedPropertyCollection highOutdegreeProperties = new CachedPropertyCollection(CONF.HighOutdregreeProperty);
+	
+	public String getLabel(String iri, boolean preferPlural) {
+		return getLabel(iri, preferPlural, defaultLanguage);
 	}
 
-	public String getLabel(String uri, boolean preferPlural, String language) {
+	public String getLabel(String iri, boolean preferPlural, String language) {
+		// TODO: Use language!
 		if (preferPlural) {
-			if (!pluralLabelCache.containsKey(uri)) {
-				String label = getProperty(uri, CONF.pluralLabel, null);
-				if (label == null) {
-					label = getLabel(uri, false, language);
-				}
-				pluralLabelCache.put(uri, label);
-			}
-			return pluralLabelCache.get(uri);
+			String pluralLabel = pluralLabels.get(iri);
+			return pluralLabel == null ? getLabel(iri, false) : pluralLabel;
 		}
-		if (!labelCache.containsKey(uri)) {
-			labelCache.put(uri, getProperty(uri, RDFS.label, null));
-		}
-		return labelCache.get(uri);
+		return labels.get(iri);
 	}
 
-	public String getInverseLabel(String uri, boolean preferPlural) {
-		return getInverseLabel(uri, preferPlural, configuration.getDefaultLanguage());
+	public String getInverseLabel(String iri, boolean preferPlural) {
+		return getInverseLabel(iri, preferPlural, defaultLanguage);
 	}
 	
-	public String getInverseLabel(String uri, boolean preferPlural, String language) {
+	public String getInverseLabel(String iri, boolean preferPlural, String language) {
+		// TODO: Use language!
 		if (preferPlural) {
-			if (!inversePluralLabelCache.containsKey(uri)) {
-				String label = getInverseProperty(uri, CONF.pluralLabel, null);
-				if (label == null) {
-					label = getInverseLabel(uri, false, language);
-				}
-				inversePluralLabelCache.put(uri, label);
-			}
-			return inversePluralLabelCache.get(uri);
+			String pluralLabel = inversePluralLabels.get(iri);
+			return pluralLabel == null ? getLabel(iri, false) : pluralLabel;
 		}
-		if (!inverseLabelCache.containsKey(uri)) {
-			inverseLabelCache.put(uri, getInverseProperty(uri, RDFS.label, null));
-		}
-		return inverseLabelCache.get(uri);
+		return inverseLabels.get(iri);
 	}
 	
-	public String getDescription(String uri) {
-		return getDescription(uri, configuration.getDefaultLanguage());
+	public String getDescription(String iri) {
+		return getDescription(iri, defaultLanguage);
 	}
 
-	public String getDescription(String uri, String language) {
-		if (descriptionCache.containsKey(uri)) {
-			return descriptionCache.get(uri);
-		}
-		String desc = getProperty(uri, RDFS.comment, null);
-		descriptionCache.put(uri, desc);
-		return desc;
+	public String getDescription(String iri, String language) {
+		// TODO: Use language!
+		return descriptions.get(iri);
 	}
 
 	public int getWeight(Property property) {
-		if (weightCache.containsKey(property.getURI())) {
-			return weightCache.get(property.getURI());
+		Integer result = weights.get(property.getURI());
+		return result == null ? 0 : result.intValue();
+	}
+
+	public CachedPropertyCollection getHighIndegreeProperties() {
+		return highIndegreeProperties;
+	}
+
+	public CachedPropertyCollection getHighOutdegreeProperties() {
+		return highOutdegreeProperties;
+	}
+
+	public class CachedPropertyCollection {
+		private final Resource type;
+		private Collection<Property> cache = null;
+		CachedPropertyCollection(Resource type) {
+			this.type = type;
 		}
-		Resource r = store.getResource(property.getURI());
-		int weight = r.hasProperty(CONF.weight) 
-				? r.getProperty(CONF.weight).getInt() : 0;
-		weightCache.put(property.getURI(), weight);
-		return weight;
+		public Collection<Property> get() {
+			if (cache != null) return cache;
+			cache = new ArrayList<Property>();
+			Model result = dataSource.listPropertyValues(type.getURI(), RDF.type, true);
+			StmtIterator it = result.listStatements(null, RDF.type, type);
+			while (it.hasNext()) {
+				Resource r = it.next().getSubject();
+				if (!r.isURIResource()) continue;
+				cache.add(r.as(Property.class));
+			}
+			return cache;
+		}
 	}
 	
-	protected String getProperty(String uri, Property prop, String defaultValue) {
-		try {
-			return store.getResource(uri).getProperty(prop).getString();
-		} catch (Throwable t) {
-			return defaultValue;
+	private abstract class ValueCache<K> {
+		private final Property property;
+		private final boolean inverse;
+		private final Map<String, K> cache = new HashMap<String, K>();
+		ValueCache(Property property, boolean inverse) {
+			this.property = property;
+			this.inverse = inverse;
+		}
+		abstract K pickBestValue(Set<RDFNode> candidates);
+		K get(String iri) {
+			if (cache.containsKey(iri)) {
+				return cache.get(iri);
+			}
+			K best = null;
+			if (dataSource.canDescribe(iri)) {
+				best = pickBestFromModel(dataSource.describeResource(iri), iri);
+			}
+			cache.put(iri, best);
+			return best;
+		}
+		private K pickBestFromModel(Model m, String iri) {
+			Resource r = m.getResource(iri);
+			Set<RDFNode> nodes = inverse ? getInverseValues(r) : getValues(r);
+			return pickBestValue(nodes);
+		}
+		private Set<RDFNode> getValues(Resource r) {
+			Set<RDFNode> nodes = new HashSet<RDFNode>();
+			StmtIterator it = r.listProperties(property);
+			while (it.hasNext()) {
+				nodes.add(it.next().getObject());
+			}
+			return nodes;
+		}
+		private Set<RDFNode> getInverseValues(Resource r) {
+			Set<RDFNode> nodes = new HashSet<RDFNode>();
+			StmtIterator it = r.listProperties(OWL.inverseOf);
+			while (it.hasNext()) {
+				RDFNode object = it.next().getObject();
+				if (!object.isResource()) continue;
+				StmtIterator it2 = object.asResource().listProperties(property);
+				while (it2.hasNext()) {
+					nodes.add(it2.next().getObject());
+				}
+			}
+			return nodes;
 		}
 	}
-	
-	protected String getInverseProperty(String uri, Property prop, String defaultValue) {
-		try {
-			return store.getResource(uri).getProperty(OWL.inverseOf)
-					.getResource().getProperty(prop).getString();
-		} catch (Throwable t) {
-			return defaultValue;
+
+	private class StringValueCache extends ValueCache<String> {
+		StringValueCache(Property p, boolean inverse) { super(p, inverse); }
+		@Override
+		String pickBestValue(Set<RDFNode> candidates) {
+			for (RDFNode node: candidates) {
+				if (!node.isLiteral()) continue;
+				Literal l = node.asLiteral();
+				String dt = l.getDatatypeURI();
+				if (dt == null || dt.equals(XSD.xstring.getURI()) || dt.equals(RDF.getURI() + "langString")) {
+					return l.getLexicalForm();
+				}
+			}
+			return null;
+		}
+	}
+
+	private class IntegerValueCache extends ValueCache<Integer> {
+		IntegerValueCache(Property p, boolean inverse) { super(p, inverse); }
+		@Override
+		Integer pickBestValue(Set<RDFNode> candidates) {
+			for (RDFNode node: candidates) {
+				if (!node.isLiteral()) continue;
+				try {
+					return node.asLiteral().getInt();
+				} catch (JenaException ex) {
+					continue;
+				}
+			}
+			return null;
 		}
 	}
 }

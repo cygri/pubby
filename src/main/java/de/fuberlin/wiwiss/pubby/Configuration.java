@@ -2,6 +2,7 @@ package de.fuberlin.wiwiss.pubby;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import de.fuberlin.wiwiss.pubby.sources.DataSource;
 import de.fuberlin.wiwiss.pubby.sources.IndexDataSource;
 import de.fuberlin.wiwiss.pubby.sources.MergeDataSource;
+import de.fuberlin.wiwiss.pubby.sources.ModelDataSource;
 import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
 /**
@@ -41,29 +43,37 @@ public class Configuration extends ResourceReader {
 		return new Configuration(it.nextStatement().getSubject());
 	}
 	
-	private final Model modelWithImports;
 	private final PrefixMapping prefixes;
 	private final String webBase;
 	private final Collection<Property> labelProperties;
 	private final Collection<Property> commentProperties;
 	private final Collection<Property> imageProperties;
 	private final ArrayList<Dataset> datasets = new ArrayList<Dataset>();
-	private final VocabularyStore vocabularyStore;
+	private final VocabularyStore vocabularyStore = new VocabularyStore();
 	private final DataSource dataSource;
 	private final String indexIRI;
+	private final Set<String> allBrowsableNamespaces = new HashSet<String>();
 	
 	public Configuration(Resource configuration) {
 		super(configuration);
 		webBase = getRequiredIRI(CONF.webBase);
 
-		modelWithImports = ModelFactory.createDefaultModel().add(getModel());
-		for (String sourceURL: getIRIs(CONF.loadVocabularyFromURL)) {
-			FileManager.get().readModel(modelWithImports, sourceURL);
-		}
-		vocabularyStore = new VocabularyStore(modelWithImports, this);
-
+		// Create datasets from conf:dataset
 		for (Resource r: getResources(CONF.dataset)) {
-			datasets.add(new Dataset(r, this));
+			Dataset ds = new Dataset(r, this);
+			datasets.add(ds);
+			allBrowsableNamespaces.addAll(ds.getBrowsableNamespaces());
+		}
+		allBrowsableNamespaces.add(getWebApplicationBaseURI() + getWebResourcePrefix());
+		allBrowsableNamespaces.addAll(getBrowsableNamespaces());
+		
+		// Create datasets from conf:loadVocabularyFromURL
+		for (String sourceURL: getIRIs(CONF.loadVocabularyFromURL)) {
+			Model m = ModelFactory.createDefaultModel();
+			Resource dummyDataset = m.createResource();
+			dummyDataset.addProperty(CONF.loadRDF, m.createResource(sourceURL));
+			dummyDataset.addProperty(RDF.type, CONF.AnnotationProvider);
+			datasets.add(new Dataset(dummyDataset, this));
 		}
 		
 		labelProperties = getProperties(CONF.labelProperty);
@@ -99,6 +109,14 @@ public class Configuration extends ResourceReader {
 		ModelUtil.addNSIfUndefined(prefixes, "rdf", RDF.getURI());
 		ModelUtil.addNSIfUndefined(prefixes, "xsd", XSD.getURI());
 		dataSource = buildDataSource();
+
+		// Vocabulary data source contains our normal data sources plus
+		// the configuration model, so that we can read labels etc from
+		// the configuration file
+		DataSource vocabularyDataSource = new MergeDataSource(
+				new ModelDataSource(getModel()), getDataSource());
+		vocabularyStore.setDataSource(vocabularyDataSource);
+		vocabularyStore.setDefaultLanguage(getDefaultLanguage());
 
 		// Sanity check to spot typical configuration problem
 		if (dataSource.getIndex().isEmpty()) {
@@ -192,7 +210,7 @@ public class Configuration extends ResourceReader {
 	}
 	
 	public String getDefaultLanguage() {
-		return getString(CONF.defaultLanguage);
+		return getString(CONF.defaultLanguage, "en");
 	}
 	
 	/**
@@ -227,22 +245,6 @@ public class Configuration extends ResourceReader {
 		return vocabularyStore;
 	}
 	
-	public Collection<Property> getHighOutdegreeProperties() {
-		if (highOutdegreePropertyCache == null) {
-			highOutdegreePropertyCache = getPropertiesByType(CONF.HighOutdregreeProperty);
-		}
-		return highOutdegreePropertyCache;
-	}
-	private Collection<Property> highOutdegreePropertyCache = null;
-
-	public Collection<Property> getHighIndegreeProperties() {
-		if (highIndegreePropertyCache == null) {
-			highIndegreePropertyCache = getPropertiesByType(CONF.HighIndregreeProperty);
-		}
-		return highIndegreePropertyCache;
-	}
-	private Collection<Property> highIndegreePropertyCache = null;
-
 	/**
 	 * Gets all values of <tt>conf:browsableNamespace</tt> declared on the
 	 * configuration resource. Does not include values declared on specific
@@ -254,12 +256,10 @@ public class Configuration extends ResourceReader {
 		return getIRIs(CONF.browsableNamespace);
 	}
 	
-	private Collection<Property> getPropertiesByType(Resource type) {
-		Collection<Property> results = new ArrayList<Property>();
-		StmtIterator it = modelWithImports.listStatements(null, RDF.type, type);
-		while (it.hasNext()) {
-			results.add(it.next().getSubject().as(Property.class));
+	public boolean isBrowsable(String iri) {
+		for (String namespace: allBrowsableNamespaces) {
+			if (iri.startsWith(namespace)) return true;
 		}
-		return results;
+		return false;
 	}
 }

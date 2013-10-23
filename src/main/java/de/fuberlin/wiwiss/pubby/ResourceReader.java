@@ -36,6 +36,10 @@ public abstract class ResourceReader {
 		return resource.getModel();
 	}
 
+	public boolean hasType(Resource class_) {
+		return resource.hasProperty(RDF.type, class_);
+	}
+	
 	public boolean hasProperty(Property p) {
 		return resource.hasProperty(p);
 	}

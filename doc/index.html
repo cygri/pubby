@@ -244,7 +244,13 @@ pre { speak-punctuation: code; }
 ex:Widget rdfs:label "widget"@en.</pre>
   <p>The example defines a label for <tt>ex:Widget</tt>, and retrieves labels
   from the RDF Schema and SKOS namespace files off the Web, as well as from
-  one local file located in the same directory as <tt>config.ttl</tt>.</p></dd>
+  one local file located in the same directory as <tt>config.ttl</tt>.</p>
+  <p>Declaring this property is equivalent to setting up a new dataset
+  with these settings:</p>
+  <pre>conf:dataset [
+    a conf:AnnotationProvider;
+    conf:loadRDF &lt;<em>vocabularyURL</em>&gt;;
+];</pre></dd>
 
 <dt><tt>conf:webResourcePrefix "<em>uri_prefix/</em>";</tt></dt>
 <dd><p>If present, this string will be prefixed to resource URIs
@@ -307,6 +313,23 @@ ex:Widget rdfs:label "widget"@en.</pre>
   into your dataset.</p>
   <p>The value <tt>&lt;http://&gt;</tt> can be used to make Pubby handle
   <em>all</em> (HTTP) URIs.</p></dd>
+
+<dt><tt>a conf:AnnotationProvider</tt></dt>
+<dd><p>A dataset typed as an annotation provider will be queried for
+  <em>every</em> resource that is displayed, regardless of
+  <tt>conf:datasetBase</tt> and <tt>conf:browsableNamespace</tt>
+  settings. This is only recommended for small datasets loaded
+  into memory to provide labels and other annotations for vocabulary
+  terms, etc.</p>
+  <p>This example loads vocabularies from multiple locations on the
+  Web and makes them browsable:</p>
+  <pre>conf:dataset [
+    a conf:AnnotationProvider;
+    conf:loadRDF &lt;http://dublincore.org/2012/06/14/dcterms.ttl&gt;,
+                 &lt;http://vocab.deri.ie/void.ttl&gt;;
+    conf:browsableNamespace dcterms:, void:;
+];
+</pre></dd>
 
 <dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
 <dd><p>If present, only dateset IRIs matching this

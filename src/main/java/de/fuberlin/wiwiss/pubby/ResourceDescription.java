@@ -429,10 +429,12 @@ public class ResourceDescription {
 		public String getLabel() {
 			if (!node.isResource()) return null;
 			String result = null;
-			if (node.isURIResource()) {
+			if (node.isURIResource() && predicate.equals(RDF.type)) {
+				// Look up class labels in cache
 				result = vocabularyStore.getLabel(node.asNode().getURI(), false);
 			}
 			if (result == null) {
+				// Use any label that may be included in the description model
 				result = new ResourceDescription(node.asResource(), model, config).getLabel();
 			}
 			return toTitleCase(result, null);

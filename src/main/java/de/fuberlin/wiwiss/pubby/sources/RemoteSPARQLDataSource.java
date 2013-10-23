@@ -28,6 +28,8 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.sparql.engine.http.HttpQuery;
 import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
+import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
+
 /**
  * A data source backed by a SPARQL endpoint accessed through
  * the SPARQL protocol.
@@ -47,8 +49,8 @@ public class RemoteSPARQLDataSource implements DataSource {
 	private final Set<String> anonPropertyQueries;
 	private final Set<String> anonInversePropertyQueries;
 	
-	private final Collection<Property> highIndegreeProperties;
-	private final Collection<Property> highOutdegreeProperties;
+	private final CachedPropertyCollection highIndegreeProperties;
+	private final CachedPropertyCollection highOutdegreeProperties;
 	
 	private String previousDescribeQuery;
 	private String contentType = null;
@@ -62,7 +64,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 			Set<String> resourceQueries, 
 			Set<String> propertyQueries, Set<String> inversePropertyQueries,
 			Set<String> anonPropertyQueries, Set<String> anonInversePropertyQueries,
-			Collection<Property> highIndegreeProperties, Collection<Property> highOutdegreeProperties) {
+			CachedPropertyCollection highIndegreeProperties, CachedPropertyCollection highOutdegreeProperties) {
 		this.endpointURL = endpointURL;
 		this.defaultGraphURI = defaultGraphURI;
 		this.supportsSPARQL11 = supportsSPARQL11;
@@ -96,10 +98,8 @@ public class RemoteSPARQLDataSource implements DataSource {
 		this.anonPropertyQueries = anonPropertyQueries;
 		this.anonInversePropertyQueries = anonInversePropertyQueries;
 		
-		this.highIndegreeProperties = highIndegreeProperties == null ? 
-				Collections.<Property>emptySet() : highIndegreeProperties;
-		this.highOutdegreeProperties = highOutdegreeProperties == null ? 
-				Collections.<Property>emptySet() : highOutdegreeProperties;
+		this.highIndegreeProperties = highIndegreeProperties;
+		this.highOutdegreeProperties = highOutdegreeProperties;
 	}
 	
 	/**
@@ -280,9 +280,9 @@ public class RemoteSPARQLDataSource implements DataSource {
 			result = replaceString(result, "?__property__", "<" + property.getURI() + ">");
 		}
 		result = replaceString(result, "?__high_indegree_properties__", 
-				toSPARQLArgumentList(highIndegreeProperties));
+				toSPARQLArgumentList(highIndegreeProperties == null ? null : highIndegreeProperties.get()));
 		result = replaceString(result, "?__high_outdegree_properties__", 
-				toSPARQLArgumentList(highOutdegreeProperties));
+				toSPARQLArgumentList(highOutdegreeProperties == null ? null : highOutdegreeProperties.get()));
 		return result;
 	}
 	
@@ -305,6 +305,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	private String toSPARQLArgumentList(Collection<? extends RDFNode> values) {
+		if (values == null) return "()";
 		StringBuilder result = new StringBuilder();
 		result.append('(');
 		boolean isFirst = true;

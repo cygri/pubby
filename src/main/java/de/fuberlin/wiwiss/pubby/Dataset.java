@@ -8,6 +8,7 @@ import com.hp.hpl.jena.n3.IRIResolver;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
 
 import de.fuberlin.wiwiss.pubby.sources.DataSource;
@@ -58,6 +59,18 @@ public class Dataset extends ResourceReader {
 		return getBoolean(CONF.supportsSPARQL11, false);
 	}
 
+	/**
+	 * Gets all values of <tt>conf:browsableNamespace</tt> declared on the
+	 * dataset resource. Does not include values inherited from the
+	 * configuration resource.
+	 *  
+	 * @return Namespace IRIs of browsable namespaces
+	 */
+	public Set<String> getBrowsableNamespaces() {
+		return getIRIs(CONF.browsableNamespace);
+	}
+	
+
 	private DataSource buildDataSource(Configuration configuration) {
 		requireExactlyOneOf(CONF.sparqlEndpoint, CONF.loadRDF);
 
@@ -76,8 +89,8 @@ public class Dataset extends ResourceReader {
 					getStrings(CONF.inversePropertyListQuery),
 					getStrings(CONF.anonymousPropertyDescriptionQuery),
 					getStrings(CONF.anonymousInversePropertyDescriptionQuery),
-					configuration.getHighIndegreeProperties(),
-					configuration.getHighOutdegreeProperties());
+					configuration.getVocabularyStore().getHighIndegreeProperties(),
+					configuration.getVocabularyStore().getHighOutdegreeProperties());
 			if (hasProperty(CONF.contentType)) {
 				sparqlDataSource.setContentType(getString(CONF.contentType));
 			}
@@ -95,15 +108,19 @@ public class Dataset extends ResourceReader {
 				String base = (fileName.startsWith("file:/") ? 
 						configuration.getWebApplicationBaseURI() : fileName);
 
-				Model m = FileManager.get().loadModel(fileName, base, null);
-				data.add(m);
+				try {
+					Model m = FileManager.get().loadModel(fileName, base, null);
+					data.add(m);
 				
-				// We'd like to do simply data.setNsPrefix(m), but that leaves relative
-				// namespace URIs like <#> unresolved, so we do a big dance to make them
-				// absolute.
-				for (String prefix: m.getNsPrefixMap().keySet()) {
-					String uri = IRIResolver.resolve(m.getNsPrefixMap().get(prefix), base);
-					data.setNsPrefix(prefix, uri);
+					// We'd like to do simply data.setNsPrefix(m), but that leaves relative
+					// namespace URIs like <#> unresolved, so we do a big dance to make them
+					// absolute.
+					for (String prefix: m.getNsPrefixMap().keySet()) {
+						String uri = IRIResolver.resolve(m.getNsPrefixMap().get(prefix), base);
+						data.setNsPrefix(prefix, uri);
+					}
+				} catch (JenaException ex) {
+					throw new ConfigurationException("Error reading <" + fileName + ">: " + ex.getMessage());
 				}
 			}
 			result = new ModelDataSource(data);
@@ -140,23 +157,27 @@ public class Dataset extends ResourceReader {
 		result = new RewrittenDataSource(
 				result, rewriter, addSameAsStatements());
 
-		// Filter the dataset to keep only those resources in the datasetBase
-		// and in browsable namespaces
+		// Determine all browsable namespaces for this dataset
 		final Set<String> browsableNamespaces = new HashSet<String>();
 		browsableNamespaces.add(fullWebBase);
-		for (String iri: getIRIs(CONF.browsableNamespace)) {
+		for (String iri: getBrowsableNamespaces()) {
 			browsableNamespaces.add(iri);
 		}
 		browsableNamespaces.addAll(configuration.getBrowsableNamespaces());
-		result = new FilteredDataSource(result) {
-			@Override
-			public boolean canDescribe(String absoluteIRI) {
-				for (String namespace: browsableNamespaces) {
-					if (absoluteIRI.startsWith(namespace)) return true;
+
+		// Filter the dataset to keep only those resources in the datasetBase
+		// and in browsable namespaces, unless it's an annotation provider
+		if (!hasType(CONF.AnnotationProvider)) {
+			result = new FilteredDataSource(result) {
+				@Override
+				public boolean canDescribe(String absoluteIRI) {
+					for (String namespace: browsableNamespaces) {
+						if (absoluteIRI.startsWith(namespace)) return true;
+					}
+					return false;
 				}
-				return false;
-			}
-		};
+			};
+		}
 		
 		return result;
 	}

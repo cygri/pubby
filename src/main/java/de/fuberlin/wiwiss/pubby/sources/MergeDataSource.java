@@ -1,6 +1,7 @@
 package de.fuberlin.wiwiss.pubby.sources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,10 @@ import de.fuberlin.wiwiss.pubby.ModelUtil;
 public class MergeDataSource implements DataSource {
 	private final Collection<DataSource> sources;
 	private final PrefixMapping prefixes;
+	
+	public MergeDataSource(DataSource... sources) {
+		this(Arrays.asList(sources));
+	}
 	
 	public MergeDataSource(Collection<DataSource> sources) {
 		this(sources, new PrefixMappingImpl());

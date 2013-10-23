@@ -27,6 +27,9 @@ public class CONF {
 	public static final Property showLabels = m.createProperty(NS + "showLabels");
 	public static final Property loadVocabularyFromURL = m.createProperty(NS + "loadVocabularyFromURL");
 
+	// Dataset subclasses
+	public static final Resource AnnotationProvider = m.createResource(NS + "AnnotationProvider");
+	
 	// Dataset properties
 	public static final Property datasetBase = m.createProperty(NS + "datasetBase");
 	public static final Property datasetURIPattern = m.createProperty(NS + "datasetURIPattern");

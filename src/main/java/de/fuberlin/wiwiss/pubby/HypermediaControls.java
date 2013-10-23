@@ -48,12 +48,7 @@ public class HypermediaControls {
 	 */
 	public static HypermediaControls createFromIRI(String absoluteIRI, Configuration config) {
 		if (absoluteIRI == null) return null;
-		if (absoluteIRI.startsWith(config.getWebApplicationBaseURI())) {
-			if (!absoluteIRI.startsWith(config.getWebApplicationBaseURI() + config.getWebResourcePrefix())) {
-				return null;
-			}
-		}
-		if (!config.getDataSource().canDescribe(absoluteIRI)) return null;
+		if (!config.isBrowsable(absoluteIRI)) return null;
 		return new HypermediaControls(absoluteIRI, config);
 	}
 	

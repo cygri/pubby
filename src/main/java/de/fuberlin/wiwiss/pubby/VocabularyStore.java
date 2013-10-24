@@ -50,48 +50,45 @@ public class VocabularyStore {
 		this.defaultLanguage = defaultLanguage;
 	}
 	
-	private final StringValueCache labels = new StringValueCache(RDFS.label, false);
-	private final StringValueCache pluralLabels = new StringValueCache(CONF.pluralLabel, false);
-	private final StringValueCache inverseLabels = new StringValueCache(RDFS.label, true);
-	private final StringValueCache inversePluralLabels = new StringValueCache(CONF.pluralLabel, true);
-	private final StringValueCache descriptions = new StringValueCache(RDFS.comment, false);
+	private final I18nStringValueCache labels = new I18nStringValueCache(RDFS.label, false);
+	private final I18nStringValueCache pluralLabels = new I18nStringValueCache(CONF.pluralLabel, false);
+	private final I18nStringValueCache inverseLabels = new I18nStringValueCache(RDFS.label, true);
+	private final I18nStringValueCache inversePluralLabels = new I18nStringValueCache(CONF.pluralLabel, true);
+	private final I18nStringValueCache descriptions = new I18nStringValueCache(RDFS.comment, false);
 	private final IntegerValueCache weights = new IntegerValueCache(CONF.weight, false);
 	private final CachedPropertyCollection highIndegreeProperties = new CachedPropertyCollection(CONF.HighIndregreeProperty);
 	private final CachedPropertyCollection highOutdegreeProperties = new CachedPropertyCollection(CONF.HighOutdregreeProperty);
 	
-	public String getLabel(String iri, boolean preferPlural) {
+	public Literal getLabel(String iri, boolean preferPlural) {
 		return getLabel(iri, preferPlural, defaultLanguage);
 	}
 
-	public String getLabel(String iri, boolean preferPlural, String language) {
-		// TODO: Use language!
+	public Literal getLabel(String iri, boolean preferPlural, String language) {
 		if (preferPlural) {
-			String pluralLabel = pluralLabels.get(iri);
-			return pluralLabel == null ? getLabel(iri, false) : pluralLabel;
+			Literal pluralLabel = pluralLabels.get(iri, language);
+			return pluralLabel == null ? getLabel(iri, false, language) : pluralLabel;
 		}
-		return labels.get(iri);
+		return labels.get(iri, language);
 	}
 
-	public String getInverseLabel(String iri, boolean preferPlural) {
+	public Literal getInverseLabel(String iri, boolean preferPlural) {
 		return getInverseLabel(iri, preferPlural, defaultLanguage);
 	}
 	
-	public String getInverseLabel(String iri, boolean preferPlural, String language) {
-		// TODO: Use language!
+	public Literal getInverseLabel(String iri, boolean preferPlural, String language) {
 		if (preferPlural) {
-			String pluralLabel = inversePluralLabels.get(iri);
-			return pluralLabel == null ? getInverseLabel(iri, false) : pluralLabel;
+			Literal pluralLabel = inversePluralLabels.get(iri, language);
+			return pluralLabel == null ? getInverseLabel(iri, false, language) : pluralLabel;
 		}
-		return inverseLabels.get(iri);
+		return inverseLabels.get(iri, language);
 	}
 	
-	public String getDescription(String iri) {
+	public Literal getDescription(String iri) {
 		return getDescription(iri, defaultLanguage);
 	}
 
-	public String getDescription(String iri, String language) {
-		// TODO: Use language!
-		return descriptions.get(iri);
+	public Literal getDescription(String iri, String language) {
+		return descriptions.get(iri, language);
 	}
 
 	public int getWeight(Property property) {
@@ -176,22 +173,66 @@ public class VocabularyStore {
 		}
 	}
 
-	private class StringValueCache extends ValueCache<String> {
-		StringValueCache(Property p, boolean inverse) { super(p, inverse); }
+// Currently not needed -- all strings are i18n
+//	private class StringValueCache extends ValueCache<String> {
+//		StringValueCache(Property p, boolean inverse) { super(p, inverse); }
+//		@Override
+//		String pickBestValue(Set<RDFNode> candidates) {
+//			for (RDFNode node: candidates) {
+//				if (!node.isLiteral()) continue;
+//				Literal l = node.asLiteral();
+//				String dt = l.getDatatypeURI();
+//				if (dt == null || dt.equals(XSD.xstring.getURI()) || dt.equals(RDF.getURI() + "langString")) {
+//					return l.getLexicalForm();
+//				}
+//			}
+//			return null;
+//		}
+//	}
+
+	private class I18nStringValueCache extends ValueCache<Collection<Literal>> {
+		I18nStringValueCache(Property p, boolean inverse) {
+			super (p, inverse);
+		}
+		Literal get(String iri, String preferredLang) {
+			Literal bestMatch = null;
+			int bestMatchLength = -1;
+			for (Literal l: get(iri)) {
+				int matchLength = getMatchLength(l.getLanguage(), preferredLang);
+				if (matchLength >= bestMatchLength) {
+					bestMatch = l;
+					bestMatchLength = matchLength;
+				}
+			}
+			return bestMatch;
+		}
+		private int getMatchLength(String langTag1, String langTag2) {
+			// TODO: This is very dodgy. It reports a decent match between "xx" and "xxx". Requires some research to do properly.
+			int i = 0;
+			while (i < langTag1.length() && i < langTag2.length()) {
+				char c1 = langTag1.charAt(i);
+				char c2 = langTag2.charAt(i);
+				if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) break;
+				i++;
+			}
+			return i;
+		}
+		
 		@Override
-		String pickBestValue(Set<RDFNode> candidates) {
+		Collection<Literal> pickBestValue(Set<RDFNode> candidates) {
+			Collection<Literal> result = new ArrayList<Literal>(candidates.size());
 			for (RDFNode node: candidates) {
 				if (!node.isLiteral()) continue;
 				Literal l = node.asLiteral();
 				String dt = l.getDatatypeURI();
 				if (dt == null || dt.equals(XSD.xstring.getURI()) || dt.equals(RDF.getURI() + "langString")) {
-					return l.getLexicalForm();
+					result.add(l);
 				}
 			}
-			return null;
+			return result;
 		}
 	}
-
+	
 	private class IntegerValueCache extends ValueCache<Integer> {
 		IntegerValueCache(Property p, boolean inverse) { super(p, inverse); }
 		@Override

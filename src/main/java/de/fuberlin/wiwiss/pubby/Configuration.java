@@ -16,6 +16,7 @@ import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
@@ -68,7 +69,7 @@ public class Configuration extends ResourceReader {
 		allBrowsableNamespaces.addAll(getBrowsableNamespaces());
 		
 		// Create datasets from conf:loadVocabularyFromURL
-		for (String sourceURL: getIRIs(CONF.loadVocabularyFromURL)) {
+		for (String sourceURL: getIRIs(CONF.loadVocabulary)) {
 			Model m = ModelFactory.createDefaultModel();
 			Resource dummyDataset = m.createResource();
 			dummyDataset.addProperty(CONF.loadRDF, m.createResource(sourceURL));
@@ -80,12 +81,14 @@ public class Configuration extends ResourceReader {
 		if (labelProperties.isEmpty()) {
 			labelProperties.add(RDFS.label);
 			labelProperties.add(DC.title);
+			labelProperties.add(DCTerms.title);
 			labelProperties.add(FOAF.name);
 		}
 		commentProperties = getProperties(CONF.commentProperty);
 		if (commentProperties.isEmpty()) {
 			commentProperties.add(RDFS.comment);
 			commentProperties.add(DC.description);
+			commentProperties.add(DCTerms.description);
 		}
 		imageProperties = getProperties(CONF.imageProperty);
 		if (imageProperties.isEmpty()) {

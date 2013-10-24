@@ -88,25 +88,29 @@ public class ResourceDescription {
 	 */
 	public String getTitle() {
 		if (!resource.isURIResource()) return null;
-		String label = getLabel();
+		Literal l = getLabel();
+		String label = l == null ? null : l.getLexicalForm();
+		String lang = l == null ? null : l.getLanguage();
 		if (label == null) {
 			label = new URIPrefixer(resource, getPrefixes()).getLocalName();
 		}
 		if ("".equals(label)) { // Prefix mapping assigns an empty local name
 			label = resource.getURI();
+			lang = null;
 		}
-		// TODO: This should get the correct language from getLabel() and pass it on
-		return toTitleCase(label, null);
+		return toTitleCase(label, lang);
 	}
 
-	public String getLabel() {
+	public Literal getLabel() {
 		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getLabelProperties());
 		return getBestLanguageMatch(candidates, config.getDefaultLanguage());
 	}
 	
 	public String getComment() {
 		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getCommentProperties());
-		return getBestLanguageMatch(candidates, config.getDefaultLanguage());
+		Literal l = getBestLanguageMatch(candidates, config.getDefaultLanguage());
+		if (l == null) return null;
+		return l.getLexicalForm();
 	}
 	
 	public String getImageURL() {
@@ -224,18 +228,19 @@ public class ResourceDescription {
 		return results;
 	}
 	
-	private String getBestLanguageMatch(Collection<RDFNode> nodes, String lang) {
+	// TODO: There is some better (?) code doing the same in VocabularyStore.I18nStringValueCache
+	private Literal getBestLanguageMatch(Collection<RDFNode> nodes, String lang) {
 		Iterator<RDFNode> it = nodes.iterator();
-		String aLiteral = null;
+		Literal aLiteral = null;
 		while (it.hasNext()) {
 			RDFNode candidate = it.next();
 			if (!candidate.isLiteral()) continue;
-			Literal literal = (Literal) candidate.as(Literal.class);
+			Literal literal = candidate.asLiteral();
 			if (lang == null
 					|| lang.equals(literal.getLanguage())) {
-				return literal.getString();
+				return literal;
 			}
-			aLiteral = literal.getString();
+			aLiteral = literal;
 		}
 		return aLiteral;
 	}
@@ -284,13 +289,17 @@ public class ResourceDescription {
 			return getLabel(isMultiValued());
 		}
 		public String getLabel(boolean preferPlural) {
-			return toTitleCase(vocabularyStore.getLabel(predicate.getURI(), preferPlural), null);
+			Literal label = vocabularyStore.getLabel(predicate.getURI(), preferPlural);
+			if (label == null) return null;
+			return toTitleCase(label.getLexicalForm(), label.getLanguage());
 		}
 		public String getInverseLabel() {
 			return getInverseLabel(isMultiValued());
 		}
 		public String getInverseLabel(boolean preferPlural) {
-			return toTitleCase(vocabularyStore.getInverseLabel(predicate.getURI(), preferPlural), null);
+			Literal label = vocabularyStore.getInverseLabel(predicate.getURI(), preferPlural);
+			if (label == null) return null;
+			return toTitleCase(label.getLexicalForm(), label.getLanguage());
 		}
 		/**
 		 * Note: This bypasses conf:showLabels, always assuming <code>true</code>
@@ -311,7 +320,7 @@ public class ResourceDescription {
 			return isInverse ? "Is " + result + " of" : result;
 		}
 		public String getDescription() {
-			return vocabularyStore.getDescription(predicate.getURI());
+			return vocabularyStore.getDescription(predicate.getURI()).getLexicalForm();
 		}
 		public List<Value> getSimpleValues() {
 			return simpleValues;
@@ -428,7 +437,7 @@ public class ResourceDescription {
 		}
 		public String getLabel() {
 			if (!node.isResource()) return null;
-			String result = null;
+			Literal result = null;
 			if (node.isURIResource() && predicate.equals(RDF.type)) {
 				// Look up class labels in cache
 				result = vocabularyStore.getLabel(node.asNode().getURI(), false);
@@ -437,10 +446,11 @@ public class ResourceDescription {
 				// Use any label that may be included in the description model
 				result = new ResourceDescription(node.asResource(), model, config).getLabel();
 			}
-			return toTitleCase(result, null);
+			if (result == null) return null;
+			return toTitleCase(result.getLexicalForm(), result.getLanguage());
 		}
 		public String getDescription() {
-			return vocabularyStore.getDescription(node.asNode().getURI());
+			return vocabularyStore.getDescription(node.asNode().getURI()).getLexicalForm();
 		}
 		public String getDatatypeLabel() {
 			if (!node.isLiteral()) return null;
@@ -488,12 +498,14 @@ public class ResourceDescription {
 	 * Converts a string to Title Case. Also trims surrounding whitespace
 	 * and collapses consecutive whitespace characters within into a single
 	 * space. If the language is English or null, English rules are used.
+	 * Also splits CamelCase into separate words to better deal with poor labels.
 	 */
 	public String toTitleCase(String s, String lang) {
 		if (s == null) return null;
 		if (lang == null) {
 			lang = config.getDefaultLanguage();
 		}
+		s = camelCaseBoundaryPattern.matcher(s).replaceAll(" ");
 		Set<String> uncapitalizedWords = Collections.emptySet();
 		if (lang == null || english.matcher(lang).matches()) {
 			uncapitalizedWords = englishUncapitalizedWords;
@@ -501,8 +513,11 @@ public class ResourceDescription {
 		StringBuffer result = new StringBuffer();
 		Matcher matcher = wordPattern.matcher(s);
 		boolean first = true;
+		int offset = 0;
 		while (matcher.find()) {
-			if (!first) result.append(' ');
+			result.append(normalizeWhitespace(
+					s.substring(offset, matcher.start()), first));
+			offset = matcher.end();
 			String word = matcher.group();
 			if ("".equals(word)) continue;
 			if (first || !uncapitalizedWords.contains(word)) {
@@ -511,9 +526,14 @@ public class ResourceDescription {
 			result.append(word);
 			first = false;
 		}
+		result.append(normalizeWhitespace(
+				s.substring(offset), true));
 		return result.toString();
 	}
-	private static Pattern wordPattern = Pattern.compile("[^ \t\r\n]+");
+	private static Pattern wordPattern = Pattern.compile("[^ \t\r\n-]+|");
+	private static Pattern camelCaseBoundaryPattern = Pattern.compile(
+			"(?<=(\\p{javaLowerCase}|\\p{javaUpperCase})\\p{javaLowerCase})" +
+			"(?=\\p{javaUpperCase}\\p{javaLowerCase})");
 	private static Pattern english = Pattern.compile("^en(-.*)?$", Pattern.CASE_INSENSITIVE);
 	private static Set<String> englishUncapitalizedWords = 
 			new HashSet<String>(Arrays.asList(
@@ -529,4 +549,10 @@ public class ResourceDescription {
 					// Conjunctions
 					"and", "but", "for", "nor", "or", "so", "yet" 
 			));
+	
+	private String normalizeWhitespace(String s, boolean squash) {
+		s = s.replaceAll("[ \t\r\n]+", " ");
+		if (squash && " ".equals(s)) return "";
+		return s;
+	}
 }

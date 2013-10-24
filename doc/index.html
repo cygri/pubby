@@ -226,7 +226,7 @@ pre { speak-punctuation: code; }
 <dd><p>When enabled, Pubby attempts to show <tt>rdfs:labels</tt> instead of
   URIs or prefixed names. Enabled by default.</p></dd>
 
-<dt><tt>conf:loadVocabularyFromURL &lt;<em>vocabularyURL</em>&gt;</tt></dt>
+<dt><tt>conf:loadVocabulary &lt;<em>vocabularyURL</em>&gt;</tt></dt>
 <dd><p>On startup, Pubby will load vocabularies from the listed URLs, and use
   any labels and weights found in them (see <tt>conf:showLabels</tt> and
   <tt>conf:weight</tt>). Pubby will always use any such statements
@@ -236,7 +236,7 @@ pre { speak-punctuation: code; }
   <pre>
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;.
 &lt;&gt; a conf:Configuration;
-    conf:loadVocabularyFromURL
+    conf:loadVocabulary
         &lt;http://www.w3.org/2004/02/skos/core#&gt;,
         rdfs:,
         &lt;custom.ttl&gt;;
@@ -456,7 +456,7 @@ conf:anonymousInversePropertyDescriptionQuery
   Properties with lower weight rise higher in the list, those with higher weight sink
   lower. Weights must be integer numbers and should be between -100 and +100.
   Property weights may be managed in an external RDF file and loaded via
-  <tt>conf:loadVocabularyURL</tt>.</p></dd>
+  <tt>conf:loadVocabulary</tt>.</p></dd>
 <dt><tt><em>my:property</em> owl:inverseOf [ rdfs:label "<em>label</em>" ]</tt></dt>
 <dd><p>When a property occurs as an incoming arc on a resource, this label will
   be shown instead of the default “is XXX of”. Example:</p>

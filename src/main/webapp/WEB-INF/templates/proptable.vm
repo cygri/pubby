@@ -1,6 +1,5 @@
 ## Renders a set of ResourceProperties, given in $properties, as a property-value table
     <table class="description">
-      <tr><th>Property</th><th width="100%">Value</th></tr>
 #foreach ($property in $properties)
 #if ($velocityCount % 2 == 0)
 #set ($odd_even = "even")

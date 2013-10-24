@@ -5,7 +5,7 @@
 #end
 
 #if ($comment)
-    <p>$comment</p>
+    <p class="comment">$comment</p>
 #end
 
 #if (!$properties.isEmpty())

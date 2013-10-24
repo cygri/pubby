@@ -1,5 +1,3 @@
-
-
 img{
 	width:100%;
 }
@@ -9,14 +7,21 @@ img{
     margin-right: auto;
     width:100%;
 }
+.warning{
+	background-color: #f0fcf0;
+}
 .property{
-	width:auto;
+	width:25%;
 }
 td img{
 	margin-right: : 0px;
 	height:auto;
 	width:100px;
 	padding: 0 10px 10px 0;
+}
+
+.table thead tr th {
+    background-color: #efefef;
 }
 
 .wrapword ul{

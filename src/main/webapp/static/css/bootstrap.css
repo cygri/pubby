@@ -2250,7 +2250,7 @@ table th[class*="span"],
 }
 
 .table tbody tr.warning > td {
-  background-color: #fcf8e3;
+  background-color: #f0fcf0;
 }
 
 .table tbody tr.info > td {

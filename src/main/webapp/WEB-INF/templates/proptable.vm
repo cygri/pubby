@@ -1,23 +1,24 @@
 <div class="row-fluid">
-    <table class="table table-striped">
+    <table class="table table-bordered table-hover">
     <thead>
       <tr><th>Property</th><th>Value</th></tr>
      </thead>
      <tbody> 
 #foreach ($property in $properties)
 #if ($velocityCount % 2 == 0)
-#set ($odd_even = "even")
+#set ($odd_even = "even success")
 #else
-#set ($odd_even = "odd")
+#set ($odd_even = "odd warning")
 #end
       <tr class="$odd_even">
         <td class="property">
+        <p> 
 #if ($property.isInverse())
           <small>is</small>
 #end
 #if ($property.hasPrefix())
           <small>$property.Prefix:</small>
-        <p>  <a class="uri" href="$property.URI" title="$property.URI">$property.LocalName</a>
+         <a class="uri" href="$property.URI" title="$property.URI">$property.LocalName</a>
 #else
           <a class="uri" href="$property.URI" title="$property.URI"><small>?:</small><p>$property.LocalName</p></a>
 #end

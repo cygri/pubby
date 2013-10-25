@@ -129,7 +129,6 @@ public class RewrittenDataSource implements DataSource {
 		List<Resource> originalIndex = original.getIndex();
 		List<Resource> result = new ArrayList<Resource>(originalIndex.size());
 		for (Resource r: originalIndex) {
-			if (!canDescribe(r.getURI())) continue;
 			result.add(rewriter.rewrite(r));
 		}
 		return result;

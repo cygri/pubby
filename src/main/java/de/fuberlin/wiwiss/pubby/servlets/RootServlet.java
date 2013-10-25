@@ -7,14 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
 
 /**
  * A catch-all servlet managing the URI space of the web application.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @author Sergio Fernández (sergio.fernandez@fundacionctic.org)
- * @version $Id$
  */
 public class RootServlet extends BaseServlet {
 
@@ -31,12 +28,15 @@ public class RootServlet extends BaseServlet {
 			return true;
 		}
 
-		// Homepage. If index resource is defined, and different from the current URI, redirect to it.
-		if ("".equals(relativeURI) && config.getIndexResource() != null 
-				&& !"".equals(config.getIndexResource().getRelativeIRI())) {
-			response.sendRedirect(IRIEncoder.toURI(
-					config.getIndexResource().getAbsoluteIRI()));
-			return true;
+		// Homepage.
+		if ("".equals(relativeURI)) {
+			// Get the URL where a description of the index resource may be found
+			String indexURL = HypermediaControls.createFromIRI(config.getIndexIRI(), config).getBrowsableURL();
+			if (!config.getWebApplicationBaseURI().equals(indexURL)) {
+				// We need to redirect to the URL
+				response.sendRedirect(IRIEncoder.toURI(indexURL));
+				return true;
+			}
 		}
 		
 		// Assume it's a resource URI -- will produce 404 if not

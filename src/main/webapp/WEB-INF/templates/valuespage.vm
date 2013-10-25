@@ -1,0 +1,36 @@
+## Renders a page showing the values of a single ResourceProperty,
+## given in $property. Simple values are shown first as a list,
+## complex values (i.e., descriptions of blank nodes) as complete
+## resource descriptions underneath.
+#parse("header.vm")
+
+    <p><a href="$back_uri">Back to $back_label</a></p>
+
+    <table class="description">
+      <tr>
+        <th>
+#parse("property-name.vm")
+        </th>
+      </tr>
+      <tr class="container">
+        <td>
+
+#if (!$property.SimpleValues.isEmpty())
+#parse("values.vm")
+#end
+
+#foreach ($resource in $property.ComplexValues)
+#if ($resource.Title)
+          <h2>$resource.Title</h2>
+#else
+          <h2>Resource #$velocityCount</h2>
+#end
+#set ($properties = $resource.Properties)
+#parse("proptable.vm")
+#end
+
+        </td>
+      </tr>
+    </table>
+
+#parse("footer.vm")

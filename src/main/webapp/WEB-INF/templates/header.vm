@@ -2,7 +2,16 @@
 <html lang="en">
   <head>
    <meta charset="utf-8">
-    <title>$title | $project_name</title>
+    <title>
+#if ($head_title)
+      $head_title
+#else
+      $title
+#end
+#if ($project_name)
+      | $project_name
+#end
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Animesh Manglik">
@@ -35,9 +44,6 @@
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="[This page as RDF]" /></a></li>
-          #if ($back_uri)
-		  <li><a href="$back_uri">Back to $back_label</a></li>
-		  #end
         </ul>
         <h3 class="muted">              
                #if ($uri)
@@ -45,11 +51,13 @@
 			   #else
 			   $title
 	  		   #end
+#if ($project_name)
 			   #if ($project_link)
 			   <small>at <a href="$project_link">$project_name</a></small>
 			   #else
 			   <small>at <a href="$server_base">$project_name</a></small>
 			   #end         
+#end
         </h3>
         #if ($uri)
       <div class="page-resource-uri truncate"><a class="page-resource-uri" href="$uri">$uri</a></div>

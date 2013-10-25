@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * RFC 3987.
  * 
  * TODO: This really needs some unit tests
+ * TODO: Make this an IRIRewriter?
  */
 public class IRIEncoder {
 

@@ -1,14 +1,12 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.IRIEncoder;
-import de.fuberlin.wiwiss.pubby.MappedResource;
 import de.fuberlin.wiwiss.pubby.negotiation.ContentTypeNegotiator;
 import de.fuberlin.wiwiss.pubby.negotiation.MediaRangeSpec;
 import de.fuberlin.wiwiss.pubby.negotiation.PubbyNegotiator;
@@ -18,16 +16,19 @@ import de.fuberlin.wiwiss.pubby.negotiation.PubbyNegotiator;
  * It redirects either to the page URL or to the data URL,
  * based on content negotiation.
  * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
+ * TODO: This should provide only a 303 service. The conneg stuff should happen in new generic versions of the representation-producing servlets.
  */
 public class WebURIServlet extends BaseServlet {
 
 	public boolean doGet(String relativeURI, HttpServletRequest request,
 			HttpServletResponse response, Configuration config) throws IOException {
-		Collection<MappedResource> resources = 
-				config.getMappedResourcesFromRelativeWebURI(relativeURI, true);
-		if (resources.isEmpty()) return false;
+		
+		HypermediaControls controller = config.getControls(relativeURI, true);
+		// It's a resource with an IRI we can't handle
+		if (controller == null) return false;
+		// It's a resource that's not in our namespace.
+		// We don't provide a 303 service for those, only browsable pages. 
+		if (!controller.isHosted()) return false;
 
 		response.addHeader("Vary", "Accept, User-Agent");
 		ContentTypeNegotiator negotiator = PubbyNegotiator.getPubbyNegotiator();
@@ -45,11 +46,10 @@ public class WebURIServlet extends BaseServlet {
 		response.setStatus(303);
 		response.setContentType("text/plain");
 		String location;
-		HypermediaResource hypermedia = config.getController(IRIEncoder.toIRI(relativeURI), true);
 		if ("text/html".equals(bestMatch.getMediaType())) {
-			location = hypermedia.getPageURL();
+			location = controller.getPageURL();
 		} else {
-			location = hypermedia.getDataURL();
+			location = controller.getDataURL();
 		}
 		response.addHeader("Location", IRIEncoder.toURI(location));
 		response.getOutputStream().println(

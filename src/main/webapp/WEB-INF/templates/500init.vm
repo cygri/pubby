@@ -1,0 +1,14 @@
+<!DOCTYPE html5>
+<html lang=en>
+  <head>
+    <meta charset=utf8>
+    <title>Configuration error</title>
+  </head>
+  <body>
+    <h1>Configuration error</h1>
+
+    <p>Pubby failed to properly initialize. This is probably due to an error in the configuration file. The message was:</p>
+
+    <p style="border: 2px solid black; padding: 1em 1.6em">$message</p>
+  </body>
+</html>

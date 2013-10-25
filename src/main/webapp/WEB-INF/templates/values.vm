@@ -1,0 +1,25 @@
+## Renders the values of a single ResourceProperties, given in $property, as an unordered list
+<ul class="property-values">
+#foreach ($value in $property.SimpleValues)
+  <li>
+#if ($value.Node.isURI())
+#if ($showLabels && $value.label)
+    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI">$value.label</a>
+#elseif ($value.hasPrefix())
+    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI"><small>$value.Prefix:</small>$value.LocalName</a>
+#else
+    <small>&lt;</small><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><small>&gt;</small>
+#end
+#elseif ($value.Node.isLiteral())
+    <span class="literal">$value.Node.LiteralLexicalForm
+#if ($value.DatatypeLabel)
+      <small> ($value.DatatypeLabel)</small>
+#end
+#if ($value.Node.LiteralLanguage != "")
+      <small> ($value.Node.LiteralLanguage)</small>
+#end
+    </span>
+#end
+  </li>
+#end
+</ul>

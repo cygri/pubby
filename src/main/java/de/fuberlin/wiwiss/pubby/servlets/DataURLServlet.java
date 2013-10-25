@@ -1,7 +1,6 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,83 +12,67 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.HypermediaResource;
-import de.fuberlin.wiwiss.pubby.MappedResource;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.ModelResponse;
 import de.fuberlin.wiwiss.pubby.ResourceDescription;
-import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
 /**
  * Servlet for serving RDF documents containing a description
  * of a given resource.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
-public class DataURLServlet extends BaseURLServlet {
+public class DataURLServlet extends BaseServlet {
 	
 	@Override
-	protected boolean doGet(HypermediaResource controller,
-			Collection<MappedResource> resources,
+	protected boolean doGet(String relativeURI,
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			Configuration config) throws IOException {
+		HypermediaControls controller = config.getControls(relativeURI, false);
 
-		Model description = getResourceDescription(resources);
-
+		ResourceDescription description = controller == null ? 
+				null : controller.getResourceDescription();
 		// Check if resource exists in dataset
-		if (description.size() == 0) {
+		if (description == null) {
 			response.setStatus(404);
 			response.setContentType("text/plain");
 			response.getOutputStream().println("Nothing known about <" + controller.getAbsoluteIRI() + ">");
 			return true;
 		}
+		Model model = description.getModel();
 		
+		addHighDegreePropertyLinks(model, controller);
+		
+		addDocumentMetadata(model, controller, 
+				addQueryString(controller.getDataURL(), request),
+				"RDF description of " + description.getTitle());
+		
+		ModelResponse server = new ModelResponse(model, request, response);
+		server.serve();
+		return true;
+	}
+	
+	private void addHighDegreePropertyLinks(Model model, HypermediaControls controller) {
+		// TODO: This should re-use the logic from ResourceDescription and ResourceProperty to decide where to create these links
 		// Add links to RDF documents with descriptions of the blank nodes
-		Resource r = description.getResource(controller.getAbsoluteIRI());
+		Resource r = model.getResource(controller.getAbsoluteIRI());
 		StmtIterator it = r.listProperties();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getObject().isAnon()) continue;
-			String pathDataURL = controller.getPathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getValuesDataURL(stmt.getPredicate());
 			if (pathDataURL == null) continue;
 			((Resource) stmt.getResource()).addProperty(RDFS.seeAlso, 
-					description.createResource(pathDataURL));
+					model.createResource(pathDataURL));
 		}
-		it = description.listStatements(null, null, r);
+		it = model.listStatements(null, null, r);
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			if (!stmt.getSubject().isAnon()) continue;
-			String pathDataURL = controller.getInversePathDataURL(stmt.getPredicate());
+			String pathDataURL = controller.getInverseValuesDataURL(stmt.getPredicate());
 			if (pathDataURL == null) continue;
 			((Resource) stmt.getSubject().as(Resource.class)).addProperty(RDFS.seeAlso, 
-					description.createResource(pathDataURL));
+					model.createResource(pathDataURL));
 		}
-		
-		// Add document metadata
-		if (description.qnameFor(FOAF.primaryTopic.getURI()) == null
-				&& description.getNsPrefixURI("foaf") == null) {
-			description.setNsPrefix("foaf", FOAF.NS);
-		}
-		if (description.qnameFor(RDFS.label.getURI()) == null
-				&& description.getNsPrefixURI("rdfs") == null) {
-			description.setNsPrefix("rdfs", RDFS.getURI());
-		}
-		Resource document = description.getResource(addQueryString(controller.getDataURL(), request));
-		document.addProperty(FOAF.primaryTopic, r);
-		document.addProperty(RDFS.label, 
-				"RDF description of " + 
-				new ResourceDescription(controller, description, config).getTitle());
-		
-		// Add provenance. This seems out of place here.
-		for (MappedResource resource: resources) {
-			resource.getDataset().addDocumentMetadata(description, document);
-			resource.getDataset().addMetadataFromTemplate(description, resource, getServletContext());
-		}
-
-		ModelResponse server = new ModelResponse(description, request, response);
-		server.serve();
-		return true;
 	}
 	
 	private static final long serialVersionUID = 6825866213915066364L;

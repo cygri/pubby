@@ -1,39 +1,9 @@
 #set ($has_text = false)
 <hr>
     <div id="footer">
-    <div class="container ">
-#if ($sparql_endpoint)
-      <p class="muted justify">This page shows information obtained from the SPARQL endpoint at </p>
-      <p class="muted justify">
-<a class="sparql-uri" href="$sparql_endpoint">$sparql_endpoint</a>
-</p>
-<p class="muted justify">
-#end
 #if ($rdf_link)
       <a href="$rdf_link?output=ttl">As Turtle</a> |
       <a href="$rdf_link?output=xml">As RDF/XML</a>
-#set ($has_text = true)
-#end
-#if ($disco_link)
-#if ($has_text)
-      |
-#end
-      <a href="$disco_link">Browse in Disco</a>
-#set ($has_text = true)
-#end
-#if ($tabulator_link)
-#if ($has_text)
-      |
-#end
-      <a href="$tabulator_link">Browse in Tabulator</a>
-#set ($has_text = true)
-#end
-#if ($openlink_link)
-#if ($has_text)
-      |
-#end
-      <a href="$openlink_link">Browse in OpenLink Browser</a>
-#set ($has_text = true)
 #end
 </p>
     </div>

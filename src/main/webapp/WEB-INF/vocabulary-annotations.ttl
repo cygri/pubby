@@ -1,0 +1,33 @@
+# This file contains default vocabulary annotations for Pubby.
+# The annotations allow Pubby to display resources in a more
+# friendly way. It should be loaded from the main config.ttl
+# file:
+# 
+#     <> conf:loadVocabulary <vocabulary-annotations.ttl>.
+
+@prefix conf: <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix void:     <http://rdfs.org/ns/void#> .
+
+rdf:type conf:weight -100.
+skos:prefLabel conf:weight -85.
+rdfs:label conf:weight -80.
+dc:title conf:weight -79.
+dcterms:title conf:weight -79.
+skos:altLabel conf:weight -75.
+rdfs:comment conf:weight -50.
+dcterms:identifier conf:weight -20.
+skos:notation conf:weight -20.
+rdfs:subPropertyOf conf:weight -15.
+rdfs:subClassOf conf:weight -15.
+rdfs:isDefinedBy conf:weight -12.
+void:dataDump conf:weight -10.
+void:sparqlEndpoint conf:weight -10.
+void:subset conf:weight 10.

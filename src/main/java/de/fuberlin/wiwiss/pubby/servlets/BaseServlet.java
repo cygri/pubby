@@ -1,10 +1,9 @@
 package de.fuberlin.wiwiss.pubby.servlets;
-import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,15 +12,15 @@ import org.apache.velocity.context.Context;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.JenaException;
-import com.hp.hpl.jena.util.FileManager;
-import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.sparql.vocabulary.FOAF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
-import de.fuberlin.wiwiss.pubby.MappedResource;
-import de.fuberlin.wiwiss.pubby.ModelTranslator;
+import de.fuberlin.wiwiss.pubby.Dataset;
+import de.fuberlin.wiwiss.pubby.HypermediaControls;
+import de.fuberlin.wiwiss.pubby.MetadataConfiguration;
 import de.fuberlin.wiwiss.pubby.ModelUtil;
 
 /**
@@ -29,89 +28,64 @@ import de.fuberlin.wiwiss.pubby.ModelUtil;
  * This class handles preprocessing of the request to extract the
  * resource URI relative to the namespace root, and manages the
  * {@link Configuration} instance shared by all servlets.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public abstract class BaseServlet extends HttpServlet {
-	private final static String SERVER_CONFIGURATION =
-		BaseServlet.class.getName() + ".serverConfiguration";
-	
 	private Configuration config;
-
+	private String initError;
+	
 	public void init() throws ServletException {
-		synchronized (getServletContext()) {
-			if (getServletContext().getAttribute(SERVER_CONFIGURATION) == null) {
-				getServletContext().setAttribute(SERVER_CONFIGURATION, createServerConfiguration());
-			}
+		config = (Configuration) getServletContext().getAttribute(
+				ServletContextInitializer.SERVER_CONFIGURATION);
+		if (config == null) {
+			initError = (String) getServletContext().getAttribute(
+					ServletContextInitializer.ERROR_MESSAGE);
 		}
-		config = 
-			(Configuration) getServletContext().getAttribute(SERVER_CONFIGURATION);
+	}
+	
+	// TODO: This should be somewhere else, doesn't fit here
+	protected void addDocumentMetadata(Model model, HypermediaControls controller,
+			String documentURL, String title) {
+		ModelUtil.addNSIfUndefined(model, "foaf", FOAF.getURI());
+		ModelUtil.addNSIfUndefined(model, "rdfs", RDFS.getURI());
+
+		// Add document metadata
+		Resource topic = model.getResource(controller.getAbsoluteIRI());
+		Resource document = model.getResource(documentURL);
+		document.addProperty(FOAF.primaryTopic, topic);
+		document.addProperty(RDFS.label, title);
+		
+		// Add custom metadata
+		for (Dataset dataset: config.getDatasets()) {
+			MetadataConfiguration metadata = dataset.getMetadataConfiguration();
+			metadata.addCustomMetadata(model, document);
+			metadata.addMetadataFromTemplate(model, controller);
+		}
 	}
 
-	private Configuration createServerConfiguration() throws UnavailableException {
-		String param = getServletContext().getInitParameter("config-file");
-		if (param == null) {
-			throw new UnavailableException("Missing context parameter 'config-file'");
-		}
-		File configFile = new File(param);
-		if (!configFile.isAbsolute()) {
-			configFile = new File(getServletContext().getRealPath("/") + "/WEB-INF/" + param);
-		}
+	// TODO: This should be somewhere else, doesn't fit here
+	protected void addPageMetadata(Context context, 
+			HypermediaControls controller, PrefixMapping prefixes) {
 		try {
-			return new Configuration(
-					FileManager.get().loadModel(
-							configFile.getAbsoluteFile().toURI().toString()));
-		} catch (JenaException ex) {
-			throw new UnavailableException(
-					"Error loading config file " + configFile.getAbsoluteFile().toURI() + ": " + ex.getMessage());
-		}
-	}
-	
-	protected Model getResourceDescription(Collection<MappedResource> resources) {
-		Model result = ModelFactory.createDefaultModel();
-		for (MappedResource resource: resources) {
-			Model description = new ModelTranslator(
-				resource.getDataset().getDataSource().getResourceDescription(
-						resource.getDatasetURI()),
-				resource.getDataset(),
-				config).getTranslated();
-			// Add owl:sameAs statements referring to the original dataset URI
-			// TODO: Make this a wrapper around DataSource
-			if (resource.getDataset().getAddSameAsStatements()) {
-				Resource r1 = description.getResource(resource.getController().getAbsoluteIRI());
-				Resource r2 = description.getResource(resource.getDatasetURI());
-				if (!r1.equals(r2)) {
-					r1.addProperty(OWL.sameAs, r2);
-					ModelUtil.addNSIfUndefined(description, "owl", OWL.NS);
-				}
+			Model metadataModel = ModelFactory.createDefaultModel();
+			for (Dataset dataset: config.getDatasets()) {
+				MetadataConfiguration metadata = dataset.getMetadataConfiguration();
+				Resource document = metadata.addMetadataFromTemplate(metadataModel, controller);
+				// Replaced the commented line by the following one because the
+				// RDF graph we want to talk about is a specific representation
+				// of the data identified by the getDataURL() URI.
+				//                                       Olaf, May 28, 2010
+				// context.put("metadata", metadata.getResource(resource.getDataURL()));
+				context.put("metadata", document);
 			}
-			ModelUtil.mergeModels(result, description);
-		}
-		return result;
-	}
-	
-	protected Model getAnonymousPropertyValues(Collection<MappedResource> resources, 
-			Property property, boolean isInverse) {
-		Model result = ModelFactory.createDefaultModel();
-		for (MappedResource resource: resources) {
-			ModelUtil.mergeModels(result, new ModelTranslator(
-					resource.getDataset().getDataSource().getAnonymousPropertyValues(
-							resource.getDatasetURI(), property, isInverse),
-					resource.getDataset(),
-					config).getTranslated());
-		}
-		return result;
-	}
 
-	// TODO: This is crap. Should return an actual account of the provenance of all resources, regardless of data source
-	protected String getFirstSPARQLEndpoint(Collection<MappedResource> resources) {
-		for (MappedResource resource: resources) {
-			if (resource.getDataset().getDataSource().getEndpointURL() != null) {
-				return resource.getDataset().getDataSource().getEndpointURL();
-			}
+			Map<String,String> nsSet = metadataModel.getNsPrefixMap();
+			nsSet.putAll(prefixes.getNsPrefixMap());
+			context.put("prefixes", nsSet.entrySet());
+			context.put("blankNodesMap", new HashMap<Resource,String>());
 		}
-		return null;
+		catch (Exception e) {
+			context.put("metadata", Boolean.FALSE);
+		}
 	}
 	
 	protected abstract boolean doGet(
@@ -122,6 +96,10 @@ public abstract class BaseServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
+		if (initError != null) {
+			sendInitialization500(response, initError);
+			return;
+		}
 		String relativeURI = request.getRequestURI().substring(
 				request.getContextPath().length() + request.getServletPath().length());
 		// Some servlet containers keep the leading slash, some don't
@@ -145,6 +123,15 @@ public abstract class BaseServlet extends HttpServlet {
 			context.put("uri", resourceURI);
 		}
 		template.renderXHTML("404.vm");
+	}
+	
+	protected void sendInitialization500(HttpServletResponse response, String message) throws IOException {
+		response.setStatus(500);
+		VelocityHelper template = new VelocityHelper(getServletContext(), response);
+		Context context = template.getVelocityContext();
+		context.put("message", message);
+		context.put("title", "Configuration error");
+		template.renderXHTML("500init.vm");
 	}
 	
 	protected String addQueryString(String dataURL, HttpServletRequest request) {

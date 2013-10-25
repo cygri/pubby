@@ -16,9 +16,6 @@ import org.apache.velocity.context.Context;
  * VelocityEngine instance, its storage in the servlet
  * context, and the rendering of templates into the
  * servlet response output stream.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class VelocityHelper {
 	private final static String VELOCITY_ENGINE = 
@@ -73,6 +70,7 @@ public class VelocityHelper {
 			result.setProperty("output.encoding", "utf-8");
 			result.setProperty("file.resource.loader.path", 
 					servletContext.getRealPath("/") + "/WEB-INF/templates/");
+			result.setProperty("velocimacro.context.localscope", true);
 			
 			// Turn off Velocity logging
 			result.setProperty("runtime.log.logsystem.class", 
@@ -80,6 +78,9 @@ public class VelocityHelper {
 			
 			// XML-escape *all* references inserted into templates
 			result.setProperty("eventhandler.referenceinsertion.class", EscapeXmlReference.class.getName());
+			
+			// Enable caching
+			result.setProperty("file.resource.loader.cache", true);
 			
 			result.init();
 			return result;

@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * that has the appropriate MIME type in the Accept: header.
  * This request can then be fed into the rest of our content
  * negotiation based tooling.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class RequestParamHandler {
 	private static final String ATTRIBUTE_NAME_IS_HANDLED =

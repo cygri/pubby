@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 img{
 	width:100%;
 }
@@ -50,3 +51,5 @@ min-width: 50%;
   -moz-hyphens: auto;
   hyphens: auto;
 }
+
+col.property-column { width: 13em; }

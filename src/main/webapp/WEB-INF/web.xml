@@ -11,6 +11,10 @@
     <param-value>config.ttl</param-value>
   </context-param>
   
+  <listener>
+    <listener-class>de.fuberlin.wiwiss.pubby.servlets.ServletContextInitializer</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>WebURIServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.WebURIServlet</servlet-class>
@@ -29,14 +33,14 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PathPageURLServlet</servlet-name>
-    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathPageURLServlet</servlet-class>
+    <servlet-name>ValuesURLServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>PathPageURLServlet</servlet-name>
-    <url-pattern>/pathpage/*</url-pattern>
+    <servlet-name>ValuesURLServlet</servlet-name>
+    <url-pattern>/values/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -51,14 +55,14 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>PathDataURLServlet</servlet-name>
-    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.PathDataURLServlet</servlet-class>
+    <servlet-name>ValuesDataURLServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.ValuesDataURLServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>PathDataURLServlet</servlet-name>
-    <url-pattern>/pathdata/*</url-pattern>
+    <servlet-name>ValuesDataURLServlet</servlet-name>
+    <url-pattern>/values.data/*</url-pattern>
   </servlet-mapping>
 
   <servlet>

@@ -16,9 +16,6 @@ import de.fuberlin.wiwiss.pubby.ModelUtil;
 
 /**
  * A data source backed by a Jena model.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class ModelDataSource implements DataSource {
 	private Model model;

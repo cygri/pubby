@@ -17,9 +17,6 @@ import de.fuberlin.wiwiss.pubby.negotiation.PubbyNegotiator;
  * based on content negotiation.
  * 
  * TODO: This should provide only a 303 service. The conneg stuff should happen in new generic versions of the representation-producing servlets.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class WebURIServlet extends BaseServlet {
 

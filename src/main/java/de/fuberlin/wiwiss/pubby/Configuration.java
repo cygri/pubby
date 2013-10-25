@@ -29,9 +29,6 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
 /**
  * The server's configuration.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class Configuration extends ResourceReader {
 	

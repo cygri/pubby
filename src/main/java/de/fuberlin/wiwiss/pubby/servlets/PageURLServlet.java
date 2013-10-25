@@ -14,9 +14,6 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription;
 /**
  * A servlet for serving the HTML page describing a resource.
  * Invokes a Velocity template.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class PageURLServlet extends BaseServlet {
 

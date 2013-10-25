@@ -33,9 +33,6 @@ import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
  * representations of its properties, and so on.
  * 
  * TODO: Sort out who constructs these. Perhaps only the data source and this class itself should?
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class ResourceDescription {
 	private final static int HIGH_DEGREE_CUTOFF = 10;

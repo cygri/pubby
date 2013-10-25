@@ -12,8 +12,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * the server.
  * 
  * TODO: describeResource and getHighXxxdegreeProperties should be combined into a single method with a complex result so that implementations can better mess with the high-degree stuff while keeping responses consistent between methods
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public interface DataSource {
 	static final int MAX_INDEX_SIZE = 100;

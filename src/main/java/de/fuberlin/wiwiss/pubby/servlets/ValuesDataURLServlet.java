@@ -17,9 +17,6 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
  * A servlet for serving an RDF document describing resources
  * related to a given resource via a given property. The property
  * can be a forward or backward arc.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class ValuesDataURLServlet extends ValuesBaseServlet {
 

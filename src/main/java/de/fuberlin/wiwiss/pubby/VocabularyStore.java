@@ -27,12 +27,6 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
  * A store for labels, descriptions and other metadata of classes and
  * properties. Values are retrieved from a {@link DataSource} and
  * cached.
- *
- * TODO: This is not i18n aware. Needs ability to cache one label/desc per language, and return Literals incl language tag
- * 
- * @author Kai Eckert (kai@informatik.uni-mannheim.de)
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class VocabularyStore {
 	private DataSource dataSource;

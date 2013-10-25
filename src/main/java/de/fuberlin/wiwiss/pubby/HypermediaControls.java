@@ -11,9 +11,6 @@ import de.fuberlin.wiwiss.pubby.sources.DataSource;
 /**
  * The hypermedia interface to a specific resource. The resource may be
  * hosted by the server or merely made browsable by the server.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class HypermediaControls {
 	

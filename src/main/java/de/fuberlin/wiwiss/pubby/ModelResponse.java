@@ -21,9 +21,6 @@ import de.fuberlin.wiwiss.pubby.servlets.RequestParamHandler;
  * content negotiation and all the other tricks supported by Joseki
  * for free. This has to be in the Joseki package because some
  * required methods are not visible.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id: ModelResponse.java,v 1.1 2007/02/07 13:49:24 cyganiak Exp $
  */
 public class ModelResponse {
 	private final Model model;

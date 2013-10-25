@@ -11,9 +11,6 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 /**
  * Helper class that splits URIs into prefix and local name
  * according to a Jena PrefixMapping.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class URIPrefixer {
 	private final Resource resource;

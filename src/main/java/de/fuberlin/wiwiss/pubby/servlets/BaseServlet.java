@@ -14,6 +14,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.Configuration;
@@ -21,16 +22,12 @@ import de.fuberlin.wiwiss.pubby.Dataset;
 import de.fuberlin.wiwiss.pubby.HypermediaControls;
 import de.fuberlin.wiwiss.pubby.MetadataConfiguration;
 import de.fuberlin.wiwiss.pubby.ModelUtil;
-import de.fuberlin.wiwiss.pubby.vocab.FOAF;
 
 /**
  * An abstract base servlet for servlets that manage a namespace of resources.
  * This class handles preprocessing of the request to extract the
  * resource URI relative to the namespace root, and manages the
  * {@link Configuration} instance shared by all servlets.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public abstract class BaseServlet extends HttpServlet {
 	private Configuration config;

@@ -20,11 +20,6 @@ import de.fuberlin.wiwiss.pubby.vocab.CONF;
 
 /**
  * A dataset block in the server's configuration.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @author Hannes Muehleisen
- * @author Olaf Hartig
- * @version $Id$
  */
 public class Dataset extends ResourceReader {
 	private final DataSource dataSource;

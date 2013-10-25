@@ -36,10 +36,6 @@ import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
 /**
  * A data source backed by a SPARQL endpoint accessed through
  * the SPARQL protocol.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @author Sergio Fernandez (sergio.fernandez@fundacionctic.org)
- * @version $Id$
  */
 public class RemoteSPARQLDataSource implements DataSource {
 	private final String endpointURL;

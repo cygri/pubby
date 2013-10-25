@@ -16,9 +16,6 @@ import org.apache.velocity.context.Context;
  * VelocityEngine instance, its storage in the servlet
  * context, and the rendering of templates into the
  * servlet response output stream.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class VelocityHelper {
 	private final static String VELOCITY_ENGINE = 

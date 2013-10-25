@@ -19,9 +19,6 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription;
 /**
  * Servlet for serving RDF documents containing a description
  * of a given resource.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class DataURLServlet extends BaseServlet {
 	

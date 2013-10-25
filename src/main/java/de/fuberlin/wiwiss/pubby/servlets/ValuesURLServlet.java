@@ -19,9 +19,6 @@ import de.fuberlin.wiwiss.pubby.ResourceDescription.ResourceProperty;
  * related to a given resource via a given property. URIs and
  * literals are displayed as simple values. Blank nodes are
  * displayed as complete resource descriptions.
- * 
- * @author Richard Cyganiak (richard@cyganiak.de)
- * @version $Id$
  */
 public class ValuesURLServlet extends ValuesBaseServlet {
 

@@ -82,7 +82,8 @@ public class MergeDataSource implements DataSource {
 			boolean isInverse) {
 		Model result = ModelFactory.createDefaultModel();
 		for (DataSource source: sources) {
-			ModelUtil.mergeModels(result, source.describeResource(resourceIRI));
+			ModelUtil.mergeModels(result, 
+					source.listPropertyValues(resourceIRI, property, isInverse));
 		}
 		ModelUtil.mergePrefixes(result, prefixes);
 		return result;

@@ -50,6 +50,7 @@ public class VocabularyStore {
 	private final I18nStringValueCache inversePluralLabels = new I18nStringValueCache(CONF.pluralLabel, true);
 	private final I18nStringValueCache descriptions = new I18nStringValueCache(RDFS.comment, false);
 	private final IntegerValueCache weights = new IntegerValueCache(CONF.weight, false);
+	private final IntegerValueCache inverseWeights = new IntegerValueCache(CONF.weight, true);
 	private final CachedPropertyCollection highIndegreeProperties = new CachedPropertyCollection(CONF.HighIndregreeProperty);
 	private final CachedPropertyCollection highOutdegreeProperties = new CachedPropertyCollection(CONF.HighOutdregreeProperty);
 	
@@ -85,8 +86,18 @@ public class VocabularyStore {
 		return descriptions.get(iri, language);
 	}
 
-	public int getWeight(Property property) {
-		Integer result = weights.get(property.getURI());
+	/**
+	 * Returns the <tt>conf:weight</tt> of the property. The inverse's weight
+	 * can be requested; if no inverse weight is specified then the "forward"
+	 * weight is used.
+	 * 
+	 * @param property The property whose weight to return
+	 * @param forInverse If true, look for the inverse's weight first
+	 * @return The conf:weight assigned to the property
+	 */
+	public int getWeight(Property property, boolean forInverse) {
+		Integer result = forInverse ? inverseWeights.get(property.getURI()) : null;
+		if (result == null) result = weights.get(property.getURI());
 		return result == null ? 0 : result.intValue();
 	}
 

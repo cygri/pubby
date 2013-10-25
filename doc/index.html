@@ -453,10 +453,21 @@ conf:anonymousInversePropertyDescriptionQuery
 <dt><tt><em>my:property</em> conf:weight <em>0</em></tt></dt>
 <dd><p>Changes the order of RDF properties in the HTML property tables by assigning
   a weight to a property. By default, all properties are considered to have weight 0.
-  Properties with lower weight rise higher in the list, those with higher weight sink
-  lower. Weights must be integer numbers and should be between -100 and +100.
+  Properties with lesser weight rise higher in the list, those with greater weight sink
+  down. Weights must be integer numbers and should be between -100 and +100.
   Property weights may be managed in an external RDF file and loaded via
-  <tt>conf:loadVocabulary</tt>.</p></dd>
+  <tt>conf:loadVocabulary</tt>.</p>
+  <p>The weight for “incoming” and “outcoming” arcs can be set separately. The incoming
+  weight is specified using the <tt>owl:inverseOf</tt> idiom:</p>
+  <pre>rdf:type conf:weight -100.
+rdf:type owl:inverseOf [ conf:weight 10 ].</pre>
+  <p>The example causes a resource's class (outgoing <tt>rdf:type</tt> arc)
+  to be displayed as the first property,
+  and if the resource is itself a class with instances
+  (incoming <tt>rdf:type</tt> arcs),
+  then the list of instances will be near the bottom.</p>
+  <p>If only an outgoing weight is specified, it will also be used for incoming
+  arcs.</p></dd>
 <dt><tt><em>my:property</em> owl:inverseOf [ rdfs:label "<em>label</em>" ]</tt></dt>
 <dd><p>When a property occurs as an incoming arc on a resource, this label will
   be shown instead of the default “is XXX of”. Example:</p>

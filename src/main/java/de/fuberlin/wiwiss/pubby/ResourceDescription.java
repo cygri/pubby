@@ -122,7 +122,7 @@ public class ResourceDescription {
 		Collection<RDFNode> candidates = getValuesFromMultipleProperties(config.getCommentProperties());
 		Literal l = getBestLanguageMatch(candidates, config.getDefaultLanguage());
 		if (l == null) return null;
-		return l.getLexicalForm();
+		return toSentenceCase(l.getLexicalForm(), l.getLanguage());
 	}
 	
 	public String getImageURL() {
@@ -506,6 +506,18 @@ public class ResourceDescription {
 		}
 	}
 
+	/**
+	 * Converts a string to Sentence Case. In our implementation, this simply
+	 * means the first letter is uppercased if it isn't already. Also trims
+	 * surrounding whitespace.
+	 */
+	public String toSentenceCase(String s, String lang) {
+		if (s == null) return null;
+		s = s.trim();
+		if ("".equals(s)) return null;
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
+	
 	/**
 	 * Converts a string to Title Case. Also trims surrounding whitespace
 	 * and collapses consecutive whitespace characters within into a single

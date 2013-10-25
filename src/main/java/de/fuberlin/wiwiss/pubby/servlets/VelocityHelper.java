@@ -79,6 +79,9 @@ public class VelocityHelper {
 			// XML-escape *all* references inserted into templates
 			result.setProperty("eventhandler.referenceinsertion.class", EscapeXmlReference.class.getName());
 			
+			// Enable caching
+			result.setProperty("file.resource.loader.cache", true);
+			
 			result.init();
 			return result;
 		} catch (Exception ex) {

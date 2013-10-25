@@ -4,17 +4,19 @@
 ## resource descriptions underneath.
 #parse("header.vm")
 
-    <p><a href="$back_uri">Back to $back_label</a></p>
+  <p><a href="$back_uri">Back to $back_label</a></p>
 
-    <table class="description">
+  <table class="table">
+    <thead>
       <tr>
         <th>
 #parse("property-name.vm")
         </th>
       </tr>
-      <tr class="container">
+    </thead>
+    <tbody>
+      <tr>
         <td>
-
 #if (!$property.SimpleValues.isEmpty())
 #parse("values.vm")
 #end
@@ -28,9 +30,9 @@
 #set ($properties = $resource.Properties)
 #parse("proptable.vm")
 #end
-
         </td>
       </tr>
-    </table>
+    </tbody>
+  </table>
 
 #parse("footer.vm")

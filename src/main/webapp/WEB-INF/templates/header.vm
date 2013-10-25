@@ -1,7 +1,7 @@
-<!Doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-   <meta charset="utf-8">
+    <meta charset="utf-8">
     <title>
 #if ($head_title)
       $head_title
@@ -13,54 +13,35 @@
 #end
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Animesh Manglik">
 #if ($rdf_link)
     <link rel="alternate" type="application/rdf+xml" href="$rdf_link" title="RDF" />
 #end
     <link rel="stylesheet" type="text/css" href="${server_base}static/style.css" />
     <link rel="stylesheet" type="text/css" href="${server_base}static/css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="${server_base}static/css/bootstrap-responsive.css" />  
-    <style type="text/css">
-      body {
-        padding-top: 20px;
-        padding-bottom: 60px;
-      }
-
-      /* Custom container */
-      .container {
-        margin: 0 auto;
-        max-width: 1000px;
-      }
-      .container > hr {
-        margin: 40px 0;
-     </style>
- 
+    <link rel="stylesheet" type="text/css" href="${server_base}static/css/bootstrap-responsive.css" />
   </head>
   <body>
-   <div id="wrap">
-   <div class="container">
-
+    <div class="container">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="[This page as RDF]" /></a></li>
         </ul>
-        <h3 class="muted">              
-               #if ($uri)
-			   <a href="$uri">$title</a>
-			   #else
-			   $title
-	  		   #end
+        <h3 class="muted">
+#if ($uri)
+          <a href="$uri">$title</a>
+#else
+          $title
+#end
 #if ($project_name)
-			   #if ($project_link)
-			   <small>at <a href="$project_link">$project_name</a></small>
-			   #else
-			   <small>at <a href="$server_base">$project_name</a></small>
-			   #end         
+#if ($project_link)
+          <small>at <a href="$project_link">$project_name</a></small>
+#else
+          <small>at <a href="$server_base">$project_name</a></small>
+#end
 #end
         </h3>
-        #if ($uri)
-      <div class="page-resource-uri truncate"><a class="page-resource-uri" href="$uri">$uri</a></div>
-	  	#end
+#if ($uri)
+        <div class="truncate"><a href="$uri">$uri</a></div>
+#end
       </div>
       <hr>

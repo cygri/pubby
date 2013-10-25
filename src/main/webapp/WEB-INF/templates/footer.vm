@@ -1,16 +1,12 @@
-#set ($has_text = false)
-<hr>
-    <div id="footer">
+      <hr>
+      <div id="footer">
 #if ($rdf_link)
-      <a href="$rdf_link?output=ttl">As Turtle</a> |
-      <a href="$rdf_link?output=xml">As RDF/XML</a>
+        <a href="$rdf_link?output=ttl">As Turtle</a> |
+        <a href="$rdf_link?output=xml">As RDF/XML</a>
 #end
-</p>
+      </div>
     </div>
-    </div>
-	</div>
-    </div>
-   <script type="text/javascript" src="${server_base}static/script.js"></script>
-   <script src="${server_base}static/js/jquery.js"></script>
+    <script src="${server_base}static/script.js"></script>
+    <script src="${server_base}static/js/jquery.js"></script>
   </body>
 </html>

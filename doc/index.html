@@ -361,11 +361,50 @@ ex:Widget rdfs:label "widget"@en.</pre>
   <tt>?__high_indegree_properties__</tt> are replaced with a comma-separated list
   in parentheses of the high-outdegree properties and high-indegree properties,
   respectively:</p>
-  <pre>conf:resourceDescriptionQuery
-    """CONSTRUCT { ?__this__ ?p ?o }
-       WHERE { ?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__) }""",
-    """CONSTRUCT { ?s ?p ?__this__ }
-       WHERE { ?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__) }""";</pre></dd>
+  <pre>conf:resourceDescriptionQuery """
+        CONSTRUCT {
+            ?__this__ ?p ?o.
+        }
+        WHERE {
+            ?__this__ ?p ?o.
+            FILTER (?p NOT IN ?__high_outdegree_properties__)
+        }
+    """, """
+        CONSTRUCT {
+            ?s ?p ?__this__.
+        }
+        WHERE {
+            ?s ?p ?__this__.
+            FILTER (?p NOT IN ?__high_indegree_properties__)
+        }
+    """;</pre>
+  <p>The following advanced example retrieves labels for all linked resources.
+  As Pubby always automatically uses labels where they are available, this will
+  cause values to be shown with nice labels rather than just as URIs. This comes
+  at a performance cost.<p>
+  <pre>conf:resourceDescriptionQuery """
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+        CONSTRUCT {
+            ?__this__ ?p ?o.
+            ?o rdfs:label ?label.
+        }
+        WHERE {
+            ?__this__ ?p ?o.
+            OPTIONAL { ?o rdfs:label ?label }
+            FILTER (?p NOT IN ?__high_outdegree_properties__)
+        }
+    """, """
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+        CONSTRUCT {
+            ?s ?p ?__this__.
+            ?s rdfs:label ?label.
+        }
+        WHERE {
+            ?s ?p ?__this__.
+            OPTIONAL { ?s rdfs:label ?label }
+            FILTER (?p NOT IN ?__high_indegree_properties__)
+        }
+    """;</pre></dd>
 
 <dt><tt>conf:propertyListQuery <em>"SPARQL query"</em></tt></dt>
 <dt><tt>conf:inversePropertyListQuery <em>"SPARQL query"</em></tt></dt>
@@ -379,10 +418,10 @@ ex:Widget rdfs:label "widget"@en.</pre>
   If unspecified, the following <tt>CONSTRUCT</tt>
   queries are used for forward and backward properties, respectively:</p>
   <pre>conf:propertyListQuery
-    "CONSTRUCT {?__this__ ?__property__ ?x} WHERE {?__this__ ?__property__ ?x. FILTER (!isBlank(?x))}";
+    "CONSTRUCT {?__this__ ?__property__ ?that} WHERE {?__this__ ?__property__ ?that. FILTER (!isBlank(?that))}";
 
 conf:inversePropertyListQuery
-    "CONSTRUCT {?x ?__property__ ?__this__} WHERE {?x ?__property__ ?__this__. FILTER (!isBlank(?x))}";</pre></dd>
+    "CONSTRUCT {?that ?__property__ ?__this__} WHERE {?that ?__property__ ?__this__. FILTER (!isBlank(?that))}";</pre></dd>
 
 <dt><tt>conf:anonymousPropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
 <dt><tt>conf:anonymousInversePropertyDescriptionQuery <em>"SPARQL query"</em></tt></dt>
@@ -391,14 +430,98 @@ conf:inversePropertyListQuery
   on a resource <tt>?__this__</tt>. If unspecified, the following <tt>DESCRIBE</tt>
   queries are used for forward and backward properties, respectively:</p>
   <pre>conf:anonymousPropertyDescriptionQuery
-    "DESCRIBE ?x WHERE {?__this__ ?__property__ ?x. FILTER (isBlank(?x))}";
+    "DESCRIBE ?that WHERE {?__this__ ?__property__ ?that. FILTER (isBlank(?that))}";
 
 conf:anonymousInversePropertyDescriptionQuery
-    "DESCRIBE ?x WHERE {?x ?__property__ ?__this__. FILTER (isBlank(?x))}";</pre></dd>
+    "DESCRIBE ?that WHERE {?that ?__property__ ?__this__. FILTER (isBlank(?that))}";</pre>
+  <p>The following <tt>CONSTRCUT</tt> queries may be used on SPARQL endpoints
+  that don't properly support <tt>DESCRIBE</tt> to achieve the same result:</p>
+  <pre>conf:anonymousPropertyDescriptionQuery """
+        CONSTRUCT {
+            ?__this__ ?property ?that.
+            ?that ?p ?o.
+            ?s ?p ?that.
+        }
+        WHERE {
+            ?__this__ ?__property__ ?that.
+            FILTER (isBlank(?that))
+            {
+                ?that ?p ?o.
+            } UNION {
+                ?s ?p ?that.
+            }
+        }
+    """;
+conf:anonymousInversePropertyDescriptionQuery """
+        CONSTRUCT {
+            ?that ?property ?__this__.
+            ?that ?p ?o.
+            ?s ?p ?that.
+        }
+        WHERE {
+            ?that ?__property__ ?__this__.
+            FILTER (isBlank(?that))
+            {
+                ?that ?p ?o.
+            } UNION {
+                ?s ?p ?that.
+            }
+        }
+    """;</pre>
+  <p>The following advanced example retrieves labels for all linked resources.
+  As Pubby always automatically uses labels where they are available, this will
+  cause values to be shown with nice labels rather than just as URIs. This comes
+  at a performance cost.<p>
+  <pre>conf:anonymousPropertyDescriptionQuery """
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+        CONSTRUCT {
+            ?__this__ ?property ?that.
+            ?that ?p ?o.
+            ?o rdfs:label ?label.
+            ?s ?p ?that.
+            ?s rdfs:label ?label.
+        }
+        WHERE {
+            ?__this__ ?__property__ ?that.
+            FILTER (isBlank(?that))
+            {
+                ?that ?p ?o.
+                OPTIONAL { ?o rdfs:label ?label. }
+            } UNION {
+                ?s ?p ?that.
+                OPTIONAL { ?s rdfs:label ?label. }
+            }
+        }
+    """;
+conf:anonymousInversePropertyDescriptionQuery """
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+        CONSTRUCT {
+            ?that ?property ?__this__.
+            ?that ?p ?o.
+            ?o rdfs:label ?label.
+            ?s ?p ?that.
+            ?s rdfs:label ?label.
+        }
+        WHERE {
+            ?that ?__property__ ?__this__.
+            FILTER (isBlank(?that))
+            {
+                ?that ?p ?o.
+                OPTIONAL { ?o rdfs:label ?label. }
+            } UNION {
+                ?s ?p ?that.
+                OPTIONAL { ?s rdfs:label ?label. }
+            }
+        }
+    """;</pre></dd>
+
 
 <dt><tt>conf:addSameAsStatements <em>"true"/"false"</em>;</tt></dt>
-<dd><p>If set to <tt>"true"</tt>, an <tt>owl:sameAs</tt> statement of the form
-  <tt>&lt;web_uri&gt; owl:sameAs &lt;dataset_uri&gt;</tt> will be present in Linked Data output.</p></dd>
+<dd><p>This may be used if the dataset defines a <tt>conf:datasetBase</tt>
+  that's different from the <tt>conf:webBase</tt>, leading to rewriting
+  of URIs. If set to <tt>"true"</tt>, an <tt>owl:sameAs</tt> statement
+  of the form <tt>&lt;web_uri&gt; owl:sameAs &lt;dataset_uri&gt;</tt>
+  will be added for every resource with a rewritten URI.</p></dd>
 
 <dt><tt>conf:rdfDocumentMetadata [ <em>statement1; statement2; ...;</em> ];</tt></dt>
 <dd>

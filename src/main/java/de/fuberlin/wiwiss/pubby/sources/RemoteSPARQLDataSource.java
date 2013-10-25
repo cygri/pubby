@@ -184,6 +184,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 		Map<Property, Integer> results = new HashMap<Property, Integer>();
 		while (rs.hasNext()) {
 			QuerySolution solution = rs.next();
+			if (!solution.contains("p") || !solution.contains("count")) continue;
 			Resource p = solution.get("p").asResource();
 			int count = solution.get("count").asLiteral().getInt();
 			results.put(ResourceFactory.createProperty(p.getURI()), count);

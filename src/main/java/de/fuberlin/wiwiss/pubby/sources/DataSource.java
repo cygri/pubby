@@ -11,6 +11,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * A source of RDF data intended for publication through
  * the server.
  * 
+ * TODO: describeResource and getHighXxxdegreeProperties should be combined into a single method with a complex result so that implementations can better mess with the high-degree stuff while keeping responses consistent between methods
  * @author Richard Cyganiak (richard@cyganiak.de)
  * @version $Id$
  */

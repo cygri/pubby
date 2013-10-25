@@ -123,6 +123,10 @@ public class VocabularyStore {
 			}
 			return cache;
 		}
+		public void reportAdditional(Property p) {
+			if (cache.contains(p)) return;
+			cache.add(p);
+		}
 	}
 	
 	private abstract class ValueCache<K> {

@@ -25,6 +25,8 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
+
 /**
  * A convenient interface to an RDF description of a resource.
  * Provides access to its label, a textual comment, detailed
@@ -36,6 +38,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
  * @version $Id$
  */
 public class ResourceDescription {
+	private final static int HIGH_DEGREE_CUTOFF = 10;
+
 	private final HypermediaControls hypermediaResource;
 	private final Model model;
 	private final Resource resource;
@@ -47,13 +51,20 @@ public class ResourceDescription {
 	
 	public ResourceDescription(HypermediaControls controller, Model model, 
 			Configuration config) {
-		this(controller, model, null, null, config);
+		this(controller, model, null, null, config, false);
    	}
 
 	public ResourceDescription(HypermediaControls controller, Model model, 
 			Map<Property, Integer> highIndegreeProperties,
 			Map<Property, Integer> highOutdegreeProperties,
 			Configuration config) {
+		this(controller, model, highIndegreeProperties, highOutdegreeProperties, config, true);
+	}
+	
+	private ResourceDescription(HypermediaControls controller, Model model, 
+			Map<Property, Integer> highIndegreeProperties,
+			Map<Property, Integer> highOutdegreeProperties,
+			Configuration config, boolean learnHighDegreeProps) {
 		this.hypermediaResource = controller;
 		this.model = model;
 		this.resource = model.getResource(controller.getAbsoluteIRI());
@@ -62,9 +73,13 @@ public class ResourceDescription {
 				Collections.<Property, Integer>emptyMap() : highIndegreeProperties;
 		this.highOutdegreeProperties = highOutdegreeProperties == null ?
 				Collections.<Property, Integer>emptyMap() : highOutdegreeProperties;
+		if (learnHighDegreeProps) {
+			learnHighDegreeProperties(true, HIGH_DEGREE_CUTOFF);
+			learnHighDegreeProperties(false, HIGH_DEGREE_CUTOFF);
+		}
 	}
 
-	public ResourceDescription(Resource resource, Model model, Configuration config) {
+	private ResourceDescription(Resource resource, Model model, Configuration config) {
 		this.hypermediaResource = null;
 		this.model = model;
 		this.resource = resource;
@@ -554,5 +569,35 @@ public class ResourceDescription {
 		s = s.replaceAll("[ \t\r\n]+", " ");
 		if (squash && " ".equals(s)) return "";
 		return s;
+	}
+	
+	private void learnHighDegreeProperties(boolean isInverse, int limit) {
+		CachedPropertyCollection knownHighProps = isInverse
+				? config.getVocabularyStore().getHighIndegreeProperties()
+				: config.getVocabularyStore().getHighOutdegreeProperties();
+		Map<Property, Integer> highCounts = isInverse
+				? highIndegreeProperties
+				: highOutdegreeProperties;
+		StmtIterator it = isInverse
+				? model.listStatements(null, null, resource)
+				: resource.listProperties();
+		Map<Property, Integer> valueCounts = new HashMap<Property, Integer>();
+		while (it.hasNext()) {
+			Property p = it.next().getPredicate();
+			if (!valueCounts.containsKey(p)) {
+				valueCounts.put(p, 0);
+			}
+			valueCounts.put(p, valueCounts.get(p) + 1);
+		}
+		for (Property p: valueCounts.keySet()) {
+			if (valueCounts.get(p) <= limit) continue;
+			knownHighProps.reportAdditional(p);
+			if (isInverse) {
+				model.removeAll(null, p, resource);
+			} else {
+				resource.removeAll(p);
+			}
+			highCounts.put(p, valueCounts.get(p));
+		}
 	}
 }

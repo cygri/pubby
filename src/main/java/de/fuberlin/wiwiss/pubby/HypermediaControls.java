@@ -155,7 +155,10 @@ public class HypermediaControls {
 	
 	private String getPathURL(String urlPrefix, Property property) {
 		if (config.getPrefixes().qnameFor(property.getURI()) == null) {
-			return null;
+			String encoded = PubbyIRIEscaper.escapeSpecialCharacters(property.getURI());
+			return config.getWebApplicationBaseURI() + urlPrefix +
+					"!" + encoded + "///" +
+					getPubbyPath();
 		}
 		return config.getWebApplicationBaseURI() + urlPrefix +
 				config.getPrefixes().qnameFor(property.getURI()) + "/" +

@@ -8,7 +8,6 @@
     conf:projectName "Linked Open Vocabularies";
     conf:projectHomepage <http://lov.okfn.org>;
     conf:webBase <http://localhost:8080/>;
-#    conf:indexResource <http://localhost:8080/resource/DBpedia>;
     conf:defaultLanguage "en";
     conf:loadVocabulary rdf:, rdfs:, <http://www.w3.org/2002/07/owl.ttl>;
     conf:dataset [

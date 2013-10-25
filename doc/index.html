@@ -291,22 +291,22 @@ ex:Widget rdfs:label "widget"@en.</pre>
   or enriching another dataset with additional triples loaded from a static file.</p></dd>
 
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
-<dd><p>Only resources starting with this IRI prefix will be handled by Pubby, and
+<dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
   will be mapped into the <tt>conf:webBase</tt> namespace. If not specified,
   only resources starting with the <tt>conf:webBase</tt> value will be handled.</p>
   <p><em>Note:</em> In the configuration file and any imported vocabularies,
-  references to resources in the dataset must be made using IRIs in the rewritten
-  form, that is, using IRIs that start with the <tt>conf:webBase</tt>. Using
-  namespace declarations or vocabulary declarations for IRIs that start with
+  references to resources in the dataset must be made using URIs in the rewritten
+  form, that is, using URIs that start with the <tt>conf:webBase</tt>. Using
+  namespace declarations or vocabulary declarations for URIs that start with
   the <tt>conf:datasetBase</tt> is likely a mistake.</p></dd>
 
 <dt><tt>conf:browsableNamespace &lt;<em>namespace_iri</em>&gt;</tt></dt>
-<dd><p>Makes all IRIs that start with that namespace IRI browsable in Pubby.
+<dd><p>Makes all URIs that start with that namespace URI browsable in Pubby.
   Unlike <tt>conf:datasetBase</tt>, Pubby will not attempt to make these
-  IRIs dereferenceable; it merely creates
+  URIs dereferenceable; it merely creates
   web pages that show descriptions of the resources and allow browsing.</p>
   <pre>conf:browsableNamespace &lt;http://www.w3.org/&gt;;</pre>
-  <p>The example means that clicking on any resource whose IRI starts with
+  <p>The example means that clicking on any resource whose URI starts with
   <tt>http://www.w3.org/</tt> takes the user to another Pubby page, rather
   than taking them away from Pubby and to the <tt>w3.org</tt> website.
   This is useful if you have loaded vocabularies from <tt>w3.org</tt>
@@ -332,14 +332,14 @@ ex:Widget rdfs:label "widget"@en.</pre>
 </pre></dd>
 
 <dt><tt>conf:datasetURIPattern "<em>regular expression</em>";</tt></dt>
-<dd><p>If present, only dateset IRIs matching this
+<dd><p>If present, only dateset URIs matching this
   <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">Java-style regular expression</a>
   will be made available by Pubby. The regular expression must match
-  <em>somwehere within the IRI as it appears in the data source</em>.</p>
+  <em>somwehere within the URI as it appears in the data source</em>.</p>
   <pre>conf:datasetURIPattern "/(users|documents)/";</pre>
   <p>This example configuration will publish the dataset URI <tt>http://example.org/users/alice</tt>, but not
-  <tt>http://example.org/invoices/5395842</tt> because the IRI part <tt>invoices/5395842</tt>
-  does not match the regular expression. It would also publish <tt>http://othersite.com/users/12345</tt> if that IRI happens to appear in the data source.</p></dd>
+  <tt>http://example.org/invoices/5395842</tt> because the URI part <tt>invoices/5395842</tt>
+  does not match the regular expression. It would also publish <tt>http://othersite.com/users/12345</tt> if that URI happens to appear in the data source.</p></dd>
 
 <dt><tt>conf:resourceDescriptionQuery <em>"SPARQL query"</em></tt></dt>
 <dd><p>Allows specification of one or more SPARQL queries that are run against the
@@ -484,6 +484,7 @@ conf:anonymousInversePropertyDescriptionQuery
 <h2 id="limitations">Limitations</h2>
 
 <ul>
+  <li>Some features do not work on SPARQL endpoints that don't support at least SPARQL 1.1.</li>
   <li>Hash URIs on the web side are not supported.</li>
 </ul>
 

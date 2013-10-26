@@ -10,16 +10,19 @@ public class PubbyNegotiator {
 		pubbyNegotiator = new ContentTypeNegotiator();
 		pubbyNegotiator.setDefaultAccept("text/html");
 		
-		// Send HTML to clients that indicate they accept everything.
-		// This is specifically so that cURL sees HTML, and also catches
-		// various browsers that send "*/*" in some circumstances.
-		pubbyNegotiator.addUserAgentOverride(null, "*/*", "text/html");
-
 		// MSIE (7.0) sends either */*, or */* with a list of other random types,
-		// but always without q values. That's useless. We will simply send
-		// HTML to MSIE, no matter what. Boy, do I hate IE.
+		// but always without q values, so it doesn't provide any basis for
+		// actual negotiation. We will simply send HTML to MSIE, no matter what.
 		pubbyNegotiator.addUserAgentOverride(Pattern.compile("MSIE"), null, "text/html");
 		
+		// Send Turtle to clients that indicate they accept everything.
+		// This is specifically so that cURL sees Turtle.
+		//
+		// NOTE: Rumor has it that some browsers send the Accept header
+		//       "*/*" too, but I believe that's only when images or scripts
+		//       are requested, not for normal web page requests.   --RC 
+		pubbyNegotiator.addUserAgentOverride(null, "*/*", "text/turtle");
+
 		pubbyNegotiator.addVariant("text/html;q=0.81")
 				.addAliasMediaType("application/xhtml+xml;q=0.81");
 		pubbyNegotiator.addVariant("application/rdf+xml")

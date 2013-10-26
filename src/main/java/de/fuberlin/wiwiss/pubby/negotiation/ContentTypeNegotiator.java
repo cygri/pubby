@@ -1,7 +1,6 @@
 package de.fuberlin.wiwiss.pubby.negotiation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +10,7 @@ public class ContentTypeNegotiator {
 	private List<VariantSpec> variantSpecs = new ArrayList<VariantSpec>();
 	private List<MediaRangeSpec> defaultAcceptRanges = 
 		Collections.singletonList(MediaRangeSpec.parseRange("*/*"));
-	private Collection<AcceptHeaderOverride> userAgentOverrides = 
+	private List<AcceptHeaderOverride> userAgentOverrides = 
 			new ArrayList<AcceptHeaderOverride>();
 	
 	public VariantSpec addVariant(String mediaType) {

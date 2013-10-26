@@ -2,37 +2,26 @@
 ## given in $property. Simple values are shown first as a list,
 ## complex values (i.e., descriptions of blank nodes) as complete
 ## resource descriptions underneath.
+
 #parse("header.vm")
 
-  <p><a href="$back_uri">Back to $back_label</a></p>
+  <ul class="breadcrumb">
+    <li><a href="$back_uri">$back_label</a> <span class="divider">/</span></li>
+    <li class="active">#parse("property-name.vm")</li>
+  </ul>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>
-#parse("property-name.vm")
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-#if (!$property.SimpleValues.isEmpty())
+#if (!$property.SimpleValues.Empty)
 #parse("values.vm")
 #end
 
 #foreach ($resource in $property.ComplexValues)
 #if ($resource.Title)
-          <h2>$resource.Title</h2>
+  <h3>$resource.Title</h3>
 #else
-          <h2>Resource #$velocityCount</h2>
+  <h3>Resource #$velocityCount</h3>
 #end
 #set ($properties = $resource.Properties)
 #parse("proptable.vm")
 #end
-        </td>
-      </tr>
-    </tbody>
-  </table>
 
 #parse("footer.vm")

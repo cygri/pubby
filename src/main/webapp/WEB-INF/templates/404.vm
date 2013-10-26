@@ -1,6 +1,8 @@
 #parse("header.vm")
 
-The requested resource does not exist at this server,
+<p class="lead">
+The requested resource does not exist on this server,
 or no information about it is available.
+</p>
 
 #parse("footer.vm")

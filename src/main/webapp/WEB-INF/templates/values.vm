@@ -1,22 +1,28 @@
 ## Renders the values of a single ResourceProperties, given in $property, as an unordered list
-<ul class="property-values">
+#if ($property.SimpleValues.size() > 1)
+  #set ($multi = "multi")
+#else
+  #set ($multi = "")
+#end
+
+<ul class="$multi property-values unstyled">
 #foreach ($value in $property.SimpleValues)
   <li>
 #if ($value.Node.isURI())
 #if ($showLabels && $value.label)
     <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI">$value.label</a>
-#elseif ($value.hasPrefix())
-    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI"><small>$value.Prefix:</small>$value.LocalName</a>
+#elseif ($value.Prefix)
+    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI"><span class="muted">$value.Prefix:</span>$value.LocalName</a>
 #else
-    <small>&lt;</small><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><small>&gt;</small>
+    <span class="muted">&lt;</span><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><span class="muted">&gt;</span>
 #end
-#elseif ($value.Node.isLiteral())
+#elseif ($value.Node.Literal)
     <span class="literal">$value.Node.LiteralLexicalForm
 #if ($value.DatatypeLabel)
-      <small> ($value.DatatypeLabel)</small>
+      <small class="muted"> &nbsp;$value.DatatypeLabel</small>
 #end
 #if ($value.Node.LiteralLanguage != "")
-      <small> ($value.Node.LiteralLanguage)</small>
+      <small class="muted"> &nbsp;$value.Node.LiteralLanguage</small>
 #end
     </span>
 #end

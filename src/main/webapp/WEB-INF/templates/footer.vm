@@ -1,12 +1,13 @@
-      <hr>
-      <div id="footer">
+      <footer>
+        <p class="text-center">
 #if ($rdf_link)
-        <a href="$rdf_link?output=ttl">As Turtle</a> |
-        <a href="$rdf_link?output=xml">As RDF/XML</a>
+          <a class="muted" href="$rdf_link?output=ttl">As Turtle</a> |
+          <a class="muted" href="$rdf_link?output=xml">As RDF/XML</a>
 #end
-      </div>
+        </p>
+      </footer>
     </div>
+    <script src="${server_base}static/js/jquery-1.10.2.min.js"></script>
     <script src="${server_base}static/script.js"></script>
-    <script src="${server_base}static/js/jquery.js"></script>
   </body>
 </html>

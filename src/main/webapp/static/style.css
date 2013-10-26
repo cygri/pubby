@@ -1,57 +1,24 @@
-img {
-  width:100%;
-}
-.image img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width:100%;
-}
-td img {
-  height:auto;
-  margin-right: : 0px;
-  padding: 0 10px 10px 0;
-  width:100px;
-}
-.wrapword ul {
-  list-style-type: none;
-  margin: 0 0 25px 0;
-}
-.wrapword {
-  word-break: break-word;
-  text-align: justify;
-  min-width: 50%;
-}
-.row-fluid {
-  padding-bottom: 50px;
-}
-.justify {
-  text-align: center;
-}
+table.property-table th { background: #f8f8f8; }
+.property-name { white-space: nowrap; }
+.property-name a { color: #444; }
+.property-name a:hover { color: #000; }
+.property-name a .muted { color: #666; }
+ul.property-values.multi li { padding-left: .7em; text-indent: -0.8em; }
+ul.property-values.multi li:before { color: #999; content: "•";font-family: monospace;  }
+td > ul.property-values { margin-bottom: 0; }
+td.property-value { min-width: 50%; text-align: justify; word-break: break-word; }
+col.property-column { width: 25%; }
+.expander { font-size: 85%; }
+.rdf-icon { margin-top: -40px; }
+.rdf-icon img { opacity: 0.7; }
+.image img { margin-bottom: 2em; max-width: 400px; max-height: 400px; width: 100%; }
+body { padding: 40px 0; }
 .truncate {
   -ms-word-break: break-all;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
   word-break: break-all;
-
   /* Non standard for webkit */
   word-break: break-word;
-
-  -webkit-hyphens: auto;
-  -moz-hyphens: auto;
-  hyphens: auto;
-}
-col.property-column {
-  width: 13em;
-}
-body {
-  padding-top: 20px;
-  padding-bottom: 60px;
-}
-
-/* Custom container */
-.container {
-  margin: 0 auto;
-  max-width: 1000px;
-}
-.container > hr {
-  margin: 40px 0;
 }

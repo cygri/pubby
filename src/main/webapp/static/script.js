@@ -1,6 +1,6 @@
-function init() {
+$(function() {
 	init_long_literals();
-}
+});
 
 var long_literal_counter = 0;
 var long_literal_spans = {};
@@ -13,13 +13,13 @@ function init_long_literals() {
         var textNode = span.firstChild;
         var text = textNode.data;
         if (text.length < 300) continue;
-        var match = text.match(/([^\0]{150}[^\0]*? )([^\0]*)/);
+        var match = text.match(/([^\0]{250}[^\0]*? )([^\0]*)/);
         if (!match) continue;
         span.insertBefore(document.createTextNode(match[1] + ' ... '), span.firstChild);
         span.removeChild(textNode);
         var link = document.createElement('a');
         link.href = 'javascript:expand(' + long_literal_counter + ');';
-        link.appendChild(document.createTextNode('\u00BBmore\u00BB'));
+        link.appendChild(document.createTextNode('more'));
         link.className = 'expander';
         span.insertBefore(link, span.firstChild.nextSibling);
         long_literal_spans[long_literal_counter] = span;

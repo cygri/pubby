@@ -1,18 +1,18 @@
 ## Renders the name of a ResourceProperty, given in $property
 <span class="property-name">
 #if ($property.Inverse && !($showLabels && $property.InverseLabel))
-  <small>Is</small>
+  <span class="muted">Is</span>
 #end
 #if ($showLabels && $property.Inverse && $property.InverseLabel)
   <a class="uri" href="$property.BrowsableURL" title="$property.URI">$property.InverseLabel</a>
 #elseif ($showLabels && $property.label)
   <a class="uri" href="$property.BrowsableURL" title="$property.URI">$property.label</a>
 #elseif ($property.hasPrefix())
-  <a class="uri" href="$property.BrowsableURL" title="$property.URI"><small>$property.Prefix:</small>$property.LocalName</a>
+  <a class="uri" href="$property.BrowsableURL" title="$property.URI"><span class="muted">$property.Prefix:</span>$property.LocalName</a>
 #else
-  <a class="uri" href="$property.BrowsableURL" title="$property.URI"><small>?:</small>$property.LocalName</a>
+  <a class="uri" href="$property.BrowsableURL" title="$property.URI"><span class="muted">?:</span>$property.LocalName</a>
 #end
 #if ($property.Inverse && !($showLabels && $property.InverseLabel))
-  <small>of</small>
+  <span class="muted">of</span>
 #end
 </span>

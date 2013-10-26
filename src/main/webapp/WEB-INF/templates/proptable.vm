@@ -1,31 +1,29 @@
 ## Renders a set of ResourceProperties, given in $properties, as a property-value table
-  <table class="table table-bordered table-striped table-hover">
+  <table class="table table-bordered property-table">
     <colgroup>
       <col class="property-column" span="1">
       <col class="value-column" span="1">
     </colgroup>
+    <thead>
+      <tr><th>Property</th><th>Value</th></tr>
+    </thead>
     <tbody> 
 #foreach ($property in $properties)
       <tr>
-        <td class="property">
+        <td>
 #parse("property-name.vm")
         </td>
-        <td class="wrapword">
+        <td class="property-value">
 #if ($property.hasOnlySimpleValues())
 #parse("values.vm")
 #else
-          <span class="values-summary">
-#if ($property.ValueCount == 1)
-#set ($text = "1 value")
-#else
-#set ($text = "$property.ValueCount values")
-#end
 #if ($property.ValuesPageURL)
-            [<a href="$property.ValuesPageURL">$text</a>]
+          <a href="$property.ValuesPageURL">
+            <span class="badge">$property.ValueCount</span>
+          </a>
 #else
-            [$text]
+          <span class="badge">$property.ValueCount</span> <small class="muted">&nbsp;&nbsp;anonymous</small>
 #end
-          </span>
 #end
         </td>
       </tr>

@@ -13,6 +13,7 @@ col.property-column { width: 25%; }
 .rdf-icon img { opacity: 0.7; }
 .image img { margin-bottom: 2em; max-width: 400px; max-height: 400px; width: 100%; }
 .collapsed > table { display: none; }
+.metadata-properties td table { margin-bottom: 0 }
 body { padding: 40px 0; }
 .truncate {
   -ms-word-break: break-all;

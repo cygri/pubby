@@ -1,6 +1,6 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -81,7 +81,7 @@ public abstract class BaseServlet extends HttpServlet {
 			Map<String,String> nsSet = metadataModel.getNsPrefixMap();
 			nsSet.putAll(prefixes.getNsPrefixMap());
 			context.put("prefixes", nsSet.entrySet());
-			context.put("blankNodesMap", new HashMap<Resource,String>());
+			context.put("blankNodesList", new ArrayList<Resource>());
 		}
 		catch (Exception e) {
 			context.put("metadata", Boolean.FALSE);

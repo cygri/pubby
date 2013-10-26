@@ -1,5 +1,3 @@
-#set($bnidCount = 0)
-
 #macro (prettyNode $node) 
 	#set ($foundSth = false)
 
@@ -12,12 +10,11 @@
 		#end
 
 	#elseif ($node.asNode().isBlank())
-		#if (!$blankNodesMap.containsKey($node))
-			#set ($bnid = "Anon_$bnidCount")
-			#set ($test = $blankNodesMap.put($node,$bnid))
-			#set ($bnidCount = $bnidCount + 1)
+		#if (!$blankNodesList.contains($node))
+			#set ($bnid = $blankNodesList.size())
+			#set ($test = $blankNodesList.add($node))
 		#end
-		#set ($bnidP = $blankNodesMap.get($node))
+		#set ($bnidP = 'Anon_' + $blankNodesList.indexOf($node))
 		$bnidP
 		#set ($foundSth = true)	
 

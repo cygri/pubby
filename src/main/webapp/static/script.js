@@ -1,5 +1,16 @@
 $(function() {
-	init_long_literals();
+    init_long_literals();
+    $('.expand-meta-all').click(function() {
+        $('.metadata-properties').removeClass('collapsed');
+        $('.expand-meta').text('hide');
+        $('.expand-meta-all').addClass('muted');
+        return false;
+    });
+    $('.expand-meta').click(function() {
+        $(this).closest('.metadata-properties').toggleClass('collapsed');
+        $(this).text($(this).text() == 'more' ? 'hide' : 'more');
+        return false;
+    });
 });
 
 var long_literal_counter = 0;
@@ -33,13 +44,4 @@ function expand(i) {
     span.removeChild(span.firstChild);
     span.removeChild(span.firstChild);
     span.insertBefore(long_literal_texts[i], span.firstChild);
-}
-
-function showAllMetadata(name) {
-	var ele = document.getElementById(name);
-	if (ele == null) return;
-	var tables = document.getElementsByTagName('table');
-	for (i = 0; i < tables.length; i++) {
-		tables[i].style.display = 'block';
-	}
 }

@@ -1,5 +1,4 @@
 #set($bnidCount = 0)
-#set($idadd = 0)
 
 #macro (prettyNode $node) 
 	#set ($foundSth = false)
@@ -7,7 +6,7 @@
 	#if ($node.asNode().isURI())
 		#foreach ($entry in $prefixes)
 			#if ($node.getURI().startsWith($entry.getValue()))
-				<a class="uri" href="$node.getURI()" title="$node.getURI()"><small>$entry.getKey()</small>:$node.getURI().substring($entry.getValue().length())</a>
+				<a class="uri" href="$node.getURI()" title="$node.getURI()"><span class="muted">$entry.getKey()</span>:$node.getURI().substring($entry.getValue().length())</a>
 				#set ($foundSth = true)
 			#end
 		#end
@@ -28,28 +27,30 @@
 	#end
 
 	#if (!$foundSth)
-		<small>&lt;</small><a class="uri" href="$node.toString()">$node.toString()</a><small>&gt;</small>
+		<span class="muted">&lt;</span><a class="uri" href="$node.toString()">$node.toString()</a><span class="muted">&gt;</span>
 	#end
 #end
 
-#macro( listProperties $name $metadataPropList $style)
-	#set ($idadd = $idadd + 1)
-	<div class="metadata-label">#prettyNode ($name)&nbsp;
-
-	#if ($metadataPropList.size() > 0 && $style != "block")
-		<a name="anchor_$idadd"></a>
-		(<a href="#anchor_$idadd" onclick="document.getElementById('ele_$idadd').style.display = 'block';">more</a>)
+#macro( listProperties $name $metadataPropList $collapsed)
+  #if ($collapsed)
+  <div class="metadata-properties collapsed">
+  #else
+  <div class="metadata-properties">
+  #end
+	<div>#prettyNode ($name)&nbsp;
+	#if ($metadataPropList.size() > 0 && $collapsed)
+		<a href="#" class="expand-meta">more</a>
 	#end
 	</div>
 
-	<table id="ele_$idadd" class="table table-striped table-bordered table-condensed truncate" style="display: $style">
+	<table class="table table-bordered table-condensed truncate">
 	#foreach  ($statement in $metadataPropList)
 		<tr>
-			<td valign="top" class="metadata-property">#prettyNode ($statement.getPredicate())</td>
+			<td valign="top" class="property-name">#prettyNode ($statement.getPredicate())</td>
 			<td class="metadata-object">
 				#set ($object = $statement.getObject())
 				#if ($object.isResource() && $object.listProperties().toList().size() > 0 && !$statement.getSubject().equals($statement.getObject()))
-					#listProperties ($object $object.listProperties().toList() 'none')
+					#listProperties ($object $object.listProperties().toList() true)
 				#else
 					#prettyNode ($statement.getObject())
 				#end
@@ -57,12 +58,13 @@
 		</tr>
 	#end
 	</table>
+  </div>
 #end
 
 ## Replaced the commented line by the following one because the
 ## RDF graph we want to talk about is a specific representation
 ## of the data identified by the $rdf_link URI.
 ##                                       Olaf, May 28, 2010
-## #listProperties ($rdf_link $metadata 'block') 
-## #listProperties ('' $metadata 'block')
-#listProperties ($metadata $metadata.listProperties().toList() 'block')
+## #listProperties ($rdf_link $metadata false) 
+## #listProperties ('' $metadata false)
+#listProperties ($metadata $metadata.listProperties().toList() false)

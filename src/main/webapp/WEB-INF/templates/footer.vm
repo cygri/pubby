@@ -1,12 +1,13 @@
-      <footer>
-        <p class="text-center">
+    </div><!-- .container-fluid -->
+
+    <footer>
+      <p class="text-center">
 #if ($rdf_link)
-          <a class="muted" href="$rdf_link?output=ttl">As Turtle</a> |
-          <a class="muted" href="$rdf_link?output=xml">As RDF/XML</a>
+        <a class="muted" href="$rdf_link?output=ttl">As Turtle</a> |
+        <a class="muted" href="$rdf_link?output=xml">As RDF/XML</a>
 #end
-        </p>
-      </footer>
-    </div>
+      </p>
+    </footer>
     <script src="${server_base}static/js/jquery-1.10.2.min.js"></script>
     <script src="${server_base}static/script.js"></script>
   </body>

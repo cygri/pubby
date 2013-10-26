@@ -11,15 +11,10 @@
 #else
   <p>No further information is available.</p>
 #end
-  </div>
 
 #if ($metadata)
-  <a name="meta"></a>
-  <h2>Metadata</h2>
-  <div id="metadata-tables">
+  <h3>Metadata <small><a href="#" class="expand-meta-all">expand all</a></small></h3>
 #parse("metadatatable.vm")
-  </div>
-  <a href="#meta" onclick="showAllMetadata('metadata-tables')">expand all</a>
 #end
 
 #parse("footer.vm")

@@ -1,6 +1,8 @@
 package de.fuberlin.wiwiss.pubby.servlets;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,19 @@ public class RootServlet extends BaseServlet {
 		// static/ directory handled by default servlet
 		if (relativeURI.startsWith("static/")) {
 			getServletContext().getNamedDispatcher("default").forward(request, response);
+			return true;
+		}
+
+		// Older versions of Pubby used to have /pathpage and /pathdata,
+		// more limited versions of what is now /values and /values.data.
+		// 301-redirect the old locations to the new ones.
+		Matcher m = Pattern.compile("^(pathpage|pathdata)(/.*)$").matcher(relativeURI);
+		if (m.matches()) {
+			String valuesURL = config.getWebApplicationBaseURI() + 
+					("pathpage".equals(m.group(1)) ? "values" : "values.data")
+					+ m.group(2);
+			response.setStatus(301);
+			response.sendRedirect(IRIEncoder.toURI(valuesURL));
 			return true;
 		}
 

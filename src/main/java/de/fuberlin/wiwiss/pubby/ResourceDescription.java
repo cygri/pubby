@@ -99,7 +99,7 @@ public class ResourceDescription {
 	 * resource is blank, return null.
 	 */
 	public String getTitle() {
-		if (!resource.isURIResource()) return null;
+		if (!resource.isResource()) return null;
 		Literal l = getLabel();
 		String label = l == null ? null : l.getLexicalForm();
 		String lang = l == null ? null : l.getLanguage();

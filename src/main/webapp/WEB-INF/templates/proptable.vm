@@ -1,3 +1,17 @@
+
+#if ($classes && !$classes.Empty)
+  <div>
+    <ul class="classes inline pull-right">
+#foreach ($value in $classes)
+      <li class="class-name">
+#parse("rdf-term.vm")
+        <i class="icon-tag"></i>
+      </li>
+#end
+    </ul>
+  </div>
+#end
+
 ## Renders a set of ResourceProperties, given in $properties, as a property-value table
   <table class="table table-bordered property-table">
     <colgroup>
@@ -9,6 +23,7 @@
     </thead>
     <tbody> 
 #foreach ($property in $properties)
+#if ($property.URI != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' || $property.Inverse)
       <tr>
         <td>
 #parse("property-name.vm")
@@ -27,6 +42,7 @@
 #end
         </td>
       </tr>
+#end
 #end
     </tbody>
   </table>

@@ -36,13 +36,13 @@
 #end
     <div class="container-fluid">
       <div class="page-header">
-        <h1>$title</h1>
-#if ($uri)
-        <div class="truncate"><a class="muted" href="$uri">$uri</a></div>
-#end
 #if ($rdf_link)
         <ul class="rdf-icon nav nav-pills pull-right">
           <li><a href="$rdf_link" title="RDF data"><img src="${server_base}static/rdf-icon.gif" alt="This page in RDF" /></a></li>
         </ul>
+#end
+        <h1>$title</h1>
+#if ($uri)
+        <div class="truncate"><a class="muted" href="$uri">$uri</a></div>
 #end
       </div>

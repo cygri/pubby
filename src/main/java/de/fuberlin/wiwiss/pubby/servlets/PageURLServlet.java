@@ -38,6 +38,7 @@ public class PageURLServlet extends BaseServlet {
 		context.put("comment", description.getComment());
 		context.put("image", description.getImageURL());
 		context.put("properties", description.getProperties());
+		context.put("classes", description.getClasses());
 		context.put("showLabels", config.showLabels());
 
 		addPageMetadata(context, controller, description.getModel());

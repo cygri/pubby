@@ -137,6 +137,12 @@ public class ResourceDescription {
 		return null;
 	}
 	
+	public List<Value> getClasses() {
+		ResourceProperty type = getProperty(RDF.type, false);
+		if (type == null) return Collections.emptyList();
+		return type.getSimpleValues();
+	}
+	
 	public ResourceProperty getProperty(Property property, boolean isInverse) {
 		for (ResourceProperty p: getProperties()) {
 			if (p.getURI().equals(property.getURI()) && p.isInverse() == isInverse) {

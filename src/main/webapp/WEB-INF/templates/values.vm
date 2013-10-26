@@ -8,24 +8,7 @@
 <ul class="$multi property-values unstyled">
 #foreach ($value in $property.SimpleValues)
   <li>
-#if ($value.Node.isURI())
-#if ($showLabels && $value.label)
-    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI">$value.label</a>
-#elseif ($value.Prefix)
-    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI"><span class="muted">$value.Prefix:</span>$value.LocalName</a>
-#else
-    <span class="muted">&lt;</span><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><span class="muted">&gt;</span>
-#end
-#elseif ($value.Node.Literal)
-    <span class="literal"><span class="lex">$value.Node.LiteralLexicalForm</span>
-#if ($value.DatatypeLabel)
-      <small class="muted"> &nbsp;$value.DatatypeLabel</small>
-#end
-#if ($value.Node.LiteralLanguage != "")
-      <small class="muted"> &nbsp;$value.Node.LiteralLanguage</small>
-#end
-    </span>
-#end
+#parse ("rdf-term.vm")
   </li>
 #end
 </ul>

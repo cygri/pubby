@@ -3,13 +3,18 @@ table.property-table th { background: #f8f8f8; }
 .property-name a { color: #444; }
 .property-name a:hover { color: #000; }
 .property-name a .muted { color: #666; }
+.class-name { white-space: nowrap; }
+.class-name a { color: #666; }
+.class-name a:hover { color: #222; }
+.class-name a .muted { color: #666; }
+.class-name i { opacity: 0.6; }
+ul.classes { margin-bottom: 0 }
 ul.property-values.multi li { padding-left: .7em; text-indent: -0.8em; }
 ul.property-values.multi li:before { color: #999; content: "•";font-family: monospace;  }
 td > ul.property-values { margin-bottom: 0; }
 td.property-value { min-width: 50%; text-align: justify; word-break: break-word; }
 col.property-column { width: 25%; }
 .expander { font-size: 85%; }
-.rdf-icon { margin-top: -40px; }
 .rdf-icon img { opacity: 0.7; }
 .image img { margin-bottom: 2em; max-width: 400px; max-height: 400px; width: 100%; }
 .collapsed > table { display: none; }

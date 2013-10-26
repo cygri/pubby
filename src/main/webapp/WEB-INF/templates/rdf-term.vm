@@ -1,0 +1,19 @@
+## Renders a single RDF term of class ResourceDescription.Value given in $value
+#if ($value.Node.isURI())
+#if ($showLabels && $value.label)
+    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI">$value.label</a>
+#elseif ($value.Prefix)
+    <a class="uri" href="$value.BrowsableURL" title="$value.Node.URI"><span class="muted">$value.Prefix:</span>$value.LocalName</a>
+#else
+    <span class="muted">&lt;</span><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><span class="muted">&gt;</span>
+#end
+#elseif ($value.Node.Literal)
+    <span class="literal">$value.Node.LiteralLexicalForm
+#if ($value.DatatypeLabel)
+      <small class="muted pull-right" title="Datatype"> &nbsp;$value.DatatypeLabel</small>
+#end
+#if ($value.Node.LiteralLanguage != "")
+      <small class="muted pull-right" title="Language"> &nbsp;$value.Node.LiteralLanguage</small>
+#end
+    </span>
+#end

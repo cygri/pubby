@@ -291,9 +291,9 @@ ex:Widget rdfs:label "widget"@en.</pre>
   or enriching another dataset with additional triples loaded from a static file.</p></dd>
 
 <dt><tt>conf:datasetBase &lt;<em>dataset_uri_prefix</em>&gt;;</tt></dt>
-<dd><p>Only resources starting with this URI prefix will be handled by Pubby, and
+<dd><p>Only resources starting with this URI prefix will be hosted by Pubby, and
   will be mapped into the <tt>conf:webBase</tt> namespace. If not specified,
-  only resources starting with the <tt>conf:webBase</tt> value will be handled.</p>
+  only resources starting with the <tt>conf:webBase</tt> value will be hosted.</p>
   <p><em>Note:</em> In the configuration file and any imported vocabularies,
   references to resources in the dataset must be made using URIs in the rewritten
   form, that is, using URIs that start with the <tt>conf:webBase</tt>. Using
@@ -614,13 +614,6 @@ rdf:type owl:inverseOf [ conf:weight 10 ].</pre>
   don't support SPARQL 1.1 (see <tt>conf:supportsSPARQL11</tt>).</p></dd>
 </dl>
 
-
-<h2 id="limitations">Limitations</h2>
-
-<ul>
-  <li>Some features do not work on SPARQL endpoints that don't support at least SPARQL 1.1.</li>
-  <li>Hash URIs on the web side are not supported.</li>
-</ul>
 
 <h2><a name="support" id="support"></a>Support and feedback</h2>
 

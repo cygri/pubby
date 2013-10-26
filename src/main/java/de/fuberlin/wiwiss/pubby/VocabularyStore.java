@@ -129,6 +129,7 @@ public class VocabularyStore {
 			return cache;
 		}
 		public void reportAdditional(Property p) {
+			if (cache == null) get();
 			if (cache.contains(p)) return;
 			cache.add(p);
 		}

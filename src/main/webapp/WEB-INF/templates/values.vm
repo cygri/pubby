@@ -17,7 +17,7 @@
     <span class="muted">&lt;</span><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><span class="muted">&gt;</span>
 #end
 #elseif ($value.Node.Literal)
-    <span class="literal">$value.Node.LiteralLexicalForm
+    <span class="literal"><span class="lex">$value.Node.LiteralLexicalForm</span>
 #if ($value.DatatypeLabel)
       <small class="muted"> &nbsp;$value.DatatypeLabel</small>
 #end

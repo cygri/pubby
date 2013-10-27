@@ -66,6 +66,21 @@ public class VocabularyStore {
 		return labels.get(iri, language);
 	}
 
+	/**
+	 * Returns a label, only taking into account previously cached values,
+	 * without querying the data sources. Fast.
+	 * @param iri IRI of the resource whose label to return
+	 * @param preferPlural Return <tt>conf:pluralLabel</tt> if available
+	 * @return The best label found, or null if none
+	 */
+	public Literal getCachedLabel(String iri, boolean preferPlural) {
+		if (preferPlural) {
+			Literal pluralLabel = pluralLabels.getCached(iri, defaultLanguage);
+			return pluralLabel == null ? getCachedLabel(iri, false) : pluralLabel;
+		}
+		return labels.getCached(iri, defaultLanguage);
+	}
+	
 	public Literal getInverseLabel(String iri, boolean preferPlural) {
 		return getInverseLabel(iri, preferPlural, defaultLanguage);
 	}
@@ -155,6 +170,9 @@ public class VocabularyStore {
 			cache.put(iri, best);
 			return best;
 		}
+		K getCached(String iri) {
+			return cache.get(iri);
+		}
 		private K pickBestFromModel(Model m, String iri) {
 			Resource r = m.getResource(iri);
 			Set<RDFNode> nodes = inverse ? getInverseValues(r) : getValues(r);
@@ -205,9 +223,16 @@ public class VocabularyStore {
 			super (p, inverse);
 		}
 		Literal get(String iri, String preferredLang) {
+			return getBestMatch(get(iri), preferredLang);
+		}
+		Literal getCached(String iri, String preferredLang) {
+			return getBestMatch(getCached(iri), preferredLang);
+		}
+		private Literal getBestMatch(Collection<Literal> candidates, String preferredLang) {
+			if (candidates == null) return null;
 			Literal bestMatch = null;
 			int bestMatchLength = -1;
-			for (Literal l: get(iri)) {
+			for (Literal l: candidates) {
 				int matchLength = getMatchLength(l.getLanguage(), preferredLang);
 				if (matchLength >= bestMatchLength) {
 					bestMatch = l;

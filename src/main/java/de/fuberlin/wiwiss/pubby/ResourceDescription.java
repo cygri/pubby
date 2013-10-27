@@ -452,9 +452,14 @@ public class ResourceDescription {
 		public String getLabel() {
 			if (!node.isResource()) return null;
 			Literal result = null;
-			if (node.isURIResource() && predicate.equals(RDF.type)) {
-				// Look up class labels in cache
-				result = vocabularyStore.getLabel(node.asNode().getURI(), false);
+			if (node.isURIResource()) {
+				if (predicate.equals(RDF.type)) {
+					// Look up class labels in vocabulary store
+					result = vocabularyStore.getLabel(node.asNode().getURI(), false);
+				} else if (node.isURIResource()) {
+					// If it's not a class, see if we happen to have a label cached
+					result = vocabularyStore.getCachedLabel(node.asResource().getURI(), false);
+				}
 			}
 			if (result == null) {
 				// Use any label that may be included in the description model

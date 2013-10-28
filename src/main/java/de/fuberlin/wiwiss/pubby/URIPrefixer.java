@@ -25,7 +25,7 @@ public class URIPrefixer {
 		this.resource = resource;
 		String uri = resource.getURI();
 		Iterator<String> it = prefixes.getNsPrefixMap().keySet().iterator();
-		while (it.hasNext()) {
+		while (it.hasNext() && uri != null) {
 			String entryPrefix = it.next();
 			String entryURI = prefixes.getNsPrefixURI(entryPrefix);
 			if (uri.startsWith(entryURI)) {
@@ -47,6 +47,7 @@ public class URIPrefixer {
 	}
 	
 	public String getLocalName() {
+		if (resource.isAnon()) return null;
 		if (localName == null) {
 			Matcher matcher = Pattern.compile("([^#/:?]+)[#/:?]*$").matcher(resource.getURI());
 			if (matcher.find()) {
@@ -58,6 +59,7 @@ public class URIPrefixer {
 	}
 	
 	public String toTurtle() {
+		if (resource.isAnon()) return "[]";
 		if (hasPrefix()) {
 			return getPrefix() + ":" + getLocalName();
 		}

@@ -64,7 +64,7 @@ public abstract class ResourceReader {
 
 	public Set<Property> getProperties(Property p) {
 		Set<Property> result = new HashSet<Property>();
-		for (Resource r: getResources(CONF.labelProperty)) {
+		for (Resource r: getResources(p)) {
 			result.add(r.as(Property.class));
 		}
 		return result;

@@ -21,6 +21,7 @@
   <h3>Resource #$velocityCount</h3>
 #end
 #set ($properties = $resource.Properties)
+#set ($classes = $resource.Classes)
 #parse("proptable.vm")
 #end
 

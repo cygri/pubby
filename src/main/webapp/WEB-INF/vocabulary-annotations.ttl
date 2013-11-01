@@ -23,11 +23,28 @@ dc:title conf:weight -79.
 dcterms:title conf:weight -79.
 skos:altLabel conf:weight -75.
 rdfs:comment conf:weight -50.
-dcterms:identifier conf:weight -20.
-skos:notation conf:weight -20.
-rdfs:subPropertyOf conf:weight -15.
-rdfs:subClassOf conf:weight -15.
+dcterms:identifier conf:weight -40.
+skos:notation conf:weight -40.
+rdfs:subPropertyOf conf:weight -35.
+rdfs:subClassOf conf:weight -35.
+rdfs:domain conf:weight -22.
+rdfs:range conf:weight -21.
 rdfs:isDefinedBy conf:weight -12.
 void:dataDump conf:weight -10.
 void:sparqlEndpoint conf:weight -10.
 void:subset conf:weight 10.
+
+rdfs:isDefinedBy
+    owl:inverseOf [ rdfs:label "defines"@en ].
+rdfs:subClassOf
+    rdfs:label "superclass"@en;
+    owl:inverseOf [ rdfs:label "subclass"@en ].
+rdfs:subPropertyOf
+    rdfs:label "superproperty"@en;
+    owl:inverseOf [ rdfs:label "subproperty"@en ].
+owl:disjointWith
+    owl:inverseOf [ rdfs:label "disjoint with"@en ].
+owl:inverseOf
+    owl:inverseOf [ rdfs:label "inverse of"@en ].
+rdf:type
+    owl:inverseOf [ rdfs:label "instance"@en; conf:pluralLabel "instances"@en; ].

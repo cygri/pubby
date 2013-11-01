@@ -14,8 +14,6 @@ import com.hp.hpl.jena.util.PrintUtil;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import de.fuberlin.wiwiss.pubby.vocab.CONF;
-
 /**
  * Convenience superclass for classes that read properties of
  * an RDF resource, intended for making the reading of configuration

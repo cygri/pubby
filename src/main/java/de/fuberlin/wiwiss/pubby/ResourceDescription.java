@@ -24,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
 
@@ -159,6 +160,7 @@ public class ResourceDescription {
 		StmtIterator it = resource.listProperties();
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
+			if (isEmptyLiteral(stmt.getObject())) continue;
 			Property predicate = stmt.getPredicate();
 			String key = "=>" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
@@ -210,6 +212,22 @@ public class ResourceDescription {
 		return results;
 	}
 
+	/**
+	 * Checks whether a node is an empty literal that should better be skipped.
+	 * The logic is that those literals are probably an error on the data
+	 * producer side and are best not shown to the user in HTML views.
+	 */
+	private boolean isEmptyLiteral(RDFNode node) {
+		if (!node.isLiteral()) return false;
+		Literal l = node.asLiteral();
+		if (l.getDatatypeURI() == null ||
+				l.getDatatypeURI().startsWith(RDF.getURI()) ||
+				l.getDatatypeURI().startsWith(XSD.getURI())) {
+			if ("".equals(l.getLexicalForm())) return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Returns a prefix mapping containing all prefixes from the input model
 	 * and from the configuration, with the configuration taking precedence.
@@ -537,8 +555,9 @@ public class ResourceDescription {
 			lang = config.getDefaultLanguage();
 		}
 		s = camelCaseBoundaryPattern.matcher(s).replaceAll(" ");
+		s = s.replace(" - ", " \u2013 ");
 		Set<String> uncapitalizedWords = Collections.emptySet();
-		if (lang == null || english.matcher(lang).matches()) {
+		if (lang == null || "".equals(lang) || english.matcher(lang).matches()) {
 			uncapitalizedWords = englishUncapitalizedWords;
 		}
 		StringBuffer result = new StringBuffer();
@@ -551,8 +570,10 @@ public class ResourceDescription {
 			offset = matcher.end();
 			String word = matcher.group();
 			if ("".equals(word)) continue;
-			if (first || !uncapitalizedWords.contains(word)) {
+			if (first || !uncapitalizedWords.contains(word.toLowerCase())) {
 				word = word.substring(0, 1).toUpperCase() + word.substring(1);
+			} else {
+				word = word.substring(0, 1).toLowerCase() + word.substring(1);
 			}
 			result.append(word);
 			first = false;
@@ -564,7 +585,7 @@ public class ResourceDescription {
 	private static Pattern wordPattern = Pattern.compile("[^ \t\r\n-]+|");
 	private static Pattern camelCaseBoundaryPattern = Pattern.compile(
 			"(?<=(\\p{javaLowerCase}|\\p{javaUpperCase})\\p{javaLowerCase})" +
-			"(?=\\p{javaUpperCase}\\p{javaLowerCase})");
+			"(?=\\p{javaUpperCase})");
 	private static Pattern english = Pattern.compile("^en(-.*)?$", Pattern.CASE_INSENSITIVE);
 	private static Set<String> englishUncapitalizedWords = 
 			new HashSet<String>(Arrays.asList(

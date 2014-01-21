@@ -36,71 +36,23 @@
 @prefix void:     <http://rdfs.org/ns/void#> .
 @prefix ir:       <http://www.ontologydesignpatterns.org/cp/owl/informationrealization.owl#> .
 
-# Server configuration section
 <> a conf:Configuration;
-    # Project name for display in page titles
-    conf:projectName "DBpedia.org";
-    # Homepage with description of the project for the link in the page header
-    conf:projectHomepage <http://dbpedia.org>;
-    # The Pubby root, where the webapp is running inside the servlet container.
-    conf:webBase <http://localhost:8080/>;
-    # URL of an RDF file whose prefix mapping is to be used by the
-    # server; defaults to <>, which is *this* file.
-    conf:usePrefixesFrom <>;
-    # If labels and descriptions are available in multiple languages,
-    # prefer this one.
-    conf:defaultLanguage "en";
-    # When the homepage of the server is accessed, this resource will
-    # be shown.
-    conf:indexResource <http://localhost:8080/resource/DBpedia>;
-    # Will be appended to the conf:webBase to form the public
-    # resource URIs; if not present, defaults to ""
-    conf:webResourcePrefix "resource/";
-
-# Dataset configuration section (for DBpedia resources)
-#
-# URIs in the SPARQL endpoint: http://dbpedia.org/resource/*
-# URIs on the Web:             http://localhost:8080/resource/*
+    conf:projectName "Planning Application Portal";
+    conf:webBase <http://planning.derilinx.ie:8080/>;
+    conf:indexResource <http://planning.derilinx.ie:8080/>;
+    conf:usePrefixesFrom <file:///Users/cygri/Desktop/odpp-planning-demo/index.ttl>;
+    conf:loadVocabulary <vocabulary-annotations.ttl>, <org.ttl>, <rdfs.rdf>, <papp.ttl>, <foaf.rdf>, <dct.ttl>, <geo.rdf>, <skos.rdf>;
     conf:dataset [
-        # SPARQL endpoint URL of the dataset
-        conf:sparqlEndpoint <http://dbpedia.openlinksw.com:8890/sparql>;
-        # Default graph name to query (not necessary for most endpoints)
-        conf:sparqlDefaultGraph <http://dbpedia.org>;
-        # Common URI prefix of all resource URIs in the SPARQL dataset
-        conf:datasetBase <http://dbpedia.org/resource/>;
-        # Fixes an issue with the server running behind an Apache proxy;
-        # can be disabled otherwise
-        conf:fixUnescapedCharacters "(),'!$&*+;=@";
-        # DBpedia uses URIs, not IRIs
-        conf:supportsIRIs false;
-
-        # Queries for describing a resource denoted by "?__this__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:resourceDescriptionQuery "CONSTRUCT { ?__this__ ?p ?o } WHERE { ?__this__ ?p ?o }";
-#        conf:resourceDescriptionQuery "CONSTRUCT { ?s ?p ?__this__ } WHERE { ?s ?p ?__this__ }";
-        
-        # Queries for describing the blank nodes related to a given resource via a given property.
-        # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:anonymousPropertyDescriptionQuery "DESCRIBE ?x WHERE { ?__this__ ?__property__ ?x. FILTER (isBlank(?x)) }";
-        
-        # Queries for describing the blank nodes inversely related to a given resource via a given property.
-        # The resource and the property should be denoted by "?__this__" and "?__property__".
-        # Multiple queries can be specified, results will be merged.
-#        conf:anonymousInversePropertyDescriptionQuery "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
-        
-        # include metadata
-        conf:metadataTemplate "metadata.ttl";
-
-        # configure your metadata here
-        # Use properties with the meta: prefix where the property name
-        # corresponds to the placeholder URIs in metadata.ttl that begin
-        # with about:metadata:metadata:
-        # Examples for such properties are:
-#        meta:pubbyUser <URI of the data publisher who uses this Pubby>;
-#        meta:pubbyOperator <URI of the service provider who operates this Pubby>;
-#        meta:endpointUser <URI of the data publisher who uses the SPARQL endpoint queried by this Pubby>;
-#        meta:endpointOperator <URI of the service provider who operates the SPARQL endpoint>;
-#        meta:endpointDataset <URI of the linked dataset that is exposed via the SPARQL endpoint>;
+        conf:sparqlEndpoint <http://localhost:8890/sparql>;
+        conf:supportsSPARQL11 true;
+        conf:datasetBase <http://planning.derilinx.ie/>;
+        conf:resourceDescriptionQuery
+            "CONSTRUCT { ?__this__ ?p ?o. ?o rdfs:label ?label } WHERE { ?__this__ ?p ?o. FILTER (?p NOT IN ?__high_outdegree_properties__) OPTIONAL { ?o rdfs:label ?label } }",
+            "CONSTRUCT { ?s ?p ?__this__. ?s rdfs:label ?label } WHERE { ?s ?p ?__this__. FILTER (?p NOT IN ?__high_indegree_properties__) OPTIONAL { ?s rdfs:label ?label } }";
+    ];
+    conf:dataset [
+        a conf:AnnotationProvider;
+        conf:loadRDF <file:/Users/cygri/Desktop/odpp-planning-demo/index.ttl>;
+        conf:datasetBase <http://planning.derilinx.ie/>;
     ];
     .

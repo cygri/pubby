@@ -113,6 +113,7 @@ public class HypermediaControls {
 		DataSource source = config.getDataSource();
 		Model model = source.describeResource(absoluteIRI);
 		if (model.isEmpty()) return null;
+		System.out.println("Requesting: " + absoluteIRI);
 		return new ResourceDescription(this, model, 
 				source.getHighIndegreeProperties(absoluteIRI), 
 				source.getHighOutdegreeProperties(absoluteIRI), 

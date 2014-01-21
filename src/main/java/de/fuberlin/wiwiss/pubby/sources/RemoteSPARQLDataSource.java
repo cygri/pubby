@@ -235,6 +235,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	private Model execQueryGraph(String query) {
+		System.out.println(query);
 		Model model = ModelFactory.createDefaultModel();
 		previousDescribeQuery = query;
 
@@ -288,6 +289,7 @@ public class RemoteSPARQLDataSource implements DataSource {
 	}
 	
 	private ResultSet execQuerySelect(String query) {
+		System.out.println(query);
 		QueryEngineHTTP endpoint = new QueryEngineHTTP(endpointURL, query);
 		if (defaultGraphURI != null) {
 			endpoint.setDefaultGraphURIs(Collections.singletonList(defaultGraphURI));

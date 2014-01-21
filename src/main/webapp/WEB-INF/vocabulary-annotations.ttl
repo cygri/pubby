@@ -23,6 +23,7 @@ dc:title conf:weight -79.
 dcterms:title conf:weight -79.
 skos:altLabel conf:weight -75.
 rdfs:comment conf:weight -50.
+foaf:homepage conf:weight -30.
 dcterms:identifier conf:weight -20.
 skos:notation conf:weight -20.
 rdfs:subPropertyOf conf:weight -15.

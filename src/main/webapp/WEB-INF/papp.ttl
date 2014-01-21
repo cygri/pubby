@@ -1,0 +1,23 @@
+@prefix papp:    <http://vocab.deri.ie/papp#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix conf:    <http://richard.cyganiak.de/2007/pubby/config.rdf#> .
+
+papp:PlanningAuthority rdfs:label "planning authority"@en.
+papp:PlanningApplication rdfs:label "planning application"@en.
+papp:Status rdfs:label "status"@en.
+
+papp:authority a conf:HighIndegreeProperty;
+    rdfs:label "authority"@en;
+    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ].
+papp:decisionDue rdfs:label "date decision due"@en.
+papp:location rdfs:label "location"@en.
+papp:received rdfs:label "date received"@en.
+papp:status a conf:HighIndegreeProperty;
+    rdfs:label "status"@en;
+    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ].
+papp:appeal a conf:HighIndegreeProperty;
+    rdfs:label "appeal"@en;
+    owl:inverseOf [ conf:pluralLabel "appeals"@en; ].
+papp:planningReference rdfs:label "planning reference"@en.
+papp:planningFile rdfs:label "online planning file"@en.

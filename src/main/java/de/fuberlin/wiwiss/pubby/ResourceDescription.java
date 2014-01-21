@@ -458,7 +458,12 @@ public class ResourceDescription {
 		public String getLabel() {
 			if (!node.isResource()) return null;
 			Literal result = null;
-			if (node.isURIResource() && predicate.equals(RDF.type)) {
+
+// TODO: Check the logic here. The docs say that a conf:AnnotationProvider
+//       is always consulted, while the commented code here seems to consider it only
+//       for classes. But the now active code will also consult non-annotation providers!
+//			if (node.isURIResource() && predicate.equals(RDF.type)) {
+			if (node.isURIResource()) {
 				// Look up class labels in cache
 				result = vocabularyStore.getLabel(node.asNode().getURI(), false);
 			}

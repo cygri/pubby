@@ -31,6 +31,7 @@ public class ModelDataSource implements DataSource {
 
 	@Override
 	public Model describeResource(String resourceURI) {
+		System.out.println("Describing " + resourceURI);
 		Resource r = ResourceFactory.createResource(resourceURI);
 		if (model.contains(r, null, (RDFNode) null) || model.contains(null, null, r)) {
 			return model;

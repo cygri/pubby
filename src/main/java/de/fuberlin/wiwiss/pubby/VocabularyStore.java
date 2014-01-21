@@ -59,6 +59,7 @@ public class VocabularyStore {
 	}
 
 	public Literal getLabel(String iri, boolean preferPlural, String language) {
+		System.out.println("Getting label for " + iri);
 		if (preferPlural) {
 			Literal pluralLabel = pluralLabels.get(iri, language);
 			return pluralLabel == null ? getLabel(iri, false, language) : pluralLabel;
@@ -129,7 +130,7 @@ public class VocabularyStore {
 			return cache;
 		}
 		public void reportAdditional(Property p) {
-			if (cache.contains(p)) return;
+			if (cache == null || cache.contains(p)) return;
 			cache.add(p);
 		}
 	}

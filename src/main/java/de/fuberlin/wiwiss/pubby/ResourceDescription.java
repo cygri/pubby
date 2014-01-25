@@ -23,7 +23,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.vocabulary.FOAF;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.fuberlin.wiwiss.pubby.VocabularyStore.CachedPropertyCollection;
 
@@ -166,6 +169,10 @@ public class ResourceDescription {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			Property predicate = stmt.getPredicate();
+
+// FIXME: Hack for ODPP
+			if (predicate.equals(RDFS.label) || predicate.equals(RDFS.comment) || predicate.equals(DCTerms.description) || predicate.equals(FOAF.depiction)) continue;
+			
 			String key = "=>" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
 				propertyBuilders.put(key, new PropertyBuilder(
@@ -182,6 +189,10 @@ public class ResourceDescription {
 		while (it.hasNext()) {
 			Statement stmt = it.nextStatement();
 			Property predicate = stmt.getPredicate();
+
+// FIXME: Hack for ODPP
+			if (predicate.getURI().equals("http://planning.derilinx.ie/authority") || predicate.getURI().equals("http://planning.derilinx.ie:8080/authority")) continue;
+
 			String key = "<=" + predicate;
 			if (!propertyBuilders.containsKey(key)) {
 				propertyBuilders.put(key, new PropertyBuilder(

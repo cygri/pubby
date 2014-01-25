@@ -1,0 +1,20 @@
+## Renders a page showing the values of a single ResourceProperty,
+## given in $property. Simple values are shown first as a list,
+## complex values (i.e., descriptions of blank nodes) as complete
+## resource descriptions underneath.
+
+#parse("header.vm")
+
+#if ($results.Empty)
+<p>No matches found</p>
+#else
+<ul class="multi property-values unstyled">
+#foreach ($value in $results)
+  <li>
+#parse ("rdf-term.vm")
+  </li>
+#end
+</ul>
+#end
+
+#parse("footer.vm")

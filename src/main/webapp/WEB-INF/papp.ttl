@@ -7,17 +7,30 @@ papp:PlanningAuthority rdfs:label "planning authority"@en.
 papp:PlanningApplication rdfs:label "planning application"@en.
 papp:Status rdfs:label "status"@en.
 
-papp:authority a conf:HighIndegreeProperty;
-    rdfs:label "authority"@en;
-    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ].
-papp:decisionDue rdfs:label "date decision due"@en.
-papp:location rdfs:label "location"@en.
-papp:received rdfs:label "date received"@en.
+papp:planningReference
+    rdfs:label "planning reference"@en;
+    conf:weight -45.
+papp:location
+    rdfs:label "location"@en;
+    conf:weight -39.
+papp:received
+    rdfs:label "date received"@en;
+    conf:weight -16.
+papp:decisionDue
+    rdfs:label "date decision due"@en;
+    conf:weight -15.
 papp:status a conf:HighIndegreeProperty;
     rdfs:label "status"@en;
-    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ].
+    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ];
+    conf:weight -12.
 papp:appeal a conf:HighIndegreeProperty;
     rdfs:label "appeal"@en;
-    owl:inverseOf [ conf:pluralLabel "appeals"@en; ].
-papp:planningReference rdfs:label "planning reference"@en.
-papp:planningFile rdfs:label "online planning file"@en.
+    owl:inverseOf [ conf:pluralLabel "appeals"@en; ];
+    conf:weight -11.
+papp:planningFile
+    rdfs:label "online planning file"@en;
+    conf:weight 1.
+papp:authority a conf:HighIndegreeProperty;
+    rdfs:label "authority"@en;
+    owl:inverseOf [ conf:pluralLabel "planning applications"@en; ];
+    conf:weight -50.

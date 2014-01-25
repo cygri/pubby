@@ -66,6 +66,16 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>SPARQLServlet</servlet-name>
+    <servlet-class>de.fuberlin.wiwiss.pubby.servlets.SPARQLServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SPARQLServlet</servlet-name>
+    <url-pattern>/sparql</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>RootServlet</servlet-name>
     <servlet-class>de.fuberlin.wiwiss.pubby.servlets.RootServlet</servlet-class>
     <load-on-startup>1</load-on-startup>

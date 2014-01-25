@@ -9,6 +9,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.app.event.implement.EscapeXmlReference;
 import org.apache.velocity.context.Context;
+import org.apache.velocity.tools.generic.DisplayTool;
 
 /**
  * A facade class that simplifies using a custom Velocity
@@ -29,6 +30,7 @@ public class VelocityHelper {
 		this.servletContext = servletContext;
 		this.response = response;
 		this.velocityContext = new VelocityContext();
+		this.velocityContext.put("display", new DisplayTool());
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class VelocityHelper {
 					"org.apache.velocity.runtime.log.NullLogSystem");
 			
 			// XML-escape *all* references inserted into templates
-			result.setProperty("eventhandler.referenceinsertion.class", EscapeXmlReference.class.getName());
+//			result.setProperty("eventhandler.referenceinsertion.class", EscapeXmlReference.class.getName());
 			
 			// Enable caching
 			result.setProperty("file.resource.loader.cache", true);

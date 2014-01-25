@@ -8,7 +8,8 @@
     <span class="muted">&lt;</span><a class="uri" href="$value.BrowsableURL">$value.Node.URI</a><span class="muted">&gt;</span>
 #end
 #elseif ($value.Node.Literal)
-    <span class="literal">$value.Node.LiteralLexicalForm
+#set($s = $value.Node.LiteralLexicalForm)
+    <span class="literal">$display.br($s)
 #if ($value.DatatypeLabel)
       <small class="muted pull-right" title="Datatype"> &nbsp;$value.DatatypeLabel</small>
 #end

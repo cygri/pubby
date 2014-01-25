@@ -40,8 +40,8 @@
     conf:projectName "Planning Application Portal";
     conf:webBase <http://planning.derilinx.ie:8080/>;
     conf:indexResource <http://planning.derilinx.ie:8080/>;
-    conf:usePrefixesFrom <file:///Users/cygri/Desktop/odpp-planning-demo/index.ttl>;
-    conf:loadVocabulary <vocabulary-annotations.ttl>, <org.ttl>, <rdfs.rdf>, <papp.ttl>, <foaf.rdf>, <dct.ttl>, <geo.rdf>, <skos.rdf>;
+    conf:usePrefixesFrom <file:///Users/RichardCyganiak/odpp-planning-demo/index.ttl>;
+    conf:loadVocabulary <vocabulary-annotations.ttl>, <org.ttl>, <papp.ttl>, <foaf.rdf>, <dct.ttl>, <geo.rdf>, <skos.rdf>;
     conf:dataset [
         conf:sparqlEndpoint <http://localhost:8890/sparql>;
         conf:supportsSPARQL11 true;
@@ -52,7 +52,7 @@
     ];
     conf:dataset [
         a conf:AnnotationProvider;
-        conf:loadRDF <file:/Users/cygri/Desktop/odpp-planning-demo/index.ttl>;
+        conf:loadRDF <file:/Users/RichardCyganiak/odpp-planning-demo/index.ttl>;
         conf:datasetBase <http://planning.derilinx.ie/>;
     ];
     .

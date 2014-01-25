@@ -30,6 +30,15 @@
 #else
           <a class="brand" href="$server_base">$project_name</a>
 #end
+          <form class="navbar-search pull-right" action="/sparql">
+            <input type="text" name="q" class="search-query" placeholder="Search">
+            <input type="hidden" name="query" value="PREFIX papp: <http://vocab.deri.ie/papp#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?result ?label ?date ?status WHERE { ?result ?p ?o. ?o bif:contains ?q.  OPTIONAL { ?result rdfs:label ?label } OPTIONAL { ?result papp:received ?date } OPTIONAL { ?result papp:status ?status } } LIMIT 100">
+          </form>
+          <ul class="nav pull-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Catalog</a></li>
+            <li><a href="http://localhost:8890/sparql">Query</a></li>
+          </ul>
         </div>
       </div>
     </div>

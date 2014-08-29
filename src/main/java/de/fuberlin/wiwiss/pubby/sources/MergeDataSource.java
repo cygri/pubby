@@ -23,7 +23,7 @@ import de.fuberlin.wiwiss.pubby.ModelUtil;
  */
 public class MergeDataSource implements DataSource {
 	private final Collection<DataSource> sources;
-	private final PrefixMapping prefixes;
+	private final PrefixMapping mustHavePrefixes;
 	
 	public MergeDataSource(DataSource... sources) {
 		this(Arrays.asList(sources));
@@ -33,9 +33,9 @@ public class MergeDataSource implements DataSource {
 		this(sources, new PrefixMappingImpl());
 	}
 	
-	public MergeDataSource(Collection<DataSource> sources, PrefixMapping prefixes) {
+	public MergeDataSource(Collection<DataSource> sources, PrefixMapping mustHavePrefixes) {
 		this.sources = sources;
-		this.prefixes = prefixes;
+		this.mustHavePrefixes = mustHavePrefixes;
 	}
 	
 	@Override
@@ -53,7 +53,15 @@ public class MergeDataSource implements DataSource {
 			if (!source.canDescribe(iri)) continue;
 			ModelUtil.mergeModels(result, source.describeResource(iri));
 		}
-		ModelUtil.mergePrefixes(result, prefixes);
+		// Remove any other prefixes that may already be defined for the must-have namespaces
+		for (String prefix: mustHavePrefixes.getNsPrefixMap().keySet()) {
+			String ns = mustHavePrefixes.getNsPrefixURI(prefix);
+			while (result.getNsURIPrefix(ns) != null) {
+				result.removeNsPrefix(result.getNsURIPrefix(ns));
+			}
+		}
+		// Set all the must-have prefix/namespace pairs
+		ModelUtil.mergePrefixes(result, mustHavePrefixes);
 		return result;
 	}
 
@@ -85,7 +93,7 @@ public class MergeDataSource implements DataSource {
 			ModelUtil.mergeModels(result, 
 					source.listPropertyValues(resourceIRI, property, isInverse));
 		}
-		ModelUtil.mergePrefixes(result, prefixes);
+		ModelUtil.mergePrefixes(result, mustHavePrefixes);
 		return result;
 	}
 

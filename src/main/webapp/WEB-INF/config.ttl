@@ -90,7 +90,7 @@
 #        conf:anonymousInversePropertyDescriptionQuery "DESCRIBE ?x WHERE { ?x ?__property__ ?__this__. FILTER (isBlank(?x)) }";
         
         # include metadata
-        conf:metadataTemplate "metadata.ttl";
+        conf:metadataTemplate <metadata.ttl>;
 
         # configure your metadata here
         # Use properties with the meta: prefix where the property name

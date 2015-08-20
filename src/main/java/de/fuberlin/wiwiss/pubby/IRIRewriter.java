@@ -65,7 +65,7 @@ public abstract class IRIRewriter {
 	
 	/**
 	 * Rewrites an IRI.
-	 * @param Any absolute IRI
+	 * @param absoluteIRI absolute IRI
 	 * @return The rewritten form of the IRI
 	 */
 	public abstract String rewrite(String absoluteIRI);
@@ -73,7 +73,7 @@ public abstract class IRIRewriter {
 	/**
 	 * Rewrites an IRI. For any valid IRI,
 	 *  
-	 * @param Any absolute IRI
+	 * @param absoluteIRI absolute IRI
 	 * @return The rewritten form of the IRI
 	 */
 	public abstract String unrewrite(String absoluteIRI);
@@ -165,7 +165,7 @@ public abstract class IRIRewriter {
 	 * 
 	 * @param originalNamespace The namespace to be replaced
 	 * @param rewrittenNamespace The replacement namespace
-	 * @return
+	 * @return the rewriter
 	 */
 	public static IRIRewriter createNamespaceBased(
 			final String originalNamespace, final String rewrittenNamespace) {

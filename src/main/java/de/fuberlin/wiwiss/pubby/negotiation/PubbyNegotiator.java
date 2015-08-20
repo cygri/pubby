@@ -5,16 +5,11 @@ import java.util.regex.Pattern;
 public class PubbyNegotiator {
 	private final static ContentTypeNegotiator pubbyNegotiator;
 	private final static ContentTypeNegotiator dataNegotiator;
-	
+
 	static {
 		pubbyNegotiator = new ContentTypeNegotiator();
 		pubbyNegotiator.setDefaultAccept("text/html");
-		
-		// MSIE (7.0) sends either */*, or */* with a list of other random types,
-		// but always without q values, so it doesn't provide any basis for
-		// actual negotiation. We will simply send HTML to MSIE, no matter what.
-		pubbyNegotiator.addUserAgentOverride(Pattern.compile("MSIE"), null, "text/html");
-		
+
 		// Send Turtle to clients that indicate they accept everything.
 		// This is specifically so that cURL sees Turtle.
 		//
@@ -22,6 +17,15 @@ public class PubbyNegotiator {
 		//       "*/*" too, but I believe that's only when images or scripts
 		//       are requested, not for normal web page requests.   --RC 
 		pubbyNegotiator.addUserAgentOverride(null, "*/*", "text/turtle");
+
+		// MSIE (7.0) sends either */*, or */* with a list of other random types,
+		// but always without q values, so it doesn't provide any basis for
+		// actual negotiation. We will simply send HTML to MSIE, no matter what.
+		pubbyNegotiator.addUserAgentOverride(Pattern.compile("MSIE"), null, "text/html");
+
+		// Some versions of Safari send a broken "*/*" Accept header.
+		// We must override this to send HTML.
+		pubbyNegotiator.addUserAgentOverride(Pattern.compile("Safari/"), "*/*", "text/html");
 
 		pubbyNegotiator.addVariant("text/html;q=0.81")
 				.addAliasMediaType("application/xhtml+xml;q=0.81");
@@ -48,11 +52,11 @@ public class PubbyNegotiator {
 				.addAliasMediaType("text/turtle;q=0.5");
 		dataNegotiator.addVariant("text/plain;q=0.2");
 	}
-	
+
 	public static ContentTypeNegotiator getPubbyNegotiator() {
 		return pubbyNegotiator;
 	}
-	
+
 	public static ContentTypeNegotiator getDataNegotiator() {
 		return dataNegotiator;
 	}

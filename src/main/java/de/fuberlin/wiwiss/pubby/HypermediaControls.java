@@ -66,7 +66,7 @@ public class HypermediaControls {
 	 * (<code>conf:webBase + conf:webResourcePrefix</code>). Otherwise, it
 	 * will be its full absolute IRI with special characters escaped to make
 	 * it safe in constructing paths.
-	 * @return 
+	 * @return the path
 	 */
 	private String getPubbyPath() {
 		if (isHosted) {
